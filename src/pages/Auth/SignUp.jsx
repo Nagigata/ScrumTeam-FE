@@ -28,43 +28,17 @@ const validationSchema = Yup.object().shape({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
-  country: Yup.string().required("Country is required"),
-  birthday: Yup.date()
-    .required("Birthday is required")
-    .max(new Date(), "Birthday cannot be in the future"),
-  verificationCode: Yup.string().required("Verification Code is required"),
 });
 
 const SignUpForm = () => {
-  const [verificationSent, setVerificationSent] = useState(false);
   const [verificationError, setVerificationError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const sendVerificationCode = async (email) => {
-    setVerificationSent(false);
-    setVerificationError("");
-    // try {
-    //   const response = await checkCode(email);
-    //   if (response.status === 200) {
-    //     setVerificationSent(true);
-    //     navigate("/verificationCode");
-    //   }
-    // } catch (error) {
-    //   if (error.response) {
-    //     const message =
-    //       error.response.data?.message ||
-    //       "Verification failed. Please try again.";
-    //     setVerificationError(message);
-    //   } else {
-    //     setVerificationError("Network error. Please check your connection.");
-    //   }
-    // }
-  };
-
   const handleSubmit = async (values, { setSubmitting }) => {
-    setVerificationError("");
     setIsLoading(true);
+    setVerificationError("");
+    console.log(values.email, values.fullname, values.password);
     // try {
     //   const response = await signUp(
     //     values.verificationCode,
@@ -120,14 +94,11 @@ const SignUpForm = () => {
                 email: "",
                 password: "",
                 confirmPassword: "",
-                country: "",
-                birthday: "",
-                verificationCode: "",
               }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ errors, touched, isSubmitting, values }) => (
+              {({ errors, touched, isSubmitting }) => (
                 <Form>
                   <InputField
                     label="Full Name"

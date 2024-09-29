@@ -28,7 +28,7 @@ const SignInForm = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     setIsLoading(true);
     setErrorMessage("");
-
+    console.log(values.email, values.password);
     // try {
     //   const response = await signIn(values.email, values.password);
 
