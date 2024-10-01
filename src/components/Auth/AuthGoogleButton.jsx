@@ -19,7 +19,7 @@ const AuthGoogleButton = () => {
           alt="Google logo"
           className="w-5 h-5 mr-2"
         />
-        Sign up with Google
+        Sign in with Google
       </motion.button>
     </div>
   );

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import WavyDivider from "./WavyDivider";
+import { useNavigate } from "react-router-dom";
 
 const AuthSection = ({
   title,
@@ -7,6 +8,10 @@ const AuthSection = ({
   backgroundImage,
   isSignUp = false,
 }) => {
+  const navigate = useNavigate();
+  const handleLogoClick = () => {
+    navigate("/");
+  };
   return (
     <div
       className="w-1/2 p-12 text-white relative bg-cover bg-center flex flex-col justify-center items-center"
@@ -33,19 +38,20 @@ const AuthSection = ({
           }}
         >
           <img
-            src="/assets/logo.ico"
-            alt="Millennium Logo"
-            className="h-32 w-32 mx-auto"
+            src="/assets/logo.png"
+            alt="DevHunt Logo"
+            className="h-32 w-32 mx-auto cursor-pointer"
+            onClick={handleLogoClick}
           />
         </motion.div>
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-4xl font-bold mb-14 text-[#e1e2fe]"
+          className="text-4xl mb-14 text-[#e1e2fe]"
           style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}
         >
-          Millennium
+          <strong>Dev</strong>Hunt
         </motion.p>
         <motion.p
           initial={{ y: 20, opacity: 0 }}

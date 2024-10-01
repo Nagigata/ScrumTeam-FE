@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import SignInForm from "./pages/Auth/SignIn";
-import SignUpForm from "./pages/Auth/SignUp";
+import SignIn from "./pages/Auth/SignIn";
+import SignUp from "./pages/Auth/SignUp";
+import Home from "./pages/Home/Home";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -11,16 +12,13 @@ function App() {
       <Routes>
         <Route
           path="/login"
-          element={user ? <Navigate to="/" /> : <SignInForm />}
+          element={user ? <Navigate to="/" /> : <SignIn />}
         />
         <Route
-          path="/signup"
-          element={user ? <Navigate to="/" /> : <SignUpForm />}
+          path="/register"
+          element={user ? <Navigate to="/" /> : <SignUp />}
         />
-        <Route
-          path="/"
-          element={user ? <div>Home Page</div> : <Navigate to="/login" />}
-        />
+        <Route path="/" element={<Home />} />
       </Routes>
     </div>
   );
