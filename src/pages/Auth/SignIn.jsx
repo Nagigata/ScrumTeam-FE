@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
-// import { signIn } from "../../services/apiService";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import AuthSection from "../../components/Auth/AuthSection";
@@ -43,18 +42,17 @@ const SignIn = () => {
       });
 
       if (res.status === 200) {
+        localStorage.setItem("username", values.username);
         navigate("/");
       } else if (res.status === 400) {
-        const data = await res.json();
         setErrorMessage(
-          data.message || "Login failed. Please check your credentials."
+          "Login failed. Please check your username or password."
         );
       } else {
         setErrorMessage("Server error. Please try again later.");
       }
     } catch (error) {
       setErrorMessage("Network error. Please check your connection.");
-      //navigate("/");
     }
 
     setIsLoading(false);

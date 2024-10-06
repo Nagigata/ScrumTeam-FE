@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
-// import { signUp } from "../../services/apiService";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -59,8 +58,7 @@ const SignUp = () => {
         alert("Account created successfully!");
         navigate("/login");
       } else if (res.status === 400) {
-        const data = await res.json();
-        setErrorMessage(data.message || "Sign up failed. Please try again.");
+        setErrorMessage("Username or email already exists. Please try again.");
       } else {
         setErrorMessage("Server error. Please try again later.");
       }
