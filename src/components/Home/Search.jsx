@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 
 const Search = () => {
+  const [sortValue, setSortValue] = useState("");
+
+  const handleSortChange = (event) => {
+    setSortValue(event.target.value);
+    // Thực hiện chức năng sắp xếp ở đây
+    console.log("Selected sort value:", event.target.value);
+  };
   return (
     <div className="searchDiv grid gap-10 bg-greyIsh rounded-[10px] p-[3rem]">
       <form action="">
@@ -53,6 +60,8 @@ const Search = () => {
             name=""
             id="relevance"
             className=" bg-white rounded-[3px] px-4 py-1"
+            value={sortValue}
+            onChange={handleSortChange}
           >
             <option value="">Relevance</option>
             <option value="">Inclusive</option>
@@ -69,6 +78,8 @@ const Search = () => {
             name=""
             id="type"
             className=" bg-white rounded-[3px] px-4 py-1"
+            value={sortValue}
+            onChange={handleSortChange}
           >
             <option value="">Full-Time</option>
             <option value="">Part-Time</option>
@@ -84,6 +95,8 @@ const Search = () => {
             name=""
             id="level"
             className=" bg-white rounded-[3px] px-4 py-1"
+            value={sortValue}
+            onChange={handleSortChange}
           >
             <option value="">Senior</option>
             <option value="">Junior</option>

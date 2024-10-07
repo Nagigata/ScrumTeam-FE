@@ -1,9 +1,8 @@
 import React from "react";
-import NavBar from "../../components/Home/NavBar";
+import { Routes, Route } from "react-router-dom";
 import Search from "../../components/Home/Search";
 import Job from "../../components/Home/Job";
 import Value from "../../components/Home/Value";
-import Footer from "../../components/Home/Footer";
 import { motion } from "framer-motion";
 
 const Home = () => {
@@ -14,7 +13,6 @@ const Home = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <NavBar />
       <Search />
       <motion.div
         initial={{ opacity: 0, x: -50 }}
@@ -30,7 +28,6 @@ const Home = () => {
       >
         <Value />
       </motion.div>
-      <Footer />
     </motion.div>
   );
 };
