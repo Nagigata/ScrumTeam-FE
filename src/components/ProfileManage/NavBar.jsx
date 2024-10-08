@@ -24,6 +24,9 @@ const NavBar = () => {
       </div>
 
       <div className="menu flex gap-8">
+        <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+          <Link to="/">Home</Link> 
+        </li>
         <li className="menuList text-[#6f6f6f] hover:text-blueColor">Jobs</li>
         <li className="menuList text-[#6f6f6f] hover:text-blueColor">
           Companies
@@ -40,9 +43,9 @@ const NavBar = () => {
             <li className="menuList text-[#6f6f6f] hover:text-red-600">
               <button
                 onClick={() => {
-                  navigate('/login');
-                  localStorage.removeItem("username");
-                  setUsername(null);
+                    navigate('/login');
+                    localStorage.removeItem("username");
+                    setUsername(null);
                 }}
               >
                 <LoginOutlinedIcon className="mr-1" /> Logout
