@@ -42,8 +42,15 @@ const SignIn = () => {
       });
 
       if (res.status === 200) {
+        const data = await res.json();
         localStorage.setItem("username", values.username);
-        navigate("/");
+        localStorage.setItem("userRole", "recruiter");
+        window.location.href = "/recruiter";
+        // if (data.role === "recruiter") {
+        //   window.location.href = "/recruiter";
+        // } else {
+        //   // navigate("/");
+        // }
       } else if (res.status === 400) {
         setErrorMessage(
           "Login failed. Please check your username or password."
