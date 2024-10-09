@@ -2,33 +2,30 @@ import React from "react";
 import { Formik, Form } from "formik";
 import InputField from "../../components/Auth/InputField";
 import AuthButton from "../../components/Auth/AuthButton";
-import { AccountCircle, Email as MailIcon, Phone as PhoneIcon, PhotoCamera as CameraIcon } from "@mui/icons-material";
+import { AccountCircle, Phone as PhoneIcon, PhotoCamera as CameraIcon } from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';
-import NavBar from "../../components/ProfileManage/NavBar"; 
+import NavBar from "../../components/ProfileManage/NavBar";
 
 const Candidate = () => {
   const initialValues = {
-    avatar: null,
-    avatarPreview: '',
-    username: '',
-    email: '',
-    sdt: '',
+    full_name: '',
+    is_male: true, // Mặc định là true
+    phone_number: '',
+    avatar: null, // Tệp avatar
+    avatarPreview: '', // Để hiển thị trước avatar
   };
 
-  const handleEdit = (values) => {
-    console.log("Editing info", values);
+  const handleSubmit = (values) => {
+    console.log("Form Values:", values); // Tạm thời chỉ log ra giá trị form
   };
 
   return (
     <div>
-      <NavBar /> 
+      <NavBar />
       <div className="max-w-md mx-auto p-4">
         <h2 className="text-2xl font-bold text-center mb-8">Candidate Information</h2>
-        
-        <Formik
-          initialValues={initialValues}
-          onSubmit={handleEdit}
-        >
+
+        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
           {({ errors, touched, setFieldValue, values }) => (
             <Form>
               {/* Upload Avatar với Biểu Tượng Camera */}
@@ -77,55 +74,50 @@ const Candidate = () => {
               </div>
 
               <InputField
-                label="Username"
-                name="username"
+                label="Full Name"
+                name="full_name"
                 type="text"
-                placeholder="Enter username"
+                placeholder="Enter full name"
                 icon={AccountCircle}
-                errors={errors} 
-                touched={touched}
-              />
-
-              <InputField
-                label="Email"
-                name="email"
-                type="email"
-                placeholder="Enter email"
-                icon={MailIcon}
-                errors={errors} 
+                errors={errors}
                 touched={touched}
               />
 
               <InputField
                 label="Phone Number"
-                name="sdt"
+                name="phone_number"
                 type="tel"
                 placeholder="Enter phone number"
                 icon={PhoneIcon}
-                errors={errors} 
+                errors={errors}
                 touched={touched}
               />
 
-              <div className="flex flex-col mt-4 space-y-2">
-                <div className="flex justify-between space-x-2">
-                  <AuthButton
-                    label="Save Information"
-                    type="submit"
-                    className="flex-1" // Để nút chiếm không gian đều
+              {/* Checkbox cho Giới tính */}
+              <div className="mb-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="is_male"
+                    className="mr-2"
+                    checked={values.is_male}
+                    onChange={() => setFieldValue("is_male", !values.is_male)}
+                    style={{
+                      width: "14px", 
+                      height: "14px", 
+                      transform: "scale(1.5)", 
+                    }}
                   />
-                  <AuthButton
-                    label="Change Password"
-                    onClick={() => console.log("Change Password")}
-                    className="flex-1" 
-                  />
-                </div>
-                <AuthButton
-                  label="Delete Account"
-                  onClick={() => console.log("Delete Account")}
-                  style={{ backgroundColor: 'red' }}
-                  className="mt-2" 
-                />
+                  Is Male
+                </label>
               </div>
+
+              {/* Button Save Information */}
+              <AuthButton
+                label="Save Information"
+                type="submit"
+                className="w-full"
+              />
             </Form>
           )}
         </Formik>

@@ -4,6 +4,7 @@ import SignIn from "./pages/Auth/SignIn";
 import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Home/Home";
 import Candidate from "./pages/ProfileManage/Candidate";
+import Company from "./pages/ProfileManage/Company";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -25,6 +26,7 @@ function App() {
           element={user ? <Candidate /> : <Navigate to="/login" />}
         /> */}
         <Route path="/candidate" element={<Candidate />} />
+        <Route path="/company" element={<Company />} />
       </Routes>
     </div>
   );

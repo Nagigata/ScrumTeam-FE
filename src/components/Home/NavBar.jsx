@@ -35,7 +35,8 @@ const NavBar = () => {
         {username ? (
           <>
             <li className="menuList text-[#6f6f6f] hover:text-blueColor">
-              <Link to="/candidate">Welcome, {username} !!</Link>
+              {/* <Link to="/candidate">Welcome, {username} !!</Link> */}
+              <Link to="/company">Welcome, {username} !!</Link>
             </li>
             <li className="menuList text-[#6f6f6f] hover:text-red-600">
               <button
