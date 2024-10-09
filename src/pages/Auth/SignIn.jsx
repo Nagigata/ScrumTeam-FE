@@ -8,7 +8,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import AuthSection from "../../components/Auth/AuthSection";
 import InputField from "../../components/Auth/InputField";
 import AuthButton from "../../components/Auth/AuthButton";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import GoogleLoginButton from "./GoogleLoginButton";
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string()
@@ -45,12 +47,9 @@ const SignIn = () => {
         const data = await res.json();
         localStorage.setItem("username", values.username);
         localStorage.setItem("userRole", "recruiter");
+        Cookies.set("access_token", data.access, { expires: 7 });
+        Cookies.set("refresh_token", data.refresh, { expires: 7 });
         window.location.href = "/recruiter";
-        // if (data.role === "recruiter") {
-        //   window.location.href = "/recruiter";
-        // } else {
-        //   // navigate("/");
-        // }
       } else if (res.status === 400) {
         setErrorMessage(
           "Login failed. Please check your username or password."
@@ -66,43 +65,6 @@ const SignIn = () => {
     setSubmitting(false);
   };
 
-  const handleGoogleLoginSuccess = async (credentialResponse) => {
-    const token = credentialResponse.credential;
-    console.log(token);
-    setErrorMessage("");
-
-    const apiURL = process.env.REACT_APP_API_URL + "/user/google/";
-    try {
-      const res = await fetch(apiURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token_google: token }),
-      });
-
-      if (res.status === 200) {
-        const data = await res.json();
-        if (data.is_first_login) {
-          navigate("/login");
-        } else {
-          navigate("/");
-        }
-      } else {
-        const errorData = await res.json();
-        setErrorMessage(
-          errorData.message || "Google login failed. Please try again."
-        );
-      }
-    } catch (error) {
-      setErrorMessage("Network error. Please check your connection.");
-    }
-  };
-
-  const handleGoogleLoginFailure = (error) => {
-    setErrorMessage("Google login failed. Please try again.");
-  };
-
   return (
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
       <div className="flex h-screen bg-[#e6f9f3]">
@@ -114,14 +76,12 @@ const SignIn = () => {
           style={{ width: "70vw", height: "80vh" }}
         >
           <div className="flex w-full h-full">
-            {/* Left section */}
             <AuthSection
               title="WELCOME TO"
               description="Sign in to explore job opportunities, connect with top companies, and take the next step in your IT career."
               backgroundImage="/assets/bg-login.png"
             />
 
-            {/* Right section */}
             <div className="w-1/2 p-12 overflow-y-auto">
               <h2 className="text-3xl font-bold mb-8 text-blueColor">
                 Login to your account
@@ -168,33 +128,17 @@ const SignIn = () => {
                         </span>
                       </label>
                     </div>
-                    <div className="flex flex-col space-y-4">
+                    <div className="space-y-4">
                       <AuthButton
                         label="Sign in"
                         isLoading={isLoading}
                         isSubmitting={isSubmitting}
                       />
-                      <div className="relative flex py-3 items-center">
-                        <div className="flex-grow border-t border-gray-300"></div>
-                        <span className="flex-shrink mx-4 text-gray-600">
-                          Or
-                        </span>
-                        <div className="flex-grow border-t border-gray-300"></div>
-                      </div>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center justify-center transition duration-200"
-                        type="button"
-                      >
-                        <GoogleLogin
-                          onSuccess={handleGoogleLoginSuccess}
-                          onFailure={handleGoogleLoginFailure}
-                          ux_mode="popup"
-                          locale="en"
-                          useOneTap="true"
-                        />
-                      </motion.button>
+                      <GoogleLoginButton
+                        onLoginSuccess={navigate}
+                        setErrorMessage={setErrorMessage}
+                        setIsLoading={setIsLoading}
+                      />
                     </div>
                   </Form>
                 )}

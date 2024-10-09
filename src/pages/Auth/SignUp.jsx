@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AuthSection from "../../components/Auth/AuthSection";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import RoleSelect from "./RoleSelect";
 import UserSignUp from "./UserSignUp";
 import RecruiterSignUp from "./RecruiterSignUp";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -51,43 +52,6 @@ const SignUp = () => {
 
     setIsLoading(false);
     setSubmitting(false);
-  };
-
-  const handleGoogleLoginSuccess = async (credentialResponse) => {
-    const token = credentialResponse.credential;
-    console.log(token);
-    setErrorMessage("");
-
-    const apiURL = process.env.REACT_APP_API_URL + "/user/google/";
-    try {
-      const res = await fetch(apiURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token_google: token }),
-      });
-
-      if (res.status === 200) {
-        const data = await res.json();
-        if (data.is_first_login) {
-          navigate("/login");
-        } else {
-          navigate("/");
-        }
-      } else {
-        const errorData = await res.json();
-        setErrorMessage(
-          errorData.message || "Google login failed. Please try again."
-        );
-      }
-    } catch (error) {
-      setErrorMessage("Network error. Please check your connection.");
-    }
-  };
-
-  const handleGoogleLoginFailure = (error) => {
-    setErrorMessage("Google login failed. Please try again.");
   };
 
   return (
@@ -135,27 +99,14 @@ const SignUp = () => {
                       isSubmitting={isLoading}
                     />
                   )}
-                  <div className="flex flex-col space-y-4">
-                    <div className="relative flex pt-8 pb-3 items-center">
-                      <div className="flex-grow border-t border-gray-300"></div>
-                      <span className="flex-shrink mx-4 text-gray-600">Or</span>
-                      <div className="flex-grow border-t border-gray-300"></div>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex items-center justify-center transition duration-200"
-                    >
-                      <GoogleLogin
-                        onSuccess={handleGoogleLoginSuccess}
-                        onFailure={handleGoogleLoginFailure}
-                        ux_mode="popup"
-                        locale="en"
-                        useOneTap="true"
-                      />
-                    </motion.button>
+                  <div className="mt-4">
+                    <GoogleLoginButton
+                      onLoginSuccess={navigate}
+                      setErrorMessage={setErrorMessage}
+                      setIsLoading={setIsLoading}
+                    />
                   </div>
-                  <p className="mt-6 text-sm text-gray-500 text-center">
+                  <div className="mt-6 text-sm text-gray-500 text-center">
                     Already have an account?{" "}
                     <motion.a
                       whileHover={{ scale: 1.05 }}
@@ -164,7 +115,7 @@ const SignUp = () => {
                     >
                       <Link to="/login">Log In</Link>
                     </motion.a>
-                  </p>
+                  </div>
                 </>
               )}
             </div>

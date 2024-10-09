@@ -84,7 +84,7 @@ const RecruiterSignUp = ({
           {errorMessage && (
             <div className="mb-4 mt-4 text-red-500 text-sm">{errorMessage}</div>
           )}
-          <div className="flex flex-col space-y-4 pt-3">
+          <div className="space-y-4 pt-3">
             <AuthButton
               label="Sign up"
               isLoading={isLoading}

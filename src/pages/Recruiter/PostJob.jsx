@@ -9,6 +9,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Recruiter/Header";
+import Cookies from "js-cookie";
 
 const initialValues = {
   jobTitle: "",
@@ -59,9 +60,48 @@ const jobLevels = [
 const PostJob = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
-    // Here you would typically send the data to your backend
+  const handleFormSubmit = async (
+    values,
+    { setSubmitting, setErrorMessage }
+  ) => {
+    const apiURL = process.env.REACT_APP_API_URL + "/job/post-recruitment/";
+    const accessToken = Cookies.get("access_token");
+    console.log(accessToken);
+
+    try {
+      const res = await fetch(apiURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          jobTitle: values.jobTitle,
+          jobType: values.jobType,
+          jobLevel: values.jobLevel,
+          jobDescription: values.jobDescription,
+          workLocation: values.workLocation,
+          applicationStartDate: values.applicationStartDate,
+          applicationEndDate: values.applicationEndDate,
+          salary: values.salary,
+        }),
+      });
+
+      if (res.status === 201) {
+        const data = await res.json();
+        console.log("Post successful", data);
+      } else if (res.status === 400) {
+        setErrorMessage("Error occurred while posting the job.");
+      } else if (res.status === 401) {
+        setErrorMessage("Unauthorized request. Please login again.");
+      } else {
+        setErrorMessage("Server error. Please try again later.");
+      }
+    } catch (error) {
+      setErrorMessage("Network error. Please check your connection.");
+    }
+
+    setSubmitting(false);
   };
 
   return (

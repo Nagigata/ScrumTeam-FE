@@ -4,11 +4,18 @@ import SignIn from "./pages/Auth/SignIn";
 import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Home/Home";
 import Recruiter from "./AppRecruiter";
+import Cookies from "js-cookie";
 
 function App() {
   const user = localStorage.getItem("username");
   const userRole = localStorage.getItem("userRole");
+  const accessToken = Cookies.get("access_token");
+  const refresh_token = Cookies.get("access_token");
+  console.log(accessToken);
+  console.log(refresh_token);
 
+  console.log(user);
+  console.log(userRole);
   return (
     <div className="App">
       <Routes>
