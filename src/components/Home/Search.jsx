@@ -4,17 +4,67 @@ import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 
-const Search = () => {
-  const [sortValue, setSortValue] = useState("");
+const Search = ({ onSearch, onCompanySearch, onLocationSearch, onSortChange, onTypeChange, onLevelChange, onClearAll }) => {
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [companyKeyword, setCompanyKeyword] = useState("");
+  const [locationKeyword, setLocationKeyword] = useState("");
+  const [sortValue, setSortValue] = useState("relevance");
+  const [typeValue, setTypeValue] = useState("fullTime");
+  const [levelValue, setLevelValue] = useState("senior");
+
+  const handleInputChange = (event) => {
+    setSearchKeyword(event.target.value);
+  };
+
+  const handleCompanyInputChange = (event) => {
+    setCompanyKeyword(event.target.value);
+  };
+
+  const handleLocationInputChange = (event) => {
+    setLocationKeyword(event.target.value);
+  };
 
   const handleSortChange = (event) => {
     setSortValue(event.target.value);
-    // Thực hiện chức năng sắp xếp ở đây
-    console.log("Selected sort value:", event.target.value);
+    onSortChange(event.target.value);
   };
+
+  const handleTypeChange = (event) => {
+    setTypeValue(event.target.value);
+    onTypeChange(event.target.value);
+  };
+
+  const handleLevelChange = (event) => {
+    setLevelValue(event.target.value);
+    onLevelChange(event.target.value);
+  };
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    onSearch(searchKeyword);
+    onCompanySearch(companyKeyword);
+    onLocationSearch(locationKeyword);
+  };
+
+  const handleClearAll = () => {
+    setSearchKeyword("");
+    setCompanyKeyword("");
+    setLocationKeyword("");
+    setSortValue("relevance");
+    setTypeValue("fullTime");
+    setLevelValue("senior");
+    onSearch("");
+    onCompanySearch("");
+    onLocationSearch("");
+    onSortChange("relevance");
+    onTypeChange("fullTime");
+    onLevelChange("senior");
+    onClearAll();
+  };
+
   return (
     <div className="searchDiv grid gap-10 bg-greyIsh rounded-[10px] p-[3rem]">
-      <form action="">
+      <form onSubmit={handleSearch}>
         <div className="firstDiv flex justify-between items-center rounded-[8px] gap-[10px] bg-white p-5 shadow-lg shadow-greyIsh-700">
           <div className="flex gap-2 items-center">
             <SearchOutlinedIcon className="text-[25px] icon" />
@@ -22,16 +72,20 @@ const Search = () => {
               type="text"
               className="bg-transparent text-[#535ac8] focus:outline-none w-[100%]"
               placeholder="Search Job Here...."
+              value={searchKeyword}
+              onChange={handleInputChange}
             />
             <HighlightOffOutlinedIcon className="text-[30px] text-[#a5a6a6] hover:text-textColor icon" />
           </div>
 
-          <div className="flex gap-2   items-center">
+          <div className="flex gap-2 items-center">
             <BusinessOutlinedIcon className="text-[25px] icon" />
             <input
               type="text"
               className="bg-transparent text-[#535ac8] focus:outline-none w-[100%]"
               placeholder="Search by company...."
+              value={companyKeyword}
+              onChange={handleCompanyInputChange}
             />
             <HighlightOffOutlinedIcon className="text-[30px] text-[#a5a6a6] hover:text-textColor icon" />
           </div>
@@ -42,6 +96,8 @@ const Search = () => {
               type="text"
               className="bg-transparent text-[#535ac8] focus:outline-none w-[100%]"
               placeholder="Search by location...."
+              value={locationKeyword}
+              onChange={handleLocationInputChange}
             />
             <HighlightOffOutlinedIcon className="text-[30px] text-[#a5a6a6] hover:text-textColor icon" />
           </div>
@@ -57,16 +113,16 @@ const Search = () => {
             Sort by:
           </label>
           <select
-            name=""
-            id="relevance"
+            name="sort"
+            id="sort"
             className=" bg-white rounded-[3px] px-4 py-1"
             value={sortValue}
             onChange={handleSortChange}
           >
-            <option value="">Relevance</option>
-            <option value="">Inclusive</option>
-            <option value="">Start With</option>
-            <option value="">Contains</option>
+            <option value="relevance">Relevance</option>
+            <option value="inclusive">Inclusive</option>
+            <option value="startWith">Start With</option>
+            <option value="contains">Contains</option>
           </select>
         </div>
 
@@ -75,15 +131,15 @@ const Search = () => {
             Type:
           </label>
           <select
-            name=""
+            name="type"
             id="type"
             className=" bg-white rounded-[3px] px-4 py-1"
-            value={sortValue}
-            onChange={handleSortChange}
+            value={typeValue}
+            onChange={handleTypeChange}
           >
-            <option value="">Full-Time</option>
-            <option value="">Part-Time</option>
-            <option value="">Contract</option>
+            <option value="fullTime">Full-Time</option>
+            <option value="partTime">Part-Time</option>
+            <option value="contract">Contract</option>
           </select>
         </div>
 
@@ -92,19 +148,19 @@ const Search = () => {
             Level:
           </label>
           <select
-            name=""
+            name="level"
             id="level"
             className=" bg-white rounded-[3px] px-4 py-1"
-            value={sortValue}
-            onChange={handleSortChange}
+            value={levelValue}
+            onChange={handleLevelChange}
           >
-            <option value="">Senior</option>
-            <option value="">Junior</option>
-            <option value="">Fresher</option>
-            <option value="">Intern</option>
+            <option value="senior">Senior</option>
+            <option value="junior">Junior</option>
+            <option value="fresher">Fresher</option>
+            <option value="intern">Intern</option>
           </select>
         </div>
-        <span className="text-[#a1a1a1] cursor-pointer">Clear All</span>
+        <span className="text-[#a1a1a1] cursor-pointer" onClick={handleClearAll}>Clear All</span>
       </div>
     </div>
   );
