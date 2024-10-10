@@ -1,104 +1,126 @@
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
   TextField,
   MenuItem,
-  InputAdornment,
+  FormControlLabel,
+  Switch,
+  Paper,
+  Typography,
+  Divider,
+  useTheme,
 } from "@mui/material";
-import { Formik } from "formik";
+import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Recruiter/Header";
 import Cookies from "js-cookie";
+import { tokens } from "../../theme";
 
 const initialValues = {
-  jobTitle: "",
-  jobType: "",
-  jobLevel: "",
-  jobDescription: "",
-  workLocation: "",
-  applicationStartDate: "",
-  applicationEndDate: "",
-  salary: "",
+  job_category: "",
+  title: "",
+  description: "",
+  skill_required: "",
+  benefits: "",
+  location: "",
+  min_salary: "",
+  max_salary: "",
+  status: true,
+  level: "",
+  experience: "",
+  interview_process: "",
 };
 
 const jobSchema = yup.object().shape({
-  jobTitle: yup.string().required("Required"),
-  jobType: yup.string().required("Required"),
-  jobLevel: yup.string().required("Required"),
-  jobDescription: yup.string().required("Required"),
-  workLocation: yup.string().required("Required"),
-  applicationStartDate: yup.date().required("Required"),
-  applicationEndDate: yup
-    .date()
-    .min(yup.ref("applicationStartDate"), "End date must be after start date")
-    .required("Required"),
-  salary: yup
+  job_category: yup.string().required("Required"),
+  title: yup.string().required("Required"),
+  description: yup.string().required("Required"),
+  skill_required: yup.string().required("Required"),
+  benefits: yup.string().required("Required"),
+  location: yup.string().required("Required"),
+  min_salary: yup
     .number()
-    .positive("Must be a positive number")
+    .positive("Minimum salary must be a positive number")
     .required("Required"),
+  max_salary: yup
+    .number()
+    .positive("Maximum salary must be a positive number")
+    .test(
+      "is-greater-than-min",
+      "Maximum salary must be greater than minimum salary",
+      function (value) {
+        return value > this.parent.min_salary;
+      }
+    )
+    .required("Required"),
+  status: yup.boolean(),
+  level: yup.string().required("Required"),
+  experience: yup.string().required("Required"),
+  interview_process: yup.string().required("Required"),
 });
 
-const jobTypes = [
-  "Full-time",
-  "Part-time",
-  "Contract",
-  "Temporary",
-  "Internship",
-];
-
-const jobLevels = [
-  "Entry Level",
-  "Junior",
-  "Mid-Level",
-  "Senior",
-  "Lead",
-  "Manager",
-  "Executive",
-];
+const levels = ["Entry", "Junior", "Middle", "Senior", "Lead"];
 
 const PostJob = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const [jobCategories, setJobCategories] = useState([]);
 
-  const handleFormSubmit = async (
-    values,
-    { setSubmitting, setErrorMessage }
-  ) => {
+  useEffect(() => {
+    fetchJobCategories();
+  }, []);
+
+  const fetchJobCategories = async () => {
+    const apiURL =
+      process.env.REACT_APP_API_URL + "/job/get-all-job-categories/";
+    try {
+      const res = await fetch(apiURL, {
+        method: "GET",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch job categories");
+      }
+      const data = await res.json();
+      setJobCategories(data);
+    } catch (error) {
+      console.error("Error fetching job categories:", error);
+    }
+  };
+
+  const handleFormSubmit = async (values, { setSubmitting, setStatus }) => {
     const apiURL = process.env.REACT_APP_API_URL + "/job/post-recruitment/";
     const accessToken = Cookies.get("access_token");
-    console.log(accessToken);
+    const confirmValues = {
+      ...values,
+      salary_range: `${values.min_salary}-${values.max_salary} USD`,
+    };
+    delete confirmValues.min_salary;
+    delete confirmValues.max_salary;
 
     try {
       const res = await fetch(apiURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          jobTitle: values.jobTitle,
-          jobType: values.jobType,
-          jobLevel: values.jobLevel,
-          jobDescription: values.jobDescription,
-          workLocation: values.workLocation,
-          applicationStartDate: values.applicationStartDate,
-          applicationEndDate: values.applicationEndDate,
-          salary: values.salary,
-        }),
+        body: JSON.stringify(confirmValues),
       });
 
+      const data = await res.json();
+
       if (res.status === 201) {
-        const data = await res.json();
-        console.log("Post successful", data);
-      } else if (res.status === 400) {
-        setErrorMessage("Error occurred while posting the job.");
-      } else if (res.status === 401) {
-        setErrorMessage("Unauthorized request. Please login again.");
+        setStatus({ success: "Job posted successfully!" });
       } else {
-        setErrorMessage("Server error. Please try again later.");
+        setStatus({
+          error: data.message || "An error occurred while posting the job.",
+        });
       }
     } catch (error) {
-      setErrorMessage("Network error. Please check your connection.");
+      setStatus({ error: "Network error. Please check your connection." });
     }
 
     setSubmitting(false);
@@ -107,175 +129,224 @@ const PostJob = () => {
   return (
     <Box m="20px">
       <Header title="POST JOB" subtitle="Create a New Job Posting" />
-
-      <Formik
-        onSubmit={handleFormSubmit}
-        initialValues={initialValues}
-        validationSchema={jobSchema}
+      <Paper
+        elevation={3}
+        sx={{ p: 4, mt: 4, backgroundColor: colors.primary[400] }}
       >
-        {({
-          values,
-          errors,
-          touched,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-        }) => (
-          <form onSubmit={handleSubmit}>
-            <Box
-              display="grid"
-              gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-              }}
-            >
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Job Title"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.jobTitle}
-                name="jobTitle"
-                error={!!touched.jobTitle && !!errors.jobTitle}
-                helperText={touched.jobTitle && errors.jobTitle}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                select
-                label="Job Type"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.jobType}
-                name="jobType"
-                error={!!touched.jobType && !!errors.jobType}
-                helperText={touched.jobType && errors.jobType}
-                sx={{ gridColumn: "span 2" }}
-              >
-                {jobTypes.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                fullWidth
-                variant="filled"
-                select
-                label="Job Level"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.jobLevel}
-                name="jobLevel"
-                error={!!touched.jobLevel && !!errors.jobLevel}
-                helperText={touched.jobLevel && errors.jobLevel}
-                sx={{ gridColumn: "span 2" }}
-              >
-                {jobLevels.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Work Location"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.workLocation}
-                name="workLocation"
-                error={!!touched.workLocation && !!errors.workLocation}
-                helperText={touched.workLocation && errors.workLocation}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="number"
-                label="Salary"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.salary}
-                name="salary"
-                error={!!touched.salary && !!errors.salary}
-                helperText={touched.salary && errors.salary}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ),
-                }}
-                inputProps={{
-                  step: 100,
-                }}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Job Description"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.jobDescription}
-                name="jobDescription"
-                error={!!touched.jobDescription && !!errors.jobDescription}
-                helperText={touched.jobDescription && errors.jobDescription}
-                multiline
-                rows={4}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="date"
-                label="Application Start Date"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.applicationStartDate}
-                name="applicationStartDate"
-                error={
-                  !!touched.applicationStartDate &&
-                  !!errors.applicationStartDate
-                }
-                helperText={
-                  touched.applicationStartDate && errors.applicationStartDate
-                }
-                InputLabelProps={{ shrink: true }}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="date"
-                label="Application End Date"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.applicationEndDate}
-                name="applicationEndDate"
-                error={
-                  !!touched.applicationEndDate && !!errors.applicationEndDate
-                }
-                helperText={
-                  touched.applicationEndDate && errors.applicationEndDate
-                }
-                InputLabelProps={{ shrink: true }}
-                sx={{ gridColumn: "span 2" }}
-              />
-            </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
-                Post Job
-              </Button>
-            </Box>
-          </form>
-        )}
-      </Formik>
+        <Formik
+          onSubmit={handleFormSubmit}
+          initialValues={initialValues}
+          validationSchema={jobSchema}
+        >
+          {({ errors, touched, values, status, handleChange }) => (
+            <Form>
+              <Box display="flex" flexDirection="column" gap={3}>
+                <Typography variant="h5" gutterBottom fontWeight="bold">
+                  Job Details
+                </Typography>
+                <Divider
+                  sx={{
+                    borderBottomWidth: 3,
+                    borderColor: colors.grey[100],
+                  }}
+                />
+                <Box
+                  display="flex"
+                  flexDirection={isNonMobile ? "row" : "column"}
+                  gap={3}
+                >
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    select
+                    variant="filled"
+                    label="Job Category"
+                    name="job_category"
+                    error={touched.job_category && errors.job_category}
+                    helperText={touched.job_category && errors.job_category}
+                  >
+                    {jobCategories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.title}
+                      </MenuItem>
+                    ))}
+                  </Field>
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    variant="filled"
+                    label="Job Title"
+                    name="title"
+                    error={touched.title && errors.title}
+                    helperText={touched.title && errors.title}
+                  />
+                </Box>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  variant="filled"
+                  label="Description"
+                  name="description"
+                  multiline
+                  rows={4}
+                  error={touched.description && errors.description}
+                  helperText={touched.description && errors.description}
+                />
+                <Box
+                  display="flex"
+                  flexDirection={isNonMobile ? "row" : "column"}
+                  gap={3}
+                >
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    variant="filled"
+                    label="Skills Required"
+                    name="skill_required"
+                    multiline
+                    error={touched.skill_required && errors.skill_required}
+                    helperText={touched.skill_required && errors.skill_required}
+                  />
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    variant="filled"
+                    label="Benefits"
+                    name="benefits"
+                    multiline
+                    error={touched.benefits && errors.benefits}
+                    helperText={touched.benefits && errors.benefits}
+                  />
+                </Box>
+                <Typography variant="h5" gutterBottom fontWeight="bold">
+                  Job Requirements
+                </Typography>
+                <Divider
+                  sx={{
+                    borderBottomWidth: 3,
+                    borderColor: colors.grey[100],
+                  }}
+                />
+                <Box
+                  display="flex"
+                  flexDirection={isNonMobile ? "row" : "column"}
+                  gap={3}
+                >
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    variant="filled"
+                    label="Location"
+                    name="location"
+                    error={touched.location && errors.location}
+                    helperText={touched.location && errors.location}
+                  />
+                  <Field
+                    as={TextField}
+                    select
+                    fullWidth
+                    variant="filled"
+                    label="Level"
+                    name="level"
+                    error={touched.level && errors.level}
+                    helperText={touched.level && errors.level}
+                  >
+                    {levels.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </Field>
+                </Box>
+                <Box
+                  display="flex"
+                  flexDirection={isNonMobile ? "row" : "column"}
+                  gap={3}
+                >
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    variant="filled"
+                    label="Minimum Salary"
+                    name="min_salary"
+                    type="number"
+                    error={touched.min_salary && errors.min_salary}
+                    helperText={touched.min_salary && errors.min_salary}
+                    inputProps={{ min: "0" }}
+                  />
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    variant="filled"
+                    label="Maximum Salary"
+                    name="max_salary"
+                    type="number"
+                    error={touched.max_salary && errors.max_salary}
+                    helperText={touched.max_salary && errors.max_salary}
+                    inputProps={{ min: "0" }}
+                  />
+                </Box>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  variant="filled"
+                  label="Experience"
+                  name="experience"
+                  error={touched.experience && errors.experience}
+                  helperText={touched.experience && errors.experience}
+                />
+                <Field
+                  as={TextField}
+                  fullWidth
+                  variant="filled"
+                  label="Interview Process"
+                  name="interview_process"
+                  multiline
+                  rows={3}
+                  error={touched.interview_process && errors.interview_process}
+                  helperText={
+                    touched.interview_process && errors.interview_process
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={values.status}
+                      onChange={handleChange}
+                      name="status"
+                    />
+                  }
+                  label="Job Status"
+                />
+              </Box>
+              {status && status.error && (
+                <Box color="error.main" mt={2} textAlign="center">
+                  {status.error}
+                </Box>
+              )}
+              {status && status.success && (
+                <Box color="success.main" mt={2} textAlign="center">
+                  {status.success}
+                </Box>
+              )}
+              <Box display="flex" justifyContent="center" mt="20px">
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  sx={{
+                    width: "200px",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Post Job
+                </Button>
+              </Box>
+            </Form>
+          )}
+        </Formik>
+      </Paper>
     </Box>
   );
 };

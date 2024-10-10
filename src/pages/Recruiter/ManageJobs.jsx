@@ -1,50 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, IconButton, Tooltip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useTheme,
+  IconButton,
+  Tooltip,
+  Chip,
+} from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Recruiter/Header";
-import DeleteJob from "../../components/Recruiter/DeleteJob";
 import EditJob from "../../components/Recruiter/EditJob";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-
-const mockJobs = [
-  {
-    id: 1,
-    title: "Software Engineer",
-    type: "Full-time",
-    level: "Mid-Level",
-    location: "New York",
-    salary: 95000,
-    applicationStartDate: "2024-05-15",
-    applicationEndDate: "2024-06-15",
-    description:
-      "We are seeking a talented Software Engineer to join our team...",
-  },
-  {
-    id: 2,
-    title: "Data Analyst",
-    type: "Part-time",
-    level: "Junior",
-    location: "Remote",
-    salary: 65000,
-    applicationStartDate: "2024-06-01",
-    applicationEndDate: "2024-07-01",
-    description:
-      "Join our data team to help analyze and interpret complex data sets...",
-  },
-  {
-    id: 3,
-    title: "UX Designer",
-    type: "Contract",
-    level: "Senior",
-    location: "San Francisco",
-    salary: 110000,
-    applicationStartDate: "2024-05-20",
-    applicationEndDate: "2024-06-20",
-    description:
-      "We're looking for an experienced UX Designer to create intuitive and engaging user experiences...",
-  },
-];
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import Cookies from "js-cookie";
 
 const ManageJobs = () => {
   const theme = useTheme();
@@ -52,38 +20,131 @@ const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [status, setStatus] = useState(null);
 
   useEffect(() => {
-    setJobs(mockJobs);
+    fetchJobs();
   }, []);
 
+  const fetchJobs = async () => {
+    const apiURL = process.env.REACT_APP_API_URL + "/job/job-list-of-company/";
+    const accessToken = Cookies.get("access_token");
+
+    try {
+      const res = await fetch(apiURL, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setJobs(data);
+      } else {
+        setStatus({ error: "Failed to fetch jobs. Please try again." });
+      }
+    } catch (error) {
+      setStatus({ error: "Network error. Please check your connection." });
+    }
+  };
+
   const handleEdit = (job) => {
-    setSelectedJob(job);
+    const jobForEdit = {
+      ...job,
+      job_category: job.job_category.id,
+    };
+    setSelectedJob(jobForEdit);
     setIsEditDialogOpen(true);
   };
 
-  const handleSaveJob = (updatedJob) => {
-    setJobs(jobs.map((job) => (job.id === updatedJob.id ? updatedJob : job)));
-    setIsEditDialogOpen(false);
-    setSelectedJob(null);
+  const handleUpdatedJob = async (updatedJob) => {
+    const apiURL = process.env.REACT_APP_API_URL + "/job/update-recruitment/";
+    const accessToken = Cookies.get("access_token");
+
+    try {
+      const response = await fetch(apiURL, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          job_id: updatedJob.id,
+          job_category: updatedJob.job_category,
+          title: updatedJob.title,
+          description: updatedJob.description,
+          skill_required: updatedJob.skill_required,
+          benefits: updatedJob.benefits,
+          location: updatedJob.location,
+          salary_range: updatedJob.salary_range,
+          status: updatedJob.status,
+          level: updatedJob.level,
+          experience: updatedJob.experience,
+          interview_process: updatedJob.interview_process,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStatus({ success: data.message });
+        fetchJobs();
+        setIsEditDialogOpen(false);
+      } else {
+        const errorData = await response.json();
+        setStatus({
+          error: errorData.message || "Failed to update job. Please try again.",
+        });
+      }
+    } catch (error) {
+      setStatus({ error: "Network error. Please check your connection." });
+    }
   };
 
-  const handleDelete = (job) => {
-    setSelectedJob(job);
-    setIsDeleteDialogOpen(true);
-  };
+  const handleHide = async (jobId) => {
+    const apiURL = process.env.REACT_APP_API_URL + "/job/hide-recruitment/";
+    const accessToken = Cookies.get("access_token");
 
-  const handleDeleteJob = (jobId, reason) => {
-    setJobs(jobs.filter((job) => job.id !== jobId));
-    setIsDeleteDialogOpen(false);
-    setSelectedJob(null);
-    console.log(`Job ${jobId} deleted. Reason: ${reason}`);
+    try {
+      const response = await fetch(apiURL, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `job_id=${jobId}`,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStatus({ success: data.message });
+        fetchJobs();
+      } else {
+        const errorData = await response.json();
+        setStatus({
+          error: errorData.message || "Failed to hide job. Please try again.",
+        });
+      }
+    } catch (error) {
+      setStatus({ error: "Network error. Please check your connection." });
+    }
   };
 
   return (
     <Box m="20px">
       <Header title="MANAGE JOBS" subtitle="View and Manage Job Listings" />
+
+      {status && (
+        <Box mb="20px">
+          <Typography
+            color={
+              status.success ? colors.greenAccent[500] : colors.redAccent[500]
+            }
+          >
+            {status.success || status.error}
+          </Typography>
+        </Box>
+      )}
 
       <Box mt="40px">
         <Typography
@@ -113,24 +174,33 @@ const ManageJobs = () => {
               >
                 {job.title}
               </Typography>
-              <Typography variant="body1" color={colors.grey[200]}>
-                {job.type} - {job.level}
+              <Typography variant="body2" color={colors.grey[300]}>
+                Category: {job.job_category.title}
               </Typography>
               <Typography variant="body2" color={colors.grey[300]}>
                 Location: {job.location}
               </Typography>
               <Typography variant="body2" color={colors.grey[300]}>
-                Salary: ${job.salary.toLocaleString()}
+                Salary Range: {job.salary_range}
               </Typography>
               <Typography variant="body2" color={colors.grey[300]}>
-                Application Period: {job.applicationStartDate} to{" "}
-                {job.applicationEndDate}
+                Experience: {job.experience}
               </Typography>
+              <Box mt="10px">
+                <Chip label={job.level} size="small" color="default" />
+                <Chip
+                  label={job.status ? "Active" : "Inactive"}
+                  size="small"
+                  color={job.status ? "info" : "error"}
+                  sx={{ ml: 1 }}
+                />
+              </Box>
               <Tooltip title={job.description}>
                 <Typography
                   variant="body2"
                   color={colors.grey[300]}
                   sx={{
+                    mt: 1,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     display: "-webkit-box",
@@ -145,8 +215,8 @@ const ManageJobs = () => {
                 <IconButton onClick={() => handleEdit(job)} color="secondary">
                   <EditIcon />
                 </IconButton>
-                <IconButton onClick={() => handleDelete(job)} color="error">
-                  <DeleteIcon />
+                <IconButton onClick={() => handleHide(job.id)} color="warning">
+                  <VisibilityOffIcon />
                 </IconButton>
               </Box>
             </Box>
@@ -160,17 +230,7 @@ const ManageJobs = () => {
           setIsEditDialogOpen(false);
           setSelectedJob(null);
         }}
-        onSave={handleSaveJob}
-        job={selectedJob}
-      />
-
-      <DeleteJob
-        open={isDeleteDialogOpen}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setSelectedJob(null);
-        }}
-        onDelete={handleDeleteJob}
+        onSave={handleUpdatedJob}
         job={selectedJob}
       />
     </Box>
