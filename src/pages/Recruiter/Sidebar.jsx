@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
-import { Box, IconButton, Typography, useTheme, Tooltip } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Typography,
+  useTheme,
+  Tooltip,
+  Dialog,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import Company from "./../ProfileManage/Company";
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
   const theme = useTheme();
@@ -34,7 +42,12 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   //const companyName = localStorage.getItem("username")
+
+  const handleAvatarClick = () => {
+    setIsEditProfileOpen(true);
+  };
 
   const renderSectionTitle = (title) => {
     if (!isCollapsed) {
@@ -118,7 +131,14 @@ const Sidebar = () => {
                   width="100px"
                   height="100px"
                   src={`../../assets/trinity.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: "50%",
+                    transition: "all 0.3s ease",
+                  }}
+                  onClick={handleAvatarClick}
+                  onMouseOver={(e) => (e.currentTarget.style.opacity = "0.5")}
+                  onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
                 />
               </Box>
 
@@ -168,6 +188,14 @@ const Sidebar = () => {
           </Box>
         </Menu>
       </ProSidebar>
+      <Dialog
+        open={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <Company onClose={() => setIsEditProfileOpen(false)} />
+      </Dialog>
     </Box>
   );
 };

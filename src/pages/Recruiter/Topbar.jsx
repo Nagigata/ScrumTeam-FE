@@ -12,6 +12,7 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import Cookies from "js-cookie";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -32,6 +33,8 @@ const Topbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("userRole");
+    Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
     handleClose();
     window.location.reload();
   };

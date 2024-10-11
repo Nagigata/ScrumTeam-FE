@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const NavBar = () => {
   const [username, setUsername] = useState(null);
@@ -16,7 +17,7 @@ const NavBar = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="navBar flex justify-between items-center p-[3rem]">
+    <div className="navBar flex justify-between items-center p-[2rem]">
       <div className="logoDiv">
         <h1 className="logo text-[25px] text-blueColor">
           <strong>Dev</strong>Hunt
@@ -34,8 +35,7 @@ const NavBar = () => {
         {username ? (
           <>
             <li className="navBarLi">
-              {/* <Link to="/candidate">Welcome, {username} !!</Link> */}
-              <Link to="/company">Welcome, {username} !!</Link>
+              <Link to="/candidate">Welcome, {username} !!</Link>
             </li>
             <li className="navBarLi  hoverRed">
               <button
@@ -43,6 +43,8 @@ const NavBar = () => {
                   navigate("/login");
                   localStorage.removeItem("username");
                   localStorage.removeItem("userRole");
+                  Cookies.remove("access_token");
+                  Cookies.remove("refresh_token");
                   setUsername(null);
                   window.location.reload();
                 }}

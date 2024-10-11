@@ -4,7 +4,6 @@ import InputField from "../../components/Auth/InputField";
 import AuthButton from "../../components/Auth/AuthButton";
 import { AccountCircle, Phone as PhoneIcon, PhotoCamera as CameraIcon } from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';
-import NavBar from "../../components/ProfileManage/NavBar";
 
 const Candidate = () => {
   const initialValues = {
