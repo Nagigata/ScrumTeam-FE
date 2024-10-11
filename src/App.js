@@ -3,11 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import SignIn from "./pages/Auth/SignIn";
 import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Home/Home";
-import JobDetail from "./components/Home/JobDetail";
-import NavBar from "./components/Home/NavBar";
-import Footer from "./components/Home/Footer";
-import Recruiter from "./AppRecruiter";
-import Cookies from "js-cookie";
+import Candidate from "./pages/ProfileManage/Candidate";
+import Company from "./pages/ProfileManage/Company";
 
 function App() {
   const user = localStorage.getItem("username");
@@ -33,20 +30,12 @@ function App() {
         />
 
         <Route path="/" element={<Home />} />
-        <Route path="/job/:id" element={<JobDetail />} />
-
-        <Route
-          path="/"
-          element={
-            userRole === "recruiter" ? <Navigate to="/recruiter" /> : <Home />
-          }
-        />
-        <Route
-          path="/recruiter/*"
-          element={
-            userRole === "recruiter" ? <Recruiter /> : <Navigate to="/" />
-          }
-        />
+        {/* <Route
+          path="/candidate"
+          element={user ? <Candidate /> : <Navigate to="/login" />}
+        /> */}
+        <Route path="/candidate" element={<Candidate />} />
+        <Route path="/company" element={<Company />} />
       </Routes>
       <Footer />
     </div>

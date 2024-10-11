@@ -24,26 +24,28 @@ const NavBar = () => {
       </div>
 
       <div className="menu flex gap-8">
-        <li className="navBarLi ">Jobs</li>
-        <li className="navBarLi ">Companies</li>
-        <li className="navBarLi ">Contact</li>
+        <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+          <Link to="/">Home</Link> 
+        </li>
+        <li className="menuList text-[#6f6f6f] hover:text-blueColor">Jobs</li>
+        <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+          Companies
+        </li>
+        <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+          Contact
+        </li>
 
         {username ? (
           <>
             <li className="menuList text-[#6f6f6f] hover:text-blueColor">
-              {/* <Link to="/candidate">Welcome, {username} !!</Link> */}
-              <Link to="/company">Welcome, {username} !!</Link>
+              <Link to="/candidate">Welcome, {username} !!</Link>
             </li>
             <li className="menuList text-[#6f6f6f] hover:text-red-600">
-            <li className="navBarLi ">Welcome, {username} !!</li>
-            <li className="navBarLi  hoverRed">
               <button
                 onClick={() => {
-                  navigate('/login');
-                  localStorage.removeItem("username");
-                  localStorage.removeItem("userRole");
-                  setUsername(null);
-                  window.location.reload();
+                    navigate('/login');
+                    localStorage.removeItem("username");
+                    setUsername(null);
                 }}
               >
                 <LoginOutlinedIcon className="mr-1" /> Logout
@@ -52,10 +54,10 @@ const NavBar = () => {
           </>
         ) : (
           <>
-            <li className="navBarLi">
+            <li className="menuList text-[#6f6f6f] hover:text-blueColor">
               <Link to="/login">Login</Link>
             </li>
-            <li className="navBarLi">
+            <li className="menuList text-[#6f6f6f] hover:text-blueColor">
               <Link to="/register">Register</Link>
             </li>
           </>

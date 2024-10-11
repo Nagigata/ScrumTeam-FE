@@ -20,7 +20,7 @@ const InputField = ({
       </label>
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-          <Icon className="h-5 w-5 text-[#19ADC8]" />
+          <Icon className="h-5 w-5 text-[#010101]" />
         </span>
         <Field
           className={`w-full pl-10 pr-3 py-3 rounded-lg border-2 ${
