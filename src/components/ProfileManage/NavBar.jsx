@@ -24,28 +24,24 @@ const NavBar = () => {
       </div>
 
       <div className="menu flex gap-8">
-        <li className="menuList text-[#6f6f6f] hover:text-blueColor">
-          <Link to="/">Home</Link> 
+        <li className="navBarLi">
+          <Link to="/">Home</Link>
         </li>
-        <li className="menuList text-[#6f6f6f] hover:text-blueColor">Jobs</li>
-        <li className="menuList text-[#6f6f6f] hover:text-blueColor">
-          Companies
-        </li>
-        <li className="menuList text-[#6f6f6f] hover:text-blueColor">
-          Contact
-        </li>
+        <li className="navBarLi">Jobs</li>
+        <li className="navBarLi">Companies</li>
+        <li className="navBarLi">Contact</li>
 
         {username ? (
           <>
-            <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+            <li className="navBarLi">
               <Link to="/candidate">Welcome, {username} !!</Link>
             </li>
-            <li className="menuList text-[#6f6f6f] hover:text-red-600">
+            <li className="navBarLi  hoverRed">
               <button
                 onClick={() => {
-                    navigate('/login');
-                    localStorage.removeItem("username");
-                    setUsername(null);
+                  navigate("/login");
+                  localStorage.removeItem("username");
+                  setUsername(null);
                 }}
               >
                 <LoginOutlinedIcon className="mr-1" /> Logout
@@ -54,10 +50,10 @@ const NavBar = () => {
           </>
         ) : (
           <>
-            <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+            <li className="navBarLi">
               <Link to="/login">Login</Link>
-            </li>
-            <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+            </li> 
+            <li className="navBarLi">
               <Link to="/register">Register</Link>
             </li>
           </>

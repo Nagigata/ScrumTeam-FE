@@ -24,22 +24,23 @@ const NavBar = () => {
       </div>
 
       <div className="menu flex gap-8">
-        <li className="navBarLi ">Jobs</li>
-        <li className="navBarLi ">Companies</li>
-        <li className="navBarLi ">Contact</li>
+        <li className="navBarLi">
+          <Link to="/">Home</Link>
+        </li>
+        <li className="navBarLi">Jobs</li>
+        <li className="navBarLi">Companies</li>
+        <li className="navBarLi">Contact</li>
 
         {username ? (
           <>
-            <li className="menuList text-[#6f6f6f] hover:text-blueColor">
+            <li className="navBarLi">
               {/* <Link to="/candidate">Welcome, {username} !!</Link> */}
               <Link to="/company">Welcome, {username} !!</Link>
             </li>
-            <li className="menuList text-[#6f6f6f] hover:text-red-600">
-            <li className="navBarLi ">Welcome, {username} !!</li>
             <li className="navBarLi  hoverRed">
               <button
                 onClick={() => {
-                  navigate('/login');
+                  navigate("/login");
                   localStorage.removeItem("username");
                   localStorage.removeItem("userRole");
                   setUsername(null);
