@@ -6,11 +6,16 @@ import Cookies from "js-cookie";
 
 const NavBar = () => {
   const [username, setUsername] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
+    const storedUserRole = localStorage.getItem("userRole");
     if (storedUsername) {
       setUsername(storedUsername);
+    }
+    if (storedUserRole) {
+      setUserRole(storedUserRole);
     }
   }, []);
 
@@ -35,6 +40,9 @@ const NavBar = () => {
         {username ? (
           <>
             <li className="navBarLi">
+              <Link to="/application-status">My application</Link>
+            </li>
+            <li className="navBarLi">
               <Link to="/candidate">Welcome, {username} !!</Link>
             </li>
             <li className="navBarLi  hoverRed">
@@ -46,6 +54,7 @@ const NavBar = () => {
                   Cookies.remove("access_token");
                   Cookies.remove("refresh_token");
                   setUsername(null);
+                  setUserRole(null);
                   window.location.reload();
                 }}
               >

@@ -29,7 +29,8 @@ const GoogleLoginButton = ({
           Cookies.set("refresh_token", data.refresh, { expires: 7 });
           Cookies.set("is_first_login", data.is_first_login, { expires: 7 });
           localStorage.setItem("username", "User");
-          onLoginSuccess("/");
+          localStorage.setItem("userRole", "candidate");
+          window.location.href = "/";
         } else {
           const errorData = await res.json();
           setErrorMessage(

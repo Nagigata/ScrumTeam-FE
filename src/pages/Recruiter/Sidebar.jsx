@@ -1,39 +1,26 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import "react-pro-sidebar/dist/css/styles.css";
-import {
-  Box,
-  IconButton,
-  Typography,
-  useTheme,
-  Tooltip,
-  Dialog,
-} from "@mui/material";
+import { Box, IconButton, Typography, useTheme, Dialog } from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import Company from "./../ProfileManage/Company";
-
-const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
+const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    <Tooltip title={isCollapsed ? title : ""} placement="right">
-      <MenuItem
-        active={selected === title}
-        style={{
-          color: colors.grey[100],
-        }}
-        onClick={() => setSelected(title)}
-        icon={icon}
-      >
-        {!isCollapsed && <Typography>{title}</Typography>}
-        <Link to={to} />
-      </MenuItem>
-    </Tooltip>
+    <MenuItem
+      active={selected === title}
+      style={{ color: colors.grey[100] }}
+      onClick={() => setSelected(title)}
+      icon={icon}
+      component={<Link to={to} />}
+    >
+      <Typography>{title}</Typography>
+    </MenuItem>
   );
 };
 
@@ -43,7 +30,6 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  //const companyName = localStorage.getItem("username")
 
   const handleAvatarClick = () => {
     setIsEditProfileOpen(true);
@@ -61,6 +47,7 @@ const Sidebar = () => {
         </Typography>
       );
     }
+
     return (
       <Box
         sx={{
@@ -72,31 +59,22 @@ const Sidebar = () => {
       />
     );
   };
-
   return (
     <Box
       sx={{
-        "& .pro-sidebar-inner": {
-          background: `${colors.primary[400]} !important`,
-          position: "fixed",
-          width: isCollapsed ? "80px" : "250px",
-          height: "100vh",
+        "& .ps-sidebar-root": {
+          border: "none !important",
         },
-        "& .pro-icon-wrapper": {
+        "& .ps-menu-button:hover": {
           backgroundColor: "transparent !important",
-        },
-        "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
-        },
-        "& .pro-inner-item:hover": {
           color: "#868dfb !important",
         },
-        "& .pro-menu-item.active": {
+        "& .ps-menu-button.ps-active": {
           color: "#6870fa !important",
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}>
+      <ProSidebar collapsed={isCollapsed} backgroundColor={colors.primary[400]}>
         <Menu iconShape="square">
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -141,7 +119,6 @@ const Sidebar = () => {
                   onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
                 />
               </Box>
-
               <Box textAlign="center">
                 <Typography
                   variant="h2"
@@ -165,7 +142,6 @@ const Sidebar = () => {
               icon={<DashboardOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              isCollapsed={isCollapsed}
             />
             {renderSectionTitle("Job Management")}
             <Item
@@ -174,8 +150,6 @@ const Sidebar = () => {
               icon={<PostAddIcon />}
               selected={selected}
               setSelected={setSelected}
-              isCollapsed={isCollapsed}
-              paddingTop="10px"
             />
             <Item
               title="Manage Jobs"
@@ -183,7 +157,6 @@ const Sidebar = () => {
               icon={<WorkOutlineIcon />}
               selected={selected}
               setSelected={setSelected}
-              isCollapsed={isCollapsed}
             />
           </Box>
         </Menu>
