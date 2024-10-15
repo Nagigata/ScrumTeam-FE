@@ -5,6 +5,7 @@ import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Home/Home";
 import JobDetail from "./components/Home/JobDetail";
 import Candidate from "./pages/ProfileManage/Candidate";
+import ApplicationStatus from "./components/Home/ApplicationStatus";
 import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
 import Recruiter from "./AppRecruiter";
@@ -62,6 +63,16 @@ function App() {
                       <Navigate to="/" />
                     ) : (
                       <Candidate />
+                    )
+                  }
+                />
+                <Route
+                  path="/application-status"
+                  element={
+                    userRole === "recruiter" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <ApplicationStatus  />
                     )
                   }
                 />
