@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Search from "../../components/Home/Search";
 import Job from "../../components/Home/Job";
@@ -11,9 +11,11 @@ const Home = () => {
   const [sortValue, setSortValue] = useState("relevance");
   const [typeValue, setTypeValue] = useState("fullTime");
   const [levelValue, setLevelValue] = useState("senior");
+  const [searchResults, setSearchResults] = useState([]); // State mới để lưu trữ kết quả tìm kiếm
 
-  const handleSearch = (searchKeyword) => {
-    setKeyword(searchKeyword);
+  const handleSearch = (keyword) => {
+    setKeyword(keyword);
+    fetchJobs(keyword); // Gọi fetchJobs với từ khóa tìm kiếm
   };
 
   const handleCompanySearch = (searchCompanyKeyword) => {
@@ -22,10 +24,12 @@ const Home = () => {
 
   const handleLocationSearch = (searchLocationKeyword) => {
     setLocationKeyword(searchLocationKeyword);
+    fetchJobs(keyword, searchLocationKeyword); // Gọi fetchJobs với từ khóa và địa điểm
   };
 
   const handleSortChange = (sortValue) => {
     setSortValue(sortValue);
+    fetchJobs(keyword, locationKeyword, levelValue, sortValue); // Gọi fetchJobs với từ khóa, địa điểm, mức lương và kỹ năng
   };
 
   const handleTypeChange = (typeValue) => {
@@ -34,6 +38,7 @@ const Home = () => {
 
   const handleLevelChange = (levelValue) => {
     setLevelValue(levelValue);
+    fetchJobs(keyword, locationKeyword, levelValue); // Gọi fetchJobs với từ khóa, địa điểm và mức lương
   };
 
   const handleClearAll = () => {
@@ -44,6 +49,29 @@ const Home = () => {
     setTypeValue("fullTime");
     setLevelValue("senior");
   };
+
+  // Hàm để gọi API tìm kiếm
+  const fetchJobs = async (keyword = "", location = "", salaryRange = "", skill = "") => {
+    try {
+      const response = await fetch(`http://cnpm.duytech.site/api/job/search/?search=${keyword}&location=${location}&salary_range=${salaryRange}&skill_required=${skill}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("API Response 1:", data); // Log dữ liệu API để kiểm tra
+        setSearchResults(Array.isArray(data.results) ? data.results : []);
+      } else {
+        console.error("Failed to fetch jobs");
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+      setSearchResults([]);
+    }
+  };
+
+  // Tự động gọi API khi trang được tải
+  useEffect(() => {
+    fetchJobs(); // Gọi API với từ khóa rỗng
+  }, []);
 
   return (
     <motion.div
@@ -73,6 +101,7 @@ const Home = () => {
           sortValue={sortValue} // Truyền giá trị sortValue
           typeValue={typeValue} // Truyền giá trị typeValue
           levelValue={levelValue} // Truyền giá trị levelValue
+          searchResults={searchResults} // Truyền kết quả tìm kiếm
         />
       </motion.div>
       <motion.div

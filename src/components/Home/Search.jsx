@@ -26,7 +26,7 @@ const Search = ({ onSearch, onCompanySearch, onLocationSearch, onSortChange, onT
 
   const handleSortChange = (event) => {
     setSortValue(event.target.value);
-    onSortChange(event.target.value);
+    onSortChange(event.target.value); // Gọi onSortChange với kỹ năng mới
   };
 
   const handleTypeChange = (event) => {
@@ -36,14 +36,13 @@ const Search = ({ onSearch, onCompanySearch, onLocationSearch, onSortChange, onT
 
   const handleLevelChange = (event) => {
     setLevelValue(event.target.value);
-    onLevelChange(event.target.value);
+    onLevelChange(event.target.value); // Gọi onLevelChange với mức lương mới
   };
 
   const handleSearch = (event) => {
     event.preventDefault();
+    console.log("Search Keyword:", searchKeyword); // Log từ khóa tìm kiếm
     onSearch(searchKeyword);
-    onCompanySearch(companyKeyword);
-    onLocationSearch(locationKeyword);
   };
 
   const handleClearAll = () => {
@@ -60,6 +59,11 @@ const Search = ({ onSearch, onCompanySearch, onLocationSearch, onSortChange, onT
     onTypeChange("fullTime");
     onLevelChange("senior");
     onClearAll();
+  };
+
+  const handleLocationChange = (event) => {
+    setLocationKeyword(event.target.value);
+    onLocationSearch(event.target.value); // Gọi onLocationSearch với địa điểm mới
   };
 
   return (
@@ -110,54 +114,55 @@ const Search = ({ onSearch, onCompanySearch, onLocationSearch, onSortChange, onT
       <div className="secDiv flex items-center gap-10 justify-center">
         <div className="singleSearch flex items-center gap-2">
           <label htmlFor="relevance" className=" text-[#808080] font-semibold">
-            Sort by:
+            Skill:
           </label>
           <select
             name="sort"
             id="sort"
             className=" bg-white rounded-[3px] px-4 py-1"
             value={sortValue}
-            onChange={handleSortChange}
+            onChange={handleSortChange} // Sử dụng handleSortChange
           >
-            <option value="relevance">Relevance</option>
-            <option value="inclusive">Inclusive</option>
-            <option value="startWith">Start With</option>
-            <option value="contains">Contains</option>
+            <option value=""></option>
+            <option value="Python">Python</option>
+            <option value="Django">Django</option>
           </select>
         </div>
 
         <div className="singleSearch flex items-center gap-2">
           <label htmlFor="type" className=" text-[#808080] font-semibold">
-            Type:
+            Location:
           </label>
           <select
             name="type"
             id="type"
             className=" bg-white rounded-[3px] px-4 py-1"
             value={typeValue}
-            onChange={handleTypeChange}
+            onChange={handleLocationChange} // Sử dụng handleLocationChange
           >
-            <option value="fullTime">Full-Time</option>
-            <option value="partTime">Part-Time</option>
-            <option value="contract">Contract</option>
+            <option value=""></option>
+            <option value="TPHCM">TPHCM</option>
+            <option value="Đà Nẵng">Đà Nẵng</option>
+            <option value="Hà Nội">Hà Nội</option>
           </select>
         </div>
 
         <div className="singleSearch flex items-center gap-2">
-          <label htmlFor="level" className=" text-[#808080] font-semibold">
-            Level:
+          <label htmlFor="salary" className=" text-[#808080] font-semibold">
+            Salary:
           </label>
           <select
-            name="level"
-            id="level"
+            name="salary"
+            id="salary"
             className=" bg-white rounded-[3px] px-4 py-1"
             value={levelValue}
             onChange={handleLevelChange}
           >
-            <option value="senior">Senior</option>
-            <option value="junior">Junior</option>
-            <option value="fresher">Fresher</option>
-            <option value="intern">Intern</option>
+            <option value=""></option>
+            <option value="1000">1000</option>
+            <option value="1500">1500</option>
+            <option value="2000">2000</option>
+            <option value="2500">2500</option>
           </select>
         </div>
         <span className="text-[#a1a1a1] cursor-pointer" onClick={handleClearAll}>Clear All</span>
