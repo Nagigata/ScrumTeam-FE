@@ -19,6 +19,8 @@ function App() {
   console.log(accessToken);
   console.log(refresh_token);
   console.log(userRole);
+
+  // localStorage.removeItem("userRole")
   const MainLayout = ({ children }) => (
     <>
       <NavBar />
