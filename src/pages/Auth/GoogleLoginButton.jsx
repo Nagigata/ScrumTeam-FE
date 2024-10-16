@@ -28,7 +28,6 @@ const GoogleLoginButton = ({
           Cookies.set("access_token", data.access, { expires: 7 });
           Cookies.set("refresh_token", data.refresh, { expires: 7 });
           Cookies.set("is_first_login", data.is_first_login, { expires: 7 });
-          localStorage.setItem("username", "User");
           localStorage.setItem("userRole", "candidate");
           window.location.href = "/";
         } else {

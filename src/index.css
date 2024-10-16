@@ -72,7 +72,3 @@ body,
 .navBarLi:hover::before {
   transform: scaleX(1);
 }
-
-.navBarLi.hoverRed:hover {
-  color: red;
-}

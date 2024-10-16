@@ -12,16 +12,13 @@ import Recruiter from "./AppRecruiter";
 import Cookies from "js-cookie";
 
 function App() {
-  const user = localStorage.getItem("username");
   const userRole = localStorage.getItem("userRole");
   const accessToken = Cookies.get("access_token");
   const refresh_token = Cookies.get("access_token");
+
   console.log(accessToken);
   console.log(refresh_token);
-
-  console.log(user);
   console.log(userRole);
-
   const MainLayout = ({ children }) => (
     <>
       <NavBar />
@@ -40,11 +37,11 @@ function App() {
               <Routes>
                 <Route
                   path="/login"
-                  element={user ? <Navigate to="/" /> : <SignIn />}
+                  element={userRole ? <Navigate to="/" /> : <SignIn />}
                 />
                 <Route
                   path="/register"
-                  element={user ? <Navigate to="/" /> : <SignUp />}
+                  element={userRole ? <Navigate to="/" /> : <SignUp />}
                 />
                 <Route
                   path="/job/:id"
@@ -72,7 +69,7 @@ function App() {
                     userRole === "recruiter" ? (
                       <Navigate to="/" />
                     ) : (
-                      <ApplicationStatus  />
+                      <ApplicationStatus />
                     )
                   }
                 />

@@ -8,10 +8,10 @@ import InputField from "../../components/Auth/InputField";
 import AuthButton from "../../components/Auth/AuthButton";
 
 const validationSchema = Yup.object().shape({
-  companyName: Yup.string()
+  username: Yup.string()
     .min(3, "Company name must be at least 3 characters")
     .required("Company name is required"),
-  companyEmail: Yup.string()
+  email: Yup.string()
     .email("Invalid email address")
     .required("Company email is required"),
   password: Yup.string()
@@ -35,8 +35,8 @@ const RecruiterSignUp = ({
   return (
     <Formik
       initialValues={{
-        companyName: "",
-        companyEmail: "",
+        username: "",
+        email: "",
         password: "",
         confirmPassword: "",
       }}
@@ -47,7 +47,7 @@ const RecruiterSignUp = ({
         <Form>
           <InputField
             label="Company Name"
-            name="companyName"
+            name="username"
             type="text"
             placeholder="Enter your company name"
             icon={BusinessOutlinedIcon}
@@ -56,7 +56,7 @@ const RecruiterSignUp = ({
           />
           <InputField
             label="Company E-mail Address"
-            name="companyEmail"
+            name="email"
             type="email"
             placeholder="Enter your company email"
             icon={EmailOutlinedIcon}

@@ -45,9 +45,9 @@ const SignIn = () => {
 
       if (res.status === 200) {
         const data = await res.json();
-        localStorage.setItem("username", values.username);
-        // localStorage.setItem("userRole", "candidate");
-        localStorage.setItem("userRole", "recruiter");
+        console.log(data);
+        localStorage.setItem("userRole", "candidate");
+        // localStorage.setItem("userRole", "recruiter");
         Cookies.set("access_token", data.access, { expires: 7 });
         Cookies.set("refresh_token", data.refresh, { expires: 7 });
         window.location.href = "/";

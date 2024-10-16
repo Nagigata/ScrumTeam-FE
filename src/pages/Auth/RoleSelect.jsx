@@ -14,10 +14,10 @@ const RoleSelect = ({ setRole }) => {
         </h2>
         <div className="flex justify-around mb-8">
           <button
-            onClick={() => handleRoleSelect("user")}
+            onClick={() => handleRoleSelect("candidate")}
             className="px-6 py-3 bg-blueColor text-white rounded-md"
           >
-            Sign Up as User
+            Sign Up as Candidate
           </button>
           <button
             onClick={() => handleRoleSelect("recruiter")}
