@@ -1,38 +1,133 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Form } from "formik";
 import InputField from "../../components/Auth/InputField";
 import AuthButton from "../../components/Auth/AuthButton";
 import { AccountCircle, Phone as PhoneIcon, PhotoCamera as CameraIcon } from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';
+import Cookies from "js-cookie";
 
 const Candidate = () => {
-  const initialValues = {
-    full_name: '',
-    is_male: true, // Mặc định là true
-    phone_number: '',
-    avatar: null, // Tệp avatar
-    avatarPreview: '', // Để hiển thị trước avatar
+  const [avatarUser, setAvatarUser] = useState(null);
+  const [dataProfile, setDataProfile] = useState({});
+
+  const accessToken = Cookies.get("access_token");
+
+  useEffect(() => {
+    const apiURL = process.env.REACT_APP_API_URL + "/candidate/profile/";
+  
+    const fetchData = async () => {
+      try {
+        const res = await fetch(apiURL, {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer ' + accessToken,
+          },
+        });
+  
+        if (res.status === 200) {
+          const data = await res.json();
+          setDataProfile(data || {});
+          setAvatarUser(data.avatar ? data.avatar : '');
+          console.log(">>> Data: ", data);
+        } else {
+          console.log("Không thể lấy dữ liệu hồ sơ");
+        }
+      } catch (error) {
+        console.log("Lỗi khi lấy dữ liệu:", error);
+      }
+    };
+  
+    fetchData();
+  }, [accessToken]);
+
+  const handleSubmit = async (values) => {
+    const dataProfile = {
+      full_name: values.full_name,
+      is_male: values.is_male,
+      phone_number: values.phone_number,
+    };
+  
+    const apiURL = process.env.REACT_APP_API_URL + "/candidate/profile/";
+  
+    try {
+      const res = await fetch(apiURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + accessToken,
+        },
+        body: JSON.stringify(dataProfile),
+      });
+  
+      if (res.ok) {
+        alert('Thông tin được cập nhật thành công');
+      } else {
+        alert('Cập nhật thông tin thất bại');
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleSubmit = (values) => {
-    console.log("Form Values:", values); // Tạm thời chỉ log ra giá trị form
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    const apiURL = process.env.REACT_APP_API_URL + "/candidate/upload-avatar/";
+    if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setAvatarUser(reader.result);
+        };
+        reader.readAsDataURL(file);
+
+        try {
+          const formData = new FormData();
+          formData.append('avatar', file);
+      
+          const response = await fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              Authorization: 'Bearer ' + accessToken,
+            },
+            body: formData,
+          });
+      
+          if (response.ok) {
+            const result = await response.json();
+            console.log('Upload successful:', result);
+          } else {
+            throw new Error(`Error: ${response.statusText}`);
+          }
+        } catch(error) {
+          console.log(error);
+        }
+    } else {
+        alert('Your image format is invalid. Please select another one.');
+    }
   };
 
   return (
     <div>
-
       <div className="max-w-md mx-auto p-4">
         <h2 className="text-2xl font-bold text-center mb-8">Candidate Information</h2>
 
-        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+        <Formik  
+          initialValues={{
+            full_name: dataProfile.full_name || '',
+            is_male: dataProfile.is_male || true,
+            phone_number: dataProfile.phone_number || '',
+            avatarPreview: '',
+          }} 
+          onSubmit={handleSubmit}
+          enableReinitialize
+        >
           {({ errors, touched, setFieldValue, values }) => (
             <Form>
               {/* Upload Avatar với Biểu Tượng Camera */}
               <div className="relative mb-6 flex flex-col items-center">
                 <div className="relative w-32 h-32">
-                  {values.avatarPreview ? (
+                  {avatarUser ? (
                     <img 
-                      src={values.avatarPreview} 
+                      src={avatarUser} 
                       alt="Avatar Preview" 
                       className="w-full h-full object-cover rounded-full" 
                     />
@@ -54,18 +149,8 @@ const Candidate = () => {
                     </span>
                     <input
                       type="file"
-                      accept="image/*"
-                      onChange={(event) => {
-                        const file = event.currentTarget.files[0];
-                        setFieldValue("avatar", file);
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            setFieldValue("avatarPreview", reader.result);
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
+                      accept='.jpg, .jpeg, .png'
+                      onChange={handleImageChange}
                       hidden
                     />
                   </IconButton>
