@@ -21,6 +21,8 @@ function App() {
   console.log(userRole);
 
   // localStorage.removeItem("userRole")
+  // Cookies.remove("access_token");
+  // Cookies.remove("access_token");
   const MainLayout = ({ children }) => (
     <>
       <NavBar />
