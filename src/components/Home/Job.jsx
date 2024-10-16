@@ -13,6 +13,10 @@ const Job = ({ searchResults }) => {
     return description;
   };
 
+  const handleJobClick = (job) => {
+    navigate(`/job/${job.id}`, { state: { job } });
+  };
+
   return (
     <div className="jobContainer flex gap-10 justify-center flex-wrap items-center py-10">
       {Array.isArray(searchResults) && searchResults.map((job) => {
@@ -30,7 +34,7 @@ const Job = ({ searchResults }) => {
           <div
             key={id}
             className="group group/item singleJob w-[270px] p-[20px] bg-white rounded-[10px] hover:bg-blueColor shadow-lg shadow-greyIsh-400/700 hover:shadow-lg"
-            onClick={() => navigate(`/job/${id}`)}
+            onClick={() => handleJobClick(job)}
           >
             <span className="flex justify-between items-center gap-4">
               <h1 className="text-[16px] font-semibold text-textColor group-hover:text-white">
