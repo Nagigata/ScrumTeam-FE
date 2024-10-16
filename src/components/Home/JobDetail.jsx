@@ -47,7 +47,7 @@ const JobDetail = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-lg font-semibold mb-4">General Information</h3>
             <ul className="text-gray-700">
-              <li><strong>Years of Experience:</strong> {job.experience || "N/A"} năm</li>
+              <li><strong>Years of Experience:</strong> {job.experience || "N/A"}</li>
               <li><strong>Benefit:</strong> {job.benefits || "N/A"}</li>
               <li><strong>Salary:</strong> {job.salary_range || "N/A"}</li>
               <li><strong>Contract Type:</strong> {job.contract || "N/A"}</li>
