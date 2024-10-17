@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CloseIcon from "@mui/icons-material/Close";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import Cookies from "js-cookie";
 
 const validationSchema = Yup.object({
@@ -30,7 +33,55 @@ const CVUploadForm = ({ onClose, jobId }) => {
     error: null,
     success: false,
   });
-  const [selectedFileName, setSelectedFileName] = useState("");
+  const [filePreview, setFilePreview] = useState({
+    url: null,
+    type: null,
+    name: "",
+  });
+
+  // Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (filePreview.url) {
+        URL.revokeObjectURL(filePreview.url);
+      }
+    };
+  }, [filePreview.url]);
+
+  const handleFileSelect = (file, setFieldValue) => {
+    if (file) {
+      // Revoke previous preview URL if exists
+      if (filePreview.url) {
+        URL.revokeObjectURL(filePreview.url);
+      }
+
+      setFieldValue("cv", file);
+
+      // Create preview for PDF files
+      if (file.type === "application/pdf") {
+        setFilePreview({
+          url: URL.createObjectURL(file),
+          type: "pdf",
+          name: file.name,
+        });
+      } else {
+        // For DOC/DOCX files, just store the name
+        setFilePreview({
+          url: null,
+          type: "doc",
+          name: file.name,
+        });
+      }
+    }
+  };
+
+  const handleRemoveFile = (setFieldValue) => {
+    if (filePreview.url) {
+      URL.revokeObjectURL(filePreview.url);
+    }
+    setFieldValue("cv", null);
+    setFilePreview({ url: null, type: null, name: "" });
+  };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setStatus({ loading: true, error: null, success: false });
@@ -103,46 +154,73 @@ const CVUploadForm = ({ onClose, jobId }) => {
               <h3 className="text-lg font-semibold mb-2 text-gray-800">
                 Select CV to apply
               </h3>
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center bg-gray-50">
-                <CloudUploadIcon
-                  className="mx-auto text-[#19ADC8] mb-2"
-                  fontSize="large"
-                />
-                <p className="text-sm text-gray-600 mb-2">
-                  Upload CV from your computer, select or drag and drop
-                </p>
-                <p className="text-xs text-gray-500">
-                  Supports .doc, .docx, pdf files under 5MB
-                </p>
-                {selectedFileName && (
-                  <p className="mt-2 text-sm font-medium text-[#19ADC8]">
-                    Selected file: {selectedFileName}
+
+              {!filePreview.name ? (
+                <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center bg-gray-50">
+                  <CloudUploadIcon
+                    className="mx-auto text-[#19ADC8] mb-2"
+                    fontSize="large"
+                  />
+                  <p className="text-sm text-gray-600 mb-2">
+                    Upload CV from your computer, select or drag and drop
                   </p>
-                )}
-                <input
-                  type="file"
-                  id="cv"
-                  name="cv"
-                  accept=".doc,.docx,.pdf"
-                  onChange={(event) => {
-                    const file = event.currentTarget.files[0];
-                    if (file) {
-                      setFieldValue("cv", file);
-                      setSelectedFileName(file.name);
-                    }
-                  }}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="cv"
-                  className="mt-3 px-4 py-2 bg-[#19ADC8] text-white rounded hover:bg-opacity-90 transition cursor-pointer inline-block"
-                >
-                  Select CV
-                </label>
-                {errors.cv && touched.cv && (
-                  <div className="text-red-500 text-sm mt-2">{errors.cv}</div>
-                )}
-              </div>
+                  <p className="text-xs text-gray-500">
+                    Supports .doc, .docx, pdf files under 5MB
+                  </p>
+                  <input
+                    type="file"
+                    id="cv"
+                    name="cv"
+                    accept=".doc,.docx,.pdf"
+                    onChange={(event) => {
+                      const file = event.currentTarget.files[0];
+                      handleFileSelect(file, setFieldValue);
+                    }}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="cv"
+                    className="mt-3 px-4 py-2 bg-[#19ADC8] text-white rounded hover:bg-opacity-90 transition cursor-pointer inline-block"
+                  >
+                    Select CV
+                  </label>
+                </div>
+              ) : (
+                <div className="border-2 border-gray-200 rounded-lg p-4 bg-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <InsertDriveFileIcon className="text-[#19ADC8]" />
+                      <span className="text-sm font-medium">
+                        {filePreview.name}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2">
+                      {filePreview.type === "pdf" && (
+                        <button
+                          type="button"
+                          onClick={() => window.open(filePreview.url, "_blank")}
+                          className="p-1 rounded-full hover:bg-gray-100"
+                          title="Preview PDF"
+                        >
+                          <VisibilityIcon className="text-gray-600 hover:text-[#19ADC8]" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(setFieldValue)}
+                        className="p-1 rounded-full hover:bg-gray-100"
+                        title="Remove file"
+                      >
+                        <DeleteOutlineIcon className="text-gray-600 hover:text-red-500" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {errors.cv && touched.cv && (
+                <div className="text-red-500 text-sm mt-2">{errors.cv}</div>
+              )}
             </div>
 
             <div className="mb-6">
