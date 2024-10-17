@@ -13,7 +13,10 @@ import EditJob from "../../components/Recruiter/EditJob";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Cookies from "js-cookie";
-
+import { style } from "framer-motion/client";
+import { motion } from "framer-motion";
+import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
+import ApplicationFile from "../../components/Recruiter/ApplicationFile";
 const ManageJobs = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -21,6 +24,12 @@ const ManageJobs = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [status, setStatus] = useState(null);
+  const [showCandidate, setShowCandidate] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [candidates, setCandidates] = useState([]);
+  const [dataDetail, setDataDetail] = useState({});
+  const [approvedApplications, setApprovedApplications] = useState({});
+  const [applicationStatuses, setApplicationStatuses] = useState({});
 
   useEffect(() => {
     fetchJobs();
@@ -37,12 +46,17 @@ const ManageJobs = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+      console.log(">>> ", res);
       if (res.ok) {
         const data = await res.json();
+
         setJobs(data);
       } else {
-        setStatus({ error: "Failed to fetch jobs. Please try again." });
+        const errorData = await res.json();
+        console.log("Error response from server:", errorData);
+        setStatus({
+          error: errorData.detail || "Failed to fetch jobs. Please try again.",
+        });
       }
     } catch (error) {
       setStatus({ error: "Network error. Please check your connection." });
@@ -130,110 +144,285 @@ const ManageJobs = () => {
     }
   };
 
+  const handleShowList = (id) => {
+    setShowCandidate(!showCandidate);
+    fetchCandidates(id);
+  };
+
+  const handleOpenShowDetail = (data) => {
+    setShowDetail(true);
+    setDataDetail(data);
+  };
+
+  // -----------------
+  const fetchCandidates = async (jobId) => {
+    const apiURL = `${process.env.REACT_APP_API_URL}/job/get_list_candidate_applied_for_job/?job_id=${jobId}`;
+    const accessToken = Cookies.get("access_token");
+
+    try {
+      const res = await fetch(apiURL, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCandidates(data); // Đảm bảo rằng `data` chứa thông tin `status` cho từng ứng viên
+      } else {
+        console.log("Error");
+      }
+    } catch (error) {
+      setStatus({ error: "Network error. Please check your connection." });
+    }
+  };
+  // -----------------
+
+  const handleApplicationStatus = async (applicationId, status) => {
+    const apiURL = "http://cnpm.duytech.site/api/job/approve_application/";
+    const accessToken = Cookies.get("access_token");
+
+    try {
+      const response = await fetch(apiURL, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          application_id: applicationId,
+          status: status,
+        }),
+      });
+
+      if (response.ok) {
+        const message =
+          status === "Accepted" ? "Approve success" : "Reject success";
+        alert(message);
+
+        // Cập nhật trạng thái phê duyệt hoặc từ chối
+        setApplicationStatuses((prev) => ({
+          ...prev,
+          [applicationId]: status,
+        }));
+      } else {
+        alert("An error occurred. Please try again.");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("Network error. Please check your connection.");
+    }
+  };
+
   return (
-    <Box m="20px">
-      <Header title="MANAGE JOBS" subtitle="View and Manage Job Listings" />
+    <>
+      <Box m="20px" style={{ display: showCandidate ? "none" : "block" }}>
+        <Header title="MANAGE JOBS" subtitle="View and Manage Job Listings" />
 
-      {status && (
-        <Box mb="20px">
+        {status && (
+          <Box mb="20px">
+            <Typography
+              color={
+                status.success ? colors.greenAccent[500] : colors.redAccent[500]
+              }
+            >
+              {status.success || status.error}
+            </Typography>
+          </Box>
+        )}
+
+        <Box mt="40px">
           <Typography
-            color={
-              status.success ? colors.greenAccent[500] : colors.redAccent[500]
-            }
+            variant="h4"
+            color={colors.grey[100]}
+            fontWeight="bold"
+            mb="15px"
           >
-            {status.success || status.error}
+            Current Job Listings
           </Typography>
-        </Box>
-      )}
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
+            gap="20px"
+          >
+            {jobs.map((job) => (
+              <Box
+                key={job.id}
+                backgroundColor={colors.primary[400]}
+                borderRadius="4px"
+                p="15px"
+              >
+                <Typography
+                  variant="h5"
+                  color={colors.grey[100]}
+                  fontWeight="bold"
+                >
+                  {job.title}
+                </Typography>
+                <Typography variant="body2" color={colors.grey[300]}>
+                  Category: {job.job_category.title}
+                </Typography>
+                <Typography variant="body2" color={colors.grey[300]}>
+                  Location: {job.location}
+                </Typography>
+                <Typography variant="body2" color={colors.grey[300]}>
+                  Salary Range: {job.salary_range}
+                </Typography>
+                <Typography variant="body2" color={colors.grey[300]}>
+                  Experience: {job.experience}
+                </Typography>
+                <Box mt="10px">
+                  <Chip label={job.level} size="small" color="default" />
+                  <Chip
+                    label={job.status ? "Active" : "Inactive"}
+                    size="small"
+                    color={job.status ? "info" : "error"}
+                    sx={{ ml: 1 }}
+                  />
+                </Box>
+                <Tooltip title={job.description}>
+                  <Typography
+                    variant="body2"
+                    color={colors.grey[300]}
+                    sx={{
+                      mt: 1,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {job.description}
+                  </Typography>
+                </Tooltip>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <motion.button
+                    className=" text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleShowList(job.id)}
+                  >
+                    <span>Show</span>
+                  </motion.button>
 
-      <Box mt="40px">
-        <Typography
-          variant="h4"
-          color={colors.grey[100]}
-          fontWeight="bold"
-          mb="15px"
+                  <Box mt="10px" display="flex" justifyContent="">
+                    <IconButton
+                      onClick={() => handleEdit(job)}
+                      color="secondary"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleHide(job.id)}
+                      color="warning"
+                    >
+                      <VisibilityOffIcon />
+                    </IconButton>
+                  </Box>
+                </div>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        <EditJob
+          open={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false);
+            setSelectedJob(null);
+          }}
+          onSave={handleUpdatedJob}
+          job={selectedJob}
+        />
+      </Box>
+
+      <Box m="20px" style={{ display: showCandidate ? "block" : "none" }}>
+        <motion.button
+          onClick={handleShowList}
+          className="mb-6 flex items-center text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          Current Job Listings
-        </Typography>
-        <Box
-          display="grid"
-          gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
-          gap="20px"
-        >
-          {jobs.map((job) => (
+          <KeyboardArrowLeftOutlinedIcon className="mr-1" />
+          <span>Back</span>
+        </motion.button>
+
+        {candidates.map((item) => {
+          const currentStatus = applicationStatuses[item.id] || item.status;
+
+          return (
             <Box
-              key={job.id}
+              key={item.id}
               backgroundColor={colors.primary[400]}
               borderRadius="4px"
               p="15px"
+              display="flex"
+              alignItems="center"
             >
-              <Typography
-                variant="h5"
-                color={colors.grey[100]}
-                fontWeight="bold"
-              >
-                {job.title}
-              </Typography>
-              <Typography variant="body2" color={colors.grey[300]}>
-                Category: {job.job_category.title}
-              </Typography>
-              <Typography variant="body2" color={colors.grey[300]}>
-                Location: {job.location}
-              </Typography>
-              <Typography variant="body2" color={colors.grey[300]}>
-                Salary Range: {job.salary_range}
-              </Typography>
-              <Typography variant="body2" color={colors.grey[300]}>
-                Experience: {job.experience}
-              </Typography>
-              <Box mt="10px">
-                <Chip label={job.level} size="small" color="default" />
-                <Chip
-                  label={job.status ? "Active" : "Inactive"}
-                  size="small"
-                  color={job.status ? "info" : "error"}
-                  sx={{ ml: 1 }}
-                />
-              </Box>
-              <Tooltip title={job.description}>
-                <Typography
-                  variant="body2"
-                  color={colors.grey[300]}
-                  sx={{
-                    mt: 1,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {job.description}
+              <Box flex="1">
+                <Typography variant="h5" color={colors.grey[100]}>
+                  {item.candidate.full_name}
                 </Typography>
-              </Tooltip>
-              <Box mt="10px" display="flex" justifyContent="flex-end">
-                <IconButton onClick={() => handleEdit(job)} color="secondary">
-                  <EditIcon />
-                </IconButton>
-                <IconButton onClick={() => handleHide(job.id)} color="warning">
-                  <VisibilityOffIcon />
-                </IconButton>
+                <Typography variant="body2" color={colors.grey[300]}>
+                  Email: {item.candidate.email}
+                </Typography>
+                <Typography variant="body2" color={colors.grey[300]}>
+                  Phone: {item.candidate.phone_number}
+                </Typography>
+                <motion.button
+                  className="mt-2 text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleOpenShowDetail(item)}
+                >
+                  Detail
+                </motion.button>
               </Box>
+              <button
+                className={`py-3 px-6 rounded-lg ${
+                  currentStatus === "Accepted"
+                    ? "bg-gray-400"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white`}
+                style={{ marginLeft: "auto" }}
+                onClick={() => handleApplicationStatus(item.id, "Accepted")}
+                disabled={currentStatus === "Accepted"}
+              >
+                {currentStatus === "Accepted" ? "Approved" : "Approve"}
+              </button>
+              <button
+                className={`py-3 px-6 rounded-lg ${
+                  currentStatus === "Rejected"
+                    ? "bg-gray-400"
+                    : "bg-red-600 hover:bg-red-700"
+                } text-white`}
+                style={{ marginLeft: "50px" }}
+                onClick={() => handleApplicationStatus(item.id, "Rejected")}
+                disabled={currentStatus === "Rejected"}
+              >
+                {currentStatus === "Rejected" ? "Rejected" : "Reject"}
+              </button>
             </Box>
-          ))}
-        </Box>
-      </Box>
+          );
+        })}
 
-      <EditJob
-        open={isEditDialogOpen}
-        onClose={() => {
-          setIsEditDialogOpen(false);
-          setSelectedJob(null);
-        }}
-        onSave={handleUpdatedJob}
-        job={selectedJob}
-      />
-    </Box>
+        <ApplicationFile
+          open={showDetail}
+          onClose={() => {
+            setShowDetail(false);
+          }}
+          dataDetail={dataDetail}
+        />
+      </Box>
+    </>
   );
 };
 

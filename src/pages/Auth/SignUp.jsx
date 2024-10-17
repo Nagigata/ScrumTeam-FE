@@ -30,6 +30,21 @@ const SignUp = () => {
     });
 
     const apiURL = process.env.REACT_APP_API_URL + "/user/register/";
+    const userRole = role === "user" ? "candidate" : "recruiter";
+
+    // Chuẩn bị dữ liệu theo role
+    const bodyData = {
+      password: values.password,
+      user_role: userRole,
+    };
+
+    if (role === "user") {
+      bodyData.username = values.username;
+      bodyData.email = values.email;
+    } else {
+      bodyData.username = values.companyName;
+      bodyData.email = values.companyEmail;
+    }
 
     try {
       const res = await fetch(apiURL, {
@@ -37,12 +52,7 @@ const SignUp = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username: values.username,
-          password: values.password,
-          email: values.email,
-          user_role: role,
-        }),
+        body: JSON.stringify(bodyData),
       });
 
       if (res.status === 201) {

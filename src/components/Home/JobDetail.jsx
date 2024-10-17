@@ -13,10 +13,7 @@ const JobDetail = () => {
 
   return (
     <div className="jobDetailContainer p-10 bg-gray-100">
-      <button
-        onClick={() => navigate(-1)}
-        className="mb-4 text-blue-500 hover:underline"
-      >
+      <button onClick={() => navigate(-1)} className="mb-4 text-blue-500 hover:underline">
         Quay lại
       </button>
 
@@ -25,11 +22,7 @@ const JobDetail = () => {
           <div className="jobDetail bg-white p-6 rounded-lg shadow-lg mb-6">
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-3xl font-bold text-blue-900">{job.title}</h1>
-              <img
-                src={job.avatar_url}
-                alt="Company Logo"
-                className="w-16 h-16 rounded-full"
-              />
+              <img src={job.avatar_url} alt="Company Logo" className="w-16 h-16 rounded-full" />
             </div>
 
             <div className="flex items-center mb-2 text-gray-600">
@@ -54,19 +47,10 @@ const JobDetail = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-lg font-semibold mb-4">General Information</h3>
             <ul className="text-gray-700">
-              <li>
-                <strong>Years of Experience:</strong> {job.experience || "N/A"}{" "}
-                năm
-              </li>
-              <li>
-                <strong>Benefit:</strong> {job.benefits || "N/A"}
-              </li>
-              <li>
-                <strong>Salary:</strong> {job.salary_range || "N/A"}
-              </li>
-              <li>
-                <strong>Contract Type:</strong> {job.contract || "N/A"}
-              </li>
+              <li><strong>Years of Experience:</strong> {job.experience || "N/A"}</li>
+              <li><strong>Benefit:</strong> {job.benefits || "N/A"}</li>
+              <li><strong>Salary:</strong> {job.salary_range || "N/A"}</li>
+              <li><strong>Contract Type:</strong> {job.contract || "N/A"}</li>
             </ul>
           </div>
 
@@ -74,20 +58,15 @@ const JobDetail = () => {
             <h3 className="text-lg font-semibold mb-4">Technologies used</h3>
             <div className="flex flex-wrap gap-2">
               {job.skill_required ? (
-                job.skill_required.split(",").map((tech, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-200 text-gray-700 py-1 px-2 rounded-lg"
-                  >
-                    {tech.trim()}
-                  </span>
+                job.skill_required.split(',').map((tech, index) => (
+                  <span key={index} className="bg-gray-200 text-gray-700 py-1 px-2 rounded-lg">{tech.trim()}</span>
                 ))
               ) : (
                 <span className="text-gray-500">No technologies listed</span>
               )}
             </div>
           </div>
-
+          
           {/* Nút Apply Now */}
           <div className="mt-6">
             <button className="bg-red-600 text-white py-3 px-6 w-full rounded-lg hover:bg-red-700">
