@@ -19,6 +19,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
+  userRole: Yup.string().required("Please select a role"),
 });
 
 const SignIn = () => {
@@ -46,8 +47,7 @@ const SignIn = () => {
       if (res.status === 200) {
         const data = await res.json();
         console.log(data);
-        localStorage.setItem("userRole", "candidate");
-        localStorage.setItem("userRole", "recruiter");
+        Cookies.set("userRole", values.userRole, { expires: 7 });
         Cookies.set("access_token", data.access, { expires: 7 });
         Cookies.set("refresh_token", data.refresh, { expires: 7 });
         window.location.href = "/";
@@ -88,11 +88,11 @@ const SignIn = () => {
                 Login to your account
               </h2>
               <Formik
-                initialValues={{ username: "", password: "" }}
+                initialValues={{ username: "", password: "", userRole: "" }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >
-                {({ errors, touched, isSubmitting }) => (
+                {({ errors, touched, isSubmitting, values, handleChange }) => (
                   <Form>
                     <InputField
                       label="Username"
@@ -112,6 +112,64 @@ const SignIn = () => {
                       errors={errors}
                       touched={touched}
                     />
+
+                    {/* Role Selection Radio Buttons */}
+                    <div className="mb-6">
+                      <label className="block text-blueColor text-sm font-semibold mb-4">
+                        Select your role
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="relative flex-1">
+                          <input
+                            type="radio"
+                            name="userRole"
+                            value="candidate"
+                            onChange={handleChange}
+                            className="peer sr-only"
+                          />
+                          <div className="w-full p-4 bg-white border-2 border-gray-200 rounded-lg cursor-pointer transition-all hover:bg-gray-50 peer-checked:border-blueColor peer-checked:bg-blue-50">
+                            <div className="flex items-center justify-between">
+                              <div className="flex flex-col gap-1">
+                                <p className="text-sm font-semibold text-gray-700">
+                                  Candidate
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Looking for job opportunities
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </label>
+
+                        <label className="relative flex-1">
+                          <input
+                            type="radio"
+                            name="userRole"
+                            value="recruiter"
+                            onChange={handleChange}
+                            className="peer sr-only"
+                          />
+                          <div className="w-full p-4 bg-white border-2 border-gray-200 rounded-lg cursor-pointer transition-all hover:bg-gray-50 peer-checked:border-blueColor peer-checked:bg-blue-50">
+                            <div className="flex items-center justify-between">
+                              <div className="flex flex-col gap-1">
+                                <p className="text-sm font-semibold text-gray-700">
+                                  Recruiter
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Hiring for your company
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                      {errors.userRole && touched.userRole && (
+                        <div className="text-red-500 text-sm mt-2">
+                          {errors.userRole}
+                        </div>
+                      )}
+                    </div>
+
                     {errorMessage && (
                       <div className="mb-4 text-red-500 text-sm">
                         {errorMessage}
@@ -146,7 +204,7 @@ const SignIn = () => {
               </Formik>
 
               <div className="mt-6 text-sm text-gray-500 text-center">
-                Don’t have an account?{" "}
+                Don't have an account?{" "}
                 <Link to="/register" className="text-blueColor font-bold">
                   Register
                 </Link>

@@ -12,7 +12,7 @@ import Recruiter from "./AppRecruiter";
 import Cookies from "js-cookie";
 
 function App() {
-  const userRole = localStorage.getItem("userRole");
+  const userRole = Cookies.get("userRole");
   const accessToken = Cookies.get("access_token");
   const refresh_token = Cookies.get("access_token");
 
@@ -20,7 +20,7 @@ function App() {
   console.log(refresh_token);
   console.log(userRole);
 
-  // localStorage.removeItem("userRole")
+  // Cookies.remove("userRole");
   // Cookies.remove("access_token");
   // Cookies.remove("access_token");
   const MainLayout = ({ children }) => (

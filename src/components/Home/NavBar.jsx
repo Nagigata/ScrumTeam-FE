@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
-import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import Avatar from "@mui/material/Avatar";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -9,7 +8,6 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const accessToken = Cookies.get("access_token");
@@ -34,8 +32,8 @@ const NavBar = () => {
         setUserProfile(data);
       } else {
         console.error("Failed to fetch user profile");
-        // If the token is invalid or expired, we should clear it
         if (response.status === 401) {
+          Cookies.remove("userRole");
           Cookies.remove("access_token");
           Cookies.remove("refresh_token");
         }
@@ -48,10 +46,8 @@ const NavBar = () => {
   const handleLogout = () => {
     Cookies.remove("access_token");
     Cookies.remove("refresh_token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("userRole");
+    Cookies.remove("userRole");
     setUserProfile(null);
-    navigate("/login");
     window.location.reload();
   };
 

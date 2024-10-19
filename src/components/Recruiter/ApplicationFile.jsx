@@ -5,17 +5,12 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Box,
-  MenuItem,
-  FormControlLabel,
-  Switch,
 } from "@mui/material";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
 import defaulAvatar from "../../assets/img/default-avatarjpg.jpg";
-import { Link } from "react-router-dom";
 const levels = ["Entry", "Junior", "Middle", "Senior", "Lead"];
 
 const ApplicationFile = ({ open, onClose, dataDetail }) => {
