@@ -1,13 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import Cookies from "js-cookie";
 import Avatar from "@mui/material/Avatar";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import Badge from "@mui/material/Badge";
+import NotificationDropdown from "./NotificationDropdown";
 
 const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(2); // Mock unread count
+
+  const handleMarkAsRead = (notificationId) => {
+    setUnreadCount(Math.max(0, unreadCount - 1));
+    // Here you would typically make an API call to update the notification status
+  };
 
   useEffect(() => {
     const accessToken = Cookies.get("access_token");
@@ -69,16 +79,30 @@ const NavBar = () => {
 
         {userProfile ? (
           <>
+            <li className="navBarLi relative">
+              <div
+                className="cursor-pointer p-2 hover:bg-gray-100 rounded-full"
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                <Badge badgeContent={unreadCount} color="error">
+                  <NotificationsIcon className="text-gray-600" />
+                </Badge>
+              </div>
+              <NotificationDropdown
+                show={showNotifications}
+                onMarkAsRead={handleMarkAsRead}
+              />
+            </li>
             <li
               className="navBarLi relative"
               onMouseEnter={() => setShowDropdown(true)}
               onMouseLeave={() => setShowDropdown(false)}
             >
               <div className="flex items-center cursor-pointer">
-                <Avatar src={userProfile.avatar} className="mr-2">
-                  {userProfile.full_name.charAt(0).toUpperCase()}
+                <Avatar src={userProfile?.avatar} className="mr-2">
+                  {userProfile?.full_name?.charAt(0).toUpperCase()}
                 </Avatar>
-                <span>{userProfile.full_name}</span>
+                <span>{userProfile?.full_name}</span>
                 <ArrowDropDownIcon />
               </div>
               {showDropdown && (
@@ -88,6 +112,9 @@ const NavBar = () => {
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
                     <Link to="/application-status">My Application</Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100">
+                    <Link to="/cv-management">CV Management</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100 hover:text-red-500">
                     <button onClick={handleLogout}>

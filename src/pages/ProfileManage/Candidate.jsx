@@ -6,6 +6,8 @@ import {
   AccountCircle,
   Phone as PhoneIcon,
   PhotoCamera as CameraIcon,
+  Code as CodeIcon,
+  WorkOutline as LevelIcon,
 } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import Cookies from "js-cookie";
@@ -14,6 +16,28 @@ const Candidate = () => {
   const [status, setStatus] = useState({ success: "", error: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+
+  const programmingLanguages = [
+    "Java",
+    "Python",
+    "JavaScript",
+    "C++",
+    "C#",
+    "PHP",
+    "Ruby",
+    "Swift",
+    "Go",
+    "Kotlin",
+  ];
+
+  const experienceLevels = [
+    "Intern",
+    "Fresher",
+    "Junior",
+    "Mid-level",
+    "Senior",
+    "Lead",
+  ];
 
   useEffect(() => {
     fetchUserProfile();
@@ -91,6 +115,8 @@ const Candidate = () => {
           full_name: values.full_name,
           is_male: values.is_male,
           phone_number: values.phone_number,
+          skills: values.skills,
+          level: values.level,
         }),
       });
 
@@ -137,12 +163,14 @@ const Candidate = () => {
             phone_number: userProfile.phone_number || "",
             avatar: null,
             avatarPreview: userProfile.avatar || "",
+            skills: userProfile.skills || "",
+            level: userProfile.level || "",
           }}
           onSubmit={handleSubmit}
         >
           {({ errors, touched, setFieldValue, values }) => (
             <Form>
-              {/* Upload Avatar with Camera Icon */}
+              {/* Avatar Upload Section */}
               <div className="relative mb-6 flex flex-col items-center">
                 <div className="relative w-32 h-32">
                   {values.avatarPreview ? (
@@ -209,7 +237,57 @@ const Candidate = () => {
                 touched={touched}
               />
 
-              {/* Checkbox for Gender */}
+              {/* Skills Dropdown */}
+              <div className="mb-6 *:">
+                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
+                  <div className="flex items-center">Programming Skills</div>
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <CodeIcon className="h-5 w-5 text-[#010101]" />
+                  </span>
+                  <select
+                    name="skills"
+                    value={values.skills}
+                    onChange={(e) => setFieldValue("skills", e.target.value)}
+                    className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select a programming language</option>
+                    {programmingLanguages.map((lang) => (
+                      <option key={lang} value={lang}>
+                        {lang}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Experience Level Dropdown */}
+              <div className="mb-6">
+                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
+                  Experience Level
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <LevelIcon className="h-5 w-5 text-[#010101]" />
+                  </span>
+                  <select
+                    name="level"
+                    value={values.level}
+                    onChange={(e) => setFieldValue("level", e.target.value)}
+                    className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select experience level</option>
+                    {experienceLevels.map((level) => (
+                      <option key={level} value={level}>
+                        {level}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Gender Checkbox */}
               <div className="mb-4">
                 <label className="flex items-center">
                   <input
@@ -228,7 +306,7 @@ const Candidate = () => {
                 </label>
               </div>
 
-              {/* AuthButton for Save Information */}
+              {/* Submit Button */}
               <AuthButton
                 label="Save Information"
                 isLoading={isSubmitting}

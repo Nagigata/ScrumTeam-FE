@@ -38,14 +38,14 @@ const SignUp = () => {
       user_role: userRole,
     };
 
-    if (role === "user") {
+    if (role === "candidate") {
       bodyData.username = values.username;
       bodyData.email = values.email;
     } else {
       bodyData.username = values.companyName;
       bodyData.email = values.companyEmail;
     }
-
+    console.log(bodyData) 
     try {
       const res = await fetch(apiURL, {
         method: "POST",
