@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 
@@ -6,6 +6,11 @@ const JobDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const job = location.state?.job;
+  const [isFollowed, setIsFollowed] = useState(false);
+
+  const handleFollowToggle = () => {
+    setIsFollowed((prev) => !prev);
+  };
 
   if (!job) {
     return <div>No job details available</div>;
@@ -67,11 +72,17 @@ const JobDetail = () => {
             </div>
           </div>
           
-          {/* Nút Apply Now */}
-          <div className="mt-6">
-            <button className="bg-red-600 text-white py-3 px-6 w-full rounded-lg hover:bg-red-700">
+          {/* Nút Apply Now và Follow */}
+          <div className="mt-6 flex items-center">
+            <button className="bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-700">
               Apply now
             </button>
+            <img
+              src={isFollowed ? "/assets/follow_on.png" : "/assets/follow_off.png"}
+              alt="Follow Icon"
+              className="ml-4 w-8 h-8 cursor-pointer"
+              onClick={handleFollowToggle}
+            />
           </div>
         </div>
       </div>

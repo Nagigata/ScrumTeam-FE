@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-
+import NotificationMenu from "./NotificationMenu";
 const NavBar = () => {
   const [username, setUsername] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -27,7 +27,11 @@ const NavBar = () => {
         <h1 className="logo text-[25px] text-blueColor">
           <strong>Dev</strong>Hunt
         </h1>
-      </div>
+      </div> 
+      
+      {/* Container flex cho NotificationMenu và Menu */}
+      <div className="flex items-center">
+        <NotificationMenu className="mr-0" />
 
       <div className="menu flex gap-8">
         <li className="navBarLi">
@@ -72,6 +76,7 @@ const NavBar = () => {
             </li>
           </>
         )}
+        </div>
       </div>
     </div>
   );
