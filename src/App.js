@@ -6,22 +6,24 @@ import Home from "./pages/Home/Home";
 import JobDetail from "./components/Home/JobDetail";
 import Candidate from "./pages/ProfileManage/Candidate";
 import ApplicationStatus from "./components/Home/ApplicationStatus";
+import CVManagement from "./components/Home/CVManagement";
 import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
 import Recruiter from "./AppRecruiter";
 import Cookies from "js-cookie";
 
 function App() {
-  const user = localStorage.getItem("username");
-  const userRole = localStorage.getItem("userRole");
+  const userRole = Cookies.get("userRole");
   const accessToken = Cookies.get("access_token");
   const refresh_token = Cookies.get("access_token");
+
   console.log(accessToken);
   console.log(refresh_token);
-
-  console.log(user);
   console.log(userRole);
 
+  // Cookies.remove("userRole");
+  // Cookies.remove("access_token");
+  // Cookies.remove("access_token");
   const MainLayout = ({ children }) => (
     <>
       <NavBar />
@@ -40,11 +42,11 @@ function App() {
               <Routes>
                 <Route
                   path="/login"
-                  element={user ? <Navigate to="/" /> : <SignIn />}
+                  element={userRole ? <Navigate to="/" /> : <SignIn />}
                 />
                 <Route
                   path="/register"
-                  element={user ? <Navigate to="/" /> : <SignUp />}
+                  element={userRole ? <Navigate to="/" /> : <SignUp />}
                 />
                 <Route
                   path="/job/:id"
@@ -72,7 +74,18 @@ function App() {
                     userRole === "recruiter" ? (
                       <Navigate to="/" />
                     ) : (
-                      <ApplicationStatus  />
+                      <ApplicationStatus />
+                    )
+                  }
+                />
+
+                <Route
+                  path="/cv-management"
+                  element={
+                    userRole === "recruiter" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <CVManagement />
                     )
                   }
                 />

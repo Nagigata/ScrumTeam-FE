@@ -22,6 +22,12 @@ const SignUp = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     setIsLoading(true);
     setErrorMessage("");
+    console.log({
+      username: values.username,
+      password: values.password,
+      email: values.email,
+      user_role: role,
+    });
 
     const apiURL = process.env.REACT_APP_API_URL + "/user/register/";
     const userRole = role === "user" ? "candidate" : "recruiter";
@@ -31,15 +37,15 @@ const SignUp = () => {
       password: values.password,
       user_role: userRole,
     };
-    
-    if (role === "user") {
+
+    if (role === "candidate") {
       bodyData.username = values.username;
       bodyData.email = values.email;
     } else {
       bodyData.username = values.companyName;
       bodyData.email = values.companyEmail;
     }
-
+    console.log(bodyData) 
     try {
       const res = await fetch(apiURL, {
         method: "POST",
@@ -53,6 +59,8 @@ const SignUp = () => {
         alert("Account created successfully!");
         navigate("/login");
       } else if (res.status === 400) {
+        const errorData = await res.json();
+        console.error("Server error:", errorData);
         setErrorMessage("Username or email already exists. Please try again.");
       } else {
         setErrorMessage("Server error. Please try again later.");
@@ -91,11 +99,11 @@ const SignUp = () => {
                     <span>Back</span>
                   </motion.button>
                   <h2 className="text-3xl font-bold mb-8 text-blueColor">
-                    {role === "user"
-                      ? "Create User Account"
+                    {role === "candidate"
+                      ? "Create Candidate Account"
                       : "Create Recruiter Account"}
                   </h2>
-                  {role === "user" ? (
+                  {role === "candidate" ? (
                     <UserSignUp
                       handleSubmit={handleSubmit}
                       errorMessage={errorMessage}
