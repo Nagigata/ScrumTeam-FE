@@ -10,6 +10,7 @@ import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
 import Recruiter from "./AppRecruiter";
 import Cookies from "js-cookie";
+import { SocketProvider } from "./contextAPI/socketProvider";
 
 function App() {
   const userRole = Cookies.get("userRole");
@@ -33,72 +34,74 @@ function App() {
 
   return (
     <div className="App">
-      <Routes>
-        <Route
-          path="/*"
-          element={
-            <MainLayout>
-              <Routes>
-                <Route
-                  path="/login"
-                  element={userRole ? <Navigate to="/" /> : <SignIn />}
-                />
-                <Route
-                  path="/register"
-                  element={userRole ? <Navigate to="/" /> : <SignUp />}
-                />
-                <Route
-                  path="/job/:id"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <JobDetail />
-                    )
-                  }
-                />
-                <Route
-                  path="/candidate"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <Candidate />
-                    )
-                  }
-                />
-                <Route
-                  path="/application-status"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <ApplicationStatus />
-                    )
-                  }
-                />
+      <SocketProvider>
+        <Routes>
+          <Route
+            path="/*"
+            element={
+              <MainLayout>
+                <Routes>
+                  <Route
+                    path="/login"
+                    element={userRole ? <Navigate to="/" /> : <SignIn />}
+                  />
+                  <Route
+                    path="/register"
+                    element={userRole ? <Navigate to="/" /> : <SignUp />}
+                  />
+                  <Route
+                    path="/job/:id"
+                    element={
+                      userRole === "recruiter" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <JobDetail />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/candidate"
+                    element={
+                      userRole === "recruiter" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <Candidate />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/application-status"
+                    element={
+                      userRole === "recruiter" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <ApplicationStatus />
+                      )
+                    }
+                  />
 
-                <Route
-                  path="/"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/recruiter" />
-                    ) : (
-                      <Home />
-                    )
-                  }
-                />
-              </Routes>
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/recruiter/*"
-          element={
-            userRole === "recruiter" ? <Recruiter /> : <Navigate to="/" />
-          }
-        />
-      </Routes>
+                  <Route
+                    path="/"
+                    element={
+                      userRole === "recruiter" ? (
+                        <Navigate to="/recruiter" />
+                      ) : (
+                        <Home />
+                      )
+                    }
+                  />
+                </Routes>
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/recruiter/*"
+            element={
+              userRole === "recruiter" ? <Recruiter /> : <Navigate to="/" />
+            }
+          />
+        </Routes>
+      </SocketProvider>
     </div>
   );
 }
