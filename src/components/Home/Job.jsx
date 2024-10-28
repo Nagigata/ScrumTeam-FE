@@ -5,6 +5,7 @@ import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 const Job = ({ searchResults }) => {
   const navigate = useNavigate();
   console.log("Search Results:", searchResults); // Log kết quả tìm kiếm
+  console.error("error");
   // Hàm để cắt bớt mô tả
   const truncateDescription = (description, maxLength) => {
     if (description.length > maxLength) {

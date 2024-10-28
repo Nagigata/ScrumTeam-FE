@@ -59,7 +59,7 @@ const Home = () => {
   ) => {
     try {
       const response = await fetch(
-        `http://cnpm.duytech.site/api/job/search/?search=${keyword}&location=${location}&salary_range=${salaryRange}&skill_required=${skill}`
+        `http://localhost:8000/api/job/search/?search=${keyword}&location=${location}&salary_range=${salaryRange}&skill_required=${skill}`
       );
       if (response.ok) {
         const data = await response.json();

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -14,6 +14,7 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import Cookies from "js-cookie";
+import { useSocket } from "../../contextAPI/SocketProvider";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -24,6 +25,34 @@ const Topbar = () => {
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const openNotifications = Boolean(notificationAnchorEl);
+  const [count, setCount] = useState(0);
+  const { message } = useSocket();
+  const accessToken = Cookies.get("access_token");
+
+  const [listMessage, setListMessage] = useState(() => {
+    const savedMessages = Cookies.get('list_message');
+    console.log(">>> " , savedMessages);
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
+
+  useEffect(() => {
+    if (message && message !== 'You are connected to Websocket') {
+      setCount(prev => prev + 1);
+  
+      setListMessage(prev => {
+        const newList = [...prev, message];
+        
+        const storedMessages = Cookies.get("list_message");
+        const parsedMessages = storedMessages ? JSON.parse(storedMessages) : [];
+  
+        if (JSON.stringify(parsedMessages) !== JSON.stringify(newList)) {
+          Cookies.set("list_message", JSON.stringify(newList));
+        }
+  
+        return newList;
+      });
+    }
+  }, [message]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -88,46 +117,86 @@ const Topbar = () => {
           )}
         </IconButton>
 
-        {/* Biểu tượng thông báo */}
-        <IconButton
-          size="medium"
-          onClick={handleNotificationClick}
-          aria-controls={openNotifications ? "notification-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={openNotifications ? "true" : undefined}
-        >
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <Menu
-          anchorEl={notificationAnchorEl}
-          id="notification-menu"
-          open={openNotifications}
-          onClose={handleNotificationClose}
-          sx={{ minWidth: '300px' }} 
-        >
-          <Box sx={{ width: 400, padding: 2 }}>
-            <Typography variant="h4" sx={{ padding: 1, fontWeight: 'bold' }}>Thông báo</Typography>
-            <Divider />
-            {notifications.map((notification, index) => (
-              <MenuItem 
-                key={index} 
-                onClick={handleNotificationClose}
-                sx={{ padding: 2 }} //khoảng cách giữa các thông báo
-              >
-                <Typography 
-                  sx={{ 
-                    whiteSpace: "normal", 
-                    overflow: "visible", 
-                    textOverflow: "clip", 
-                    fontSize: '0.9rem', 
-                  }}
-                >
-                  {notification}
-                </Typography>
-              </MenuItem>
-            ))}
-          </Box>
-        </Menu>
+        {accessToken ?
+          <>
+            {/* Biểu tượng thông báo */}
+            <IconButton
+              onClick={handleNotificationClick}
+              size="medium"
+              aria-controls={openNotifications ? "notification-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={openNotifications ? "true" : undefined}
+              className="relative"
+            >
+              {/* Notification Badge */}
+              {count > 0 && (
+                <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-cyan-500 rounded-full">
+                  <span className="text-white text-xs">
+                    {count > 99 ? '99+' : count}
+                  </span>
+                </div>
+              )}
+              
+              {/* Notification Icon */}
+              <NotificationsOutlinedIcon className="relative z-0" />
+            </IconButton>
+            
+            <Menu
+              anchorEl={notificationAnchorEl}
+              id="notification-menu"
+              open={openNotifications}
+              onClose={handleNotificationClose}
+              sx={{ minWidth: '300px' }} 
+            >
+              <Box sx={{ width: 400, padding: 2 }}>
+                <Typography variant="h6" sx={{ padding: 1, fontWeight: 'bold' }}>Thông báo</Typography>
+                <Divider />
+                {listMessage.length > 0 ?
+                  <>
+                    {listMessage.map((notification, index) => (
+                      <MenuItem 
+                        key={index} 
+                        onClick={handleNotificationClose}
+                        sx={{ padding: 2 }} //khoảng cách giữa các thông báo
+                      >
+                        <Typography 
+                          sx={{ 
+                            whiteSpace: "normal", 
+                            overflow: "visible", 
+                            textOverflow: "clip", 
+                            fontSize: '0.9rem', 
+                          }}
+                        >
+                          {notification}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                  </>
+                  :
+                  <>
+                    <MenuItem 
+                        onClick={handleNotificationClose}
+                        sx={{ padding: 2 }}
+                      >
+                        <Typography 
+                          sx={{ 
+                            whiteSpace: "normal", 
+                            overflow: "visible", 
+                            textOverflow: "clip", 
+                            fontSize: '0.9rem', 
+                          }}
+                        >
+                          No notification
+                        </Typography>
+                    </MenuItem>
+                  </>
+                }
+              </Box>
+            </Menu>
+          </>
+          :
+          <></>
+        }
 
         <IconButton
           size="medium"
