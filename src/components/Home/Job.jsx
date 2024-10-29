@@ -49,7 +49,8 @@ const Job = ({ searchResults }) => {
               <h6 className="text-[#ccc]">{location}</h6>
 
               <p className="text-[13px] text-[#959595] pt-[20px] border-t-[2px] mt-[20px] group-hover:text-white h-[60px] overflow-hidden">
-                {truncateDescription(description, 100)} {/* Giới hạn mô tả */}
+                {/* Giới hạn mô tả */}
+                {/*  {truncateDescription(description, 100)} */}{" "}
               </p>
               <div className="company flex items-center gap-2">
                 <img src={avatar_url} alt="Company Logo" className="w-[10%]" />

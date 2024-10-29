@@ -175,7 +175,7 @@ const CVManagement = () => {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto my-10 bg-white rounded-lg shadow-lg border border-gray-200">
+    <div className="w-full  my-10 bg-white rounded-lg shadow-lg border border-gray-200">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <h2 className="text-2xl font-semibold text-gray-800">CV Management</h2>
