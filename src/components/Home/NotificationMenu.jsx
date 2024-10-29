@@ -18,7 +18,7 @@ const NotificationMenu = () => {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      const apiURL = "http://localhost:8000/api/job/notifications_job/";
+      const apiURL = "http://cnpm.duytech.site/api/job/notifications_job/";
       const accessToken = Cookies.get("access_token");
 
       try {

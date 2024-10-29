@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 import {
   Work as WorkIcon,
   ChevronLeft as ChevronLeftIcon,
@@ -14,14 +15,14 @@ const FollowingJob = () => {
   const [status, setStatus] = useState({ error: null });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchFollowedJobs();
   }, []);
 
   const fetchFollowedJobs = async () => {
-    const apiURL =
-      process.env.REACT_APP_API_URL + "/job/user-get-list-follow-job/";
+    const apiURL = "http://cnpm.duytech.site/api/job/user-get-list-follow-job/";
     const accessToken = Cookies.get("access_token");
 
     try {
@@ -62,6 +63,37 @@ const FollowingJob = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
+  const truncateDescription = (description, maxLength) => {
+    if (!description) return "No description available";
+    if (description.length > maxLength) {
+      return description.substring(0, maxLength) + "...";
+    }
+    return description;
+  };
+
+  const handleJobClick = async (jobId) => {
+    const apiURL = `http://cnpm.duytech.site/api/job/detail-job/?job_id=${jobId}`;
+    const accessToken = Cookies.get("access_token");
+
+    try {
+      const response = await fetch(apiURL, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const jobDetail = await response.json();
+        navigate(`/job/${jobId}`, { state: { job: jobDetail } });
+      } else {
+        console.error("Failed to fetch job details");
+      }
+    } catch (error) {
+      console.error("Error fetching job details:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-greyIsh">
@@ -88,7 +120,8 @@ const FollowingJob = () => {
           {currentItems.map((job) => (
             <div
               key={job.id}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden cursor-pointer"
+              onClick={() => handleJobClick(job.job_id)}
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
@@ -98,52 +131,52 @@ const FollowingJob = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl font-semibold text-gray-900">
-                        {job.title}
+                        {job.job_title}
                       </h2>
-                      <p className="text-gray-600">{job.company_name}</p>
+                      <p className="text-gray-600">Job ID: {job.job_id}</p>
                     </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="flex items-center">
-                    <CalendarIcon className="text-blueColor mr-2" />
-                    <span className="text-gray-700">
-                      Posted on: {new Date(job.posted_at).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center md:justify-self-center">
-                    <PersonIcon className="text-blueColor mr-2" />
-                    <span className="text-gray-700">
-                      Location: {job.location}
-                    </span>
                   </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        <div className="flex justify-between items-center mt-8">
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors duration-200"
-          >
-            <ChevronLeftIcon className="w-5 h-5 mr-2" />
-            Previous
-          </button>
-          <span className="text-sm text-gray-700">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors duration-200"
-          >
-            Next
-            <ChevronRightIcon className="w-5 h-5 ml-2" />
-          </button>
-        </div>
+
+        {followedJobs.length > 0 && (
+          <div className="flex justify-between items-center mt-8">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors duration-200"
+            >
+              <ChevronLeftIcon className="w-5 h-5 mr-2" />
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors duration-200"
+            >
+              Next
+              <ChevronRightIcon className="w-5 h-5 ml-2" />
+            </button>
+          </div>
+        )}
+
+        {followedJobs.length === 0 && !loading && !status.error && (
+          <div className="text-center py-10">
+            <p className="text-gray-500 text-lg">
+              You haven't followed any jobs yet.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

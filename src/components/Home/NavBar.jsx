@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Cookies from "js-cookie";
@@ -12,7 +12,10 @@ const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(2); // Mock unread count
+  const [unreadCount, setUnreadCount] = useState(2); 
+
+  const accessToken = Cookies.get("access_token");
+  const navigate = useNavigate();
 
   const handleMarkAsRead = (notificationId) => {
     setUnreadCount(Math.max(0, unreadCount - 1));
@@ -20,16 +23,15 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    const accessToken = Cookies.get("access_token");
     if (accessToken) {
       fetchUserProfile(accessToken);
     }
-  }, []);
+  }, [accessToken]);
 
   const fetchUserProfile = async (accessToken) => {
     try {
       const response = await fetch(
-        process.env.REACT_APP_API_URL + "/candidate/profile/",
+        process.env.REACT_APP_API_URL + "/candidate/basic-profile/",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -43,9 +45,7 @@ const NavBar = () => {
       } else {
         console.error("Failed to fetch user profile");
         if (response.status === 401) {
-          Cookies.remove("userRole");
-          Cookies.remove("access_token");
-          Cookies.remove("refresh_token");
+          console.error("Unauthorized request");
         }
       }
     } catch (error) {
@@ -58,6 +58,7 @@ const NavBar = () => {
     Cookies.remove("refresh_token");
     Cookies.remove("userRole");
     setUserProfile(null);
+    navigate("/");
     window.location.reload();
   };
 
@@ -78,7 +79,7 @@ const NavBar = () => {
         <li className="navBarLi">Companies</li>
         <li className="navBarLi">Contact</li>
 
-        {userProfile ? (
+        {accessToken ? (
           <>
             <li className="navBarLi relative">
               <div
@@ -116,9 +117,10 @@ const NavBar = () => {
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
                     <Link to="/application-status">My Application</Link>
+                    <Link to="/skills">Portfolio</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
-                    <Link to="/cv-management">CV Management</Link>
+                    <Link to="/application-status">My Application</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100 hover:text-red-500">
                     <button onClick={handleLogout}>

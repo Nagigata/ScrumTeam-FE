@@ -6,8 +6,8 @@ import {
   AccountCircle,
   Phone as PhoneIcon,
   PhotoCamera as CameraIcon,
-  Code as CodeIcon,
-  WorkOutline as LevelIcon,
+  CalendarToday as CalendarIcon,
+  Home as HomeIcon,
 } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import Cookies from "js-cookie";
@@ -16,28 +16,6 @@ const Candidate = () => {
   const [status, setStatus] = useState({ success: "", error: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
-
-  const programmingLanguages = [
-    "Java",
-    "Python",
-    "JavaScript",
-    "C++",
-    "C#",
-    "PHP",
-    "Ruby",
-    "Swift",
-    "Go",
-    "Kotlin",
-  ];
-
-  const experienceLevels = [
-    "Intern",
-    "Fresher",
-    "Junior",
-    "Mid-level",
-    "Senior",
-    "Lead",
-  ];
 
   useEffect(() => {
     fetchUserProfile();
@@ -49,7 +27,7 @@ const Candidate = () => {
 
     try {
       const response = await fetch(
-        process.env.REACT_APP_API_URL + "/candidate/profile/",
+        process.env.REACT_APP_API_URL + "/candidate/basic-profile/",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -97,7 +75,7 @@ const Candidate = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     setStatus({ success: "", error: "" });
     setIsSubmitting(true);
-    const apiURL = process.env.REACT_APP_API_URL + "/candidate/profile/";
+    const apiURL = process.env.REACT_APP_API_URL + "/candidate/basic-profile/";
     const accessToken = Cookies.get("access_token");
 
     try {
@@ -113,10 +91,10 @@ const Candidate = () => {
         },
         body: JSON.stringify({
           full_name: values.full_name,
+          birthday: values.birthday,
           is_male: values.is_male,
           phone_number: values.phone_number,
-          skills: values.skills,
-          level: values.level,
+          address: values.address,
         }),
       });
 
@@ -153,18 +131,18 @@ const Candidate = () => {
     <div>
       <div className="max-w-md mx-auto p-4">
         <h2 className="text-2xl font-bold text-center mb-8">
-          Candidate Information
+          Candidate Profile
         </h2>
 
         <Formik
           initialValues={{
             full_name: userProfile.full_name || "",
+            birthday: userProfile.birthday || "",
             is_male: userProfile.is_male,
             phone_number: userProfile.phone_number || "",
+            address: userProfile.address || "",
             avatar: null,
             avatarPreview: userProfile.avatar || "",
-            skills: userProfile.skills || "",
-            level: userProfile.level || "",
           }}
           onSubmit={handleSubmit}
         >
@@ -217,6 +195,7 @@ const Candidate = () => {
                 </div>
               </div>
 
+              {/* Full Name Field */}
               <InputField
                 label="Full Name"
                 name="full_name"
@@ -227,6 +206,7 @@ const Candidate = () => {
                 touched={touched}
               />
 
+              {/* Phone Number Field */}
               <InputField
                 label="Phone Number"
                 name="phone_number"
@@ -237,73 +217,56 @@ const Candidate = () => {
                 touched={touched}
               />
 
-              {/* Skills Dropdown */}
-              <div className="mb-6 *:">
-                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
-                  <div className="flex items-center">Programming Skills</div>
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <CodeIcon className="h-5 w-5 text-[#010101]" />
-                  </span>
-                  <select
-                    name="skills"
-                    value={values.skills}
-                    onChange={(e) => setFieldValue("skills", e.target.value)}
-                    className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select a programming language</option>
-                    {programmingLanguages.map((lang) => (
-                      <option key={lang} value={lang}>
-                        {lang}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+              {/* Birthday Field */}
+              <InputField
+                label="Birthday"
+                name="birthday"
+                type="date"
+                icon={CalendarIcon}
+                errors={errors}
+                touched={touched}
+              />
 
-              {/* Experience Level Dropdown */}
-              <div className="mb-6">
-                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
-                  Experience Level
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <LevelIcon className="h-5 w-5 text-[#010101]" />
-                  </span>
-                  <select
-                    name="level"
-                    value={values.level}
-                    onChange={(e) => setFieldValue("level", e.target.value)}
-                    className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select experience level</option>
-                    {experienceLevels.map((level) => (
-                      <option key={level} value={level}>
-                        {level}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+              {/* Address Field */}
+              <InputField
+                label="Address"
+                name="address"
+                type="text"
+                placeholder="Enter your address"
+                icon={HomeIcon}
+                errors={errors}
+                touched={touched}
+              />
 
-              {/* Gender Checkbox */}
+              {/* Gender Radio Button */}
               <div className="mb-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="is_male"
-                    className="mr-2"
-                    checked={values.is_male}
-                    onChange={() => setFieldValue("is_male", !values.is_male)}
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      transform: "scale(1.5)",
-                    }}
-                  />
-                  Is Male
+                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
+                  Gender
                 </label>
+                <div className="flex items-center">
+                  <label className="mr-10">
+                    <input
+                      type="radio"
+                      name="is_male"
+                      value={true}
+                      checked={values.is_male === true}
+                      onChange={() => setFieldValue("is_male", true)}
+                      className="mr-1"
+                    />
+                    Male
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="is_male"
+                      value={false}
+                      checked={values.is_male === false}
+                      onChange={() => setFieldValue("is_male", false)}
+                      className="mr-1"
+                    />
+                    Female
+                  </label>
+                </div>
               </div>
 
               {/* Submit Button */}
@@ -318,7 +281,6 @@ const Candidate = () => {
         {status.success && (
           <div className="mt-4 text-center text-green-600">
             {status.success}
-            {window.location.reload()}
           </div>
         )}
         {status.error && (

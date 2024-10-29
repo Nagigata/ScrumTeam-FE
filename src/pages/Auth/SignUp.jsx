@@ -30,7 +30,7 @@ const SignUp = () => {
     });
 
     const apiURL = process.env.REACT_APP_API_URL + "/user/register/";
-    const userRole = role === "user" ? "candidate" : "recruiter";
+    const userRole = role;
 
     // Chuẩn bị dữ liệu theo role
     const bodyData = {
@@ -45,7 +45,7 @@ const SignUp = () => {
       bodyData.username = values.companyName;
       bodyData.email = values.companyEmail;
     }
-    console.log(bodyData) 
+    console.log(bodyData);
     try {
       const res = await fetch(apiURL, {
         method: "POST",

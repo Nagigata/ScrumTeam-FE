@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CVUploadForm from "./CVUpload";
@@ -14,8 +14,45 @@ const JobDetail = () => {
   // Khai báo state showUploadModal
   const [showUploadModal, setShowUploadModal] = useState(false);
 
+  const checkFollowStatus = async () => {
+    if (!job?.id) return;
+
+    const apiURL = "http://cnpm.duytech.site/api/job/user-get-list-follow-job/";
+    const accessToken = Cookies.get("access_token");
+
+    if (!accessToken) {
+      console.log("No access token found");
+      return;
+    }
+
+    try {
+      const response = await fetch(apiURL, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Kiểm tra xem job hiện tại có trong danh sách followed jobs không
+        const isJobFollowed = data.some(followedJob => followedJob.job_id === job.id);
+        setIsFollowed(isJobFollowed);
+        console.log("Follow status:", isJobFollowed);
+      } else {
+        console.error("Failed to get followed jobs:", response.status);
+      }
+    } catch (error) {
+      console.error("Error checking follow status:", error);
+    }
+  };
+
+  useEffect(() => {
+    checkFollowStatus();
+  }, [job?.id]);
+
   const handleFollowToggle = async () => {
-    const apiURL = "http://localhost:8000/api/job/follow/";
+    const apiURL = "http://cnpm.duytech.site/api/job/follow/";
     const accessToken = Cookies.get("access_token");
 
     try {
@@ -84,9 +121,13 @@ const JobDetail = () => {
             <div className="jobDescription mt-6">
               <h2 className="text-xl font-semibold mb-4">Job Description</h2>
               <ul className="list-disc list-inside text-gray-700">
-                {job.description.split("\n").map((line, index) => (
-                  <li key={index}>{line}</li>
-                ))}
+                {job.description ? 
+                  job.description.split("\n").map((line, index) => (
+                    <li key={index}>{line}</li>
+                  ))
+                  : 
+                  <li>No description available</li>
+                }
               </ul>
             </div>
           </div>
