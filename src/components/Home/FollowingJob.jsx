@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import {
-  CalendarToday as CalendarIcon,
-  Person as PersonIcon,
-  Schedule as ScheduleIcon,
-  ArrowForward as ArrowForwardIcon,
+  Work as WorkIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Work as WorkIcon,
+  CalendarToday as CalendarIcon,
+  Person as PersonIcon,
 } from "@mui/icons-material";
 
-const ApplicationStatus = () => {
-  const [applications, setApplications] = useState([]);
+const FollowingJob = () => {
+  const [followedJobs, setFollowedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState({ error: null });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
   useEffect(() => {
-    fetchApplications();
+    fetchFollowedJobs();
   }, []);
 
-  const fetchApplications = async () => {
+  const fetchFollowedJobs = async () => {
     const apiURL =
-      process.env.REACT_APP_API_URL + "/job/get_list_application_candidate/";
+      process.env.REACT_APP_API_URL + "/job/user-get-list-follow-job/";
     const accessToken = Cookies.get("access_token");
 
     try {
@@ -36,11 +34,11 @@ const ApplicationStatus = () => {
 
       if (res.ok) {
         const data = await res.json();
-        setApplications(data);
+        setFollowedJobs(data);
         setLoading(false);
       } else {
         setStatus({
-          error: "Profile not found. Please complete your candidate profile.",
+          error: "Failed to fetch followed jobs. Please try again later.",
         });
         setLoading(false);
       }
@@ -50,36 +48,11 @@ const ApplicationStatus = () => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Pending":
-        return "bg-yellow-500";
-      case "Rejected":
-        return "bg-red-500";
-      case "Accepted":
-        return "bg-green-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
-  const formatDateTime = (dateTimeString) => {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    };
-    return new Date(dateTimeString).toLocaleString("en-US", options);
-  };
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = applications.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = followedJobs.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(applications.length / itemsPerPage);
+  const totalPages = Math.ceil(followedJobs.length / itemsPerPage);
 
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
@@ -109,12 +82,12 @@ const ApplicationStatus = () => {
     <div className="bg-gray-100 min-h-screen py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
-          Your Application Journey
+          Jobs You're Following
         </h1>
         <div className="space-y-6">
-          {currentItems.map((app) => (
+          {currentItems.map((job) => (
             <div
-              key={app.id}
+              key={job.id}
               className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
             >
               <div className="p-6">
@@ -125,57 +98,27 @@ const ApplicationStatus = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl font-semibold text-gray-900">
-                        Application #{app.id}
+                        {job.title}
                       </h2>
-                      <p className="text-gray-600">{app.candidate.full_name}</p>
+                      <p className="text-gray-600">{job.company_name}</p>
                     </div>
                   </div>
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold text-white rounded-full ${getStatusColor(
-                      app.status
-                    )}`}
-                  >
-                    {app.status}
-                  </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="flex items-center">
                     <CalendarIcon className="text-blueColor mr-2" />
                     <span className="text-gray-700">
-                      Applied on: {formatDateTime(app.applied_at)}
+                      Posted on: {new Date(job.posted_at).toLocaleDateString()}
                     </span>
                   </div>
 
                   <div className="flex items-center md:justify-self-center">
                     <PersonIcon className="text-blueColor mr-2" />
                     <span className="text-gray-700">
-                      Email: {app.candidate.email}
+                      Location: {job.location}
                     </span>
                   </div>
-
-                  <div className="flex items-center">
-                    <ScheduleIcon className="text-blueColor mr-2" />
-                    <span className="text-gray-700">
-                      Urgent: {app.is_urgent ? "Yes" : "No"}
-                    </span>
-                  </div>
-
-                  {app.cv && (
-                    <div className="flex items-center md:justify-self-center">
-                      <ArrowForwardIcon className="text-blueColor mr-2" />
-                      <a
-                        href={app.cv}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blueColor hover:underline"
-                      >
-                        View CV
-                      </a>
-                    </div>
-                  )}
                 </div>
-
-                <div className="flex justify-end"></div>
               </div>
             </div>
           ))}
@@ -206,4 +149,5 @@ const ApplicationStatus = () => {
   );
 };
 
-export default ApplicationStatus;
+export default FollowingJob;
+

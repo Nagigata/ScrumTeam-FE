@@ -4,7 +4,15 @@ import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 
-const Search = ({ onSearch, onCompanySearch, onLocationSearch, onSortChange, onTypeChange, onLevelChange, onClearAll }) => {
+const Search = ({
+  onSearch,
+  onCompanySearch,
+  onLocationSearch,
+  onSortChange,
+  onTypeChange,
+  onLevelChange,
+  onClearAll,
+}) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [companyKeyword, setCompanyKeyword] = useState("");
   const [locationKeyword, setLocationKeyword] = useState("");
@@ -165,7 +173,12 @@ const Search = ({ onSearch, onCompanySearch, onLocationSearch, onSortChange, onT
             <option value="2500">2500</option>
           </select>
         </div>
-        <span className="text-[#a1a1a1] cursor-pointer" onClick={handleClearAll}>Clear All</span>
+        <span
+          className="text-[#a1a1a1] cursor-pointer"
+          onClick={handleClearAll}
+        >
+          Clear All
+        </span>
       </div>
     </div>
   );

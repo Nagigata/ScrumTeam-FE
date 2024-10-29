@@ -53,7 +53,7 @@ const ManageJobs = () => {
         setJobs(data);
       } else {
         const errorData = await res.json();
-        console.log('Error response from server:', errorData);
+        console.log("Error response from server:", errorData);
         setStatus({
           error: errorData.detail || "Failed to fetch jobs. Please try again.",
         });
@@ -152,7 +152,7 @@ const ManageJobs = () => {
   const handleOpenShowDetail = (data) => {
     setShowDetail(true);
     setDataDetail(data);
-  }
+  };
 
   // -----------------
   const fetchCandidates = async (jobId) => {
@@ -197,7 +197,8 @@ const ManageJobs = () => {
       });
 
       if (response.ok) {
-        const message = status === "Accepted" ? "Approve success" : "Reject success";
+        const message =
+          status === "Accepted" ? "Approve success" : "Reject success";
         alert(message);
 
         // Cập nhật trạng thái phê duyệt hoặc từ chối
@@ -216,7 +217,7 @@ const ManageJobs = () => {
 
   return (
     <>
-      <Box m="20px" style={{ display: showCandidate ? 'none' : 'block' }}>
+      <Box m="20px" style={{ display: showCandidate ? "none" : "block" }}>
         <Header title="MANAGE JOBS" subtitle="View and Manage Job Listings" />
 
         {status && (
@@ -296,11 +297,13 @@ const ManageJobs = () => {
                     {job.description}
                   </Typography>
                 </Tooltip>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
                   <motion.button
                     className=" text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
                     whileHover={{ scale: 1.05 }}
@@ -311,10 +314,16 @@ const ManageJobs = () => {
                   </motion.button>
 
                   <Box mt="10px" display="flex" justifyContent="">
-                    <IconButton onClick={() => handleEdit(job)} color="secondary">
+                    <IconButton
+                      onClick={() => handleEdit(job)}
+                      color="secondary"
+                    >
                       <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => handleHide(job.id)} color="warning">
+                    <IconButton
+                      onClick={() => handleHide(job.id)}
+                      color="warning"
+                    >
                       <VisibilityOffIcon />
                     </IconButton>
                   </Box>
@@ -335,7 +344,7 @@ const ManageJobs = () => {
         />
       </Box>
 
-      <Box m="20px" style={{ display: showCandidate ? 'block' : 'none' }}>
+      <Box m="20px" style={{ display: showCandidate ? "block" : "none" }}>
         <motion.button
           onClick={handleShowList}
           className="mb-6 flex items-center text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
@@ -378,26 +387,34 @@ const ManageJobs = () => {
                 </motion.button>
               </Box>
               <button
-                className={`py-3 px-6 rounded-lg ${currentStatus === 'Accepted' ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white`}
-                style={{ marginLeft: 'auto' }}
+                className={`py-3 px-6 rounded-lg ${
+                  currentStatus === "Accepted"
+                    ? "bg-gray-400"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white`}
+                style={{ marginLeft: "auto" }}
                 onClick={() => handleApplicationStatus(item.id, "Accepted")}
-                disabled={currentStatus === 'Accepted'}
+                disabled={currentStatus === "Accepted"}
               >
-                {currentStatus === 'Accepted' ? "Approved" : "Approve"}
+                {currentStatus === "Accepted" ? "Approved" : "Approve"}
               </button>
               <button
-                className={`py-3 px-6 rounded-lg ${currentStatus === 'Rejected' ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'} text-white`}
-                style={{ marginLeft: '50px' }}
+                className={`py-3 px-6 rounded-lg ${
+                  currentStatus === "Rejected"
+                    ? "bg-gray-400"
+                    : "bg-red-600 hover:bg-red-700"
+                } text-white`}
+                style={{ marginLeft: "50px" }}
                 onClick={() => handleApplicationStatus(item.id, "Rejected")}
-                disabled={currentStatus === 'Rejected'}
+                disabled={currentStatus === "Rejected"}
               >
-                {currentStatus === 'Rejected' ? "Rejected" : "Reject"}
+                {currentStatus === "Rejected" ? "Rejected" : "Reject"}
               </button>
             </Box>
           );
         })}
 
-        <ApplicationFile 
+        <ApplicationFile
           open={showDetail}
           onClose={() => {
             setShowDetail(false);

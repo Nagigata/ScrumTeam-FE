@@ -51,9 +51,16 @@ const Home = () => {
   };
 
   // Hàm để gọi API tìm kiếm
-  const fetchJobs = async (keyword = "", location = "", salaryRange = "", skill = "") => {
+  const fetchJobs = async (
+    keyword = "",
+    location = "",
+    salaryRange = "",
+    skill = ""
+  ) => {
     try {
-      const response = await fetch(`http://cnpm.duytech.site/api/job/search/?search=${keyword}&location=${location}&salary_range=${salaryRange}&skill_required=${skill}`);
+      const response = await fetch(
+        `http://cnpm.duytech.site/api/job/search/?search=${keyword}&location=${location}&salary_range=${salaryRange}&skill_required=${skill}`
+      );
       if (response.ok) {
         const data = await response.json();
         console.log("API Response 1:", data); // Log dữ liệu API để kiểm tra

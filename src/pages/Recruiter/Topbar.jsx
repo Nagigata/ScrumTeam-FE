@@ -34,8 +34,7 @@ const Topbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("username");
-    localStorage.removeItem("userRole");
+    Cookies.remove("userRole");
     Cookies.remove("access_token");
     Cookies.remove("refresh_token");
     handleClose();

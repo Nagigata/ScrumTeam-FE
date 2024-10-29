@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebarProvider, Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme, Dialog } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -8,6 +8,7 @@ import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import Company from "./../ProfileManage/Company";
+import Cookies from "js-cookie";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -31,6 +32,41 @@ const SidebarComponent = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [companyProfile, setCompanyProfile] = useState(null);
+
+  useEffect(() => {
+    const accessToken = Cookies.get("access_token");
+    if (accessToken) {
+      fetchCompanyProfile(accessToken);
+    }
+  }, []);
+
+  const fetchCompanyProfile = async (accessToken) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/company/profile/`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setCompanyProfile(data);
+      } else {
+        console.error("Failed to fetch company profile");
+        if (response.status === 401) {
+          Cookies.remove("userRole");
+          Cookies.remove("access_token");
+          Cookies.remove("refresh_token");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching company profile:", error);
+    }
+  };
 
   const handleAvatarClick = () => {
     setIsEditProfileOpen(true);
@@ -65,8 +101,10 @@ const SidebarComponent = () => {
     <ProSidebarProvider>
       <Box
         sx={{
+          height: "100vh",
           "& .ps-sidebar-root": {
             border: "none !important",
+            height: "100vh",
           },
           "& .ps-menu-button:hover": {
             backgroundColor: "transparent !important",
@@ -106,20 +144,36 @@ const SidebarComponent = () => {
 
             {!isCollapsed && (
               <Box mb="25px">
-                <Box display="flex" justifyContent="center" alignItems="center">
-                  <img
-                    alt="profile-user"
-                    width="100px"
-                    height="100px"
-                    src={`../../assets/trinity.png`}
-                    style={{
-                      cursor: "pointer",
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{
+                    "& img": {
+                      width: "100px",
+                      height: "100px",
                       borderRadius: "50%",
+                      objectFit: "cover",
+                      border: `2px solid ${colors.grey[100]}`,
+                      padding: "3px",
+                      backgroundColor: colors.primary[400],
+                      cursor: "pointer",
                       transition: "all 0.3s ease",
-                    }}
+                      "&:hover": {
+                        opacity: 0.8,
+                        transform: "scale(1.05)",
+                        boxShadow: `0 0 10px ${colors.primary[500]}`,
+                      },
+                    },
+                  }}
+                >
+                  <img
+                    alt={companyProfile?.name || "Company Logo"}
+                    src={
+                      companyProfile?.avatar ||
+                      `../../assets/default-company.png`
+                    }
                     onClick={handleAvatarClick}
-                    onMouseOver={(e) => (e.currentTarget.style.opacity = "0.5")}
-                    onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
                   />
                 </Box>
                 <Box textAlign="center">
@@ -129,10 +183,10 @@ const SidebarComponent = () => {
                     fontWeight="bold"
                     sx={{ m: "10px 0 0 0" }}
                   >
-                    Trinity
+                    {companyProfile?.name || "Company Name"}
                   </Typography>
                   <Typography variant="h5" color={colors.greenAccent[500]}>
-                    Software Development
+                    {companyProfile?.description || "Description"}
                   </Typography>
                 </Box>
               </Box>
