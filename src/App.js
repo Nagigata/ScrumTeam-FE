@@ -8,7 +8,6 @@ import AdvancedProfile from "./components/Home/AdvancedProfile";
 import Candidate from "./pages/ProfileManage/Candidate";
 import CVManagement from "./components/Home/CVManagement";
 import ApplicationStatus from "./components/Home/ApplicationStatus";
-import CVManagement from "./components/Home/CVManagement";
 import FollowingJob from "./components/Home/FollowingJob"; // Import FollowingJob
 import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";

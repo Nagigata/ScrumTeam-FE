@@ -116,15 +116,9 @@ const NavBar = () => {
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
                     <Link to="/cv-management">CV Management</Link>
-                    <Link to="/following-job">Following Job</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
                     <Link to="/following-job">Following Job</Link>
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100">
-                    <Link to="/application-status">My Application</Link>
-                    <Link to="/skills">Portfolio</Link>
-                    <Link to="/cv-management">CV Management</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
                     <Link to="/application-status">My Application</Link>
