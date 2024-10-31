@@ -11,6 +11,7 @@ import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
 import Recruiter from "./AppRecruiter";
 import Cookies from "js-cookie";
+import { SocketProvider } from "./contextAPI/SocketProvider";
 
 function App() {
   const userRole = Cookies.get("userRole");
@@ -35,6 +36,7 @@ function App() {
 
   return (
     <div className="App">
+      <SocketProvider>
       <Routes>
         <Route
           path="/*"
@@ -105,6 +107,8 @@ function App() {
           }
         />
       </Routes>
+    </SocketProvider>
+
     </div>
   );
 }

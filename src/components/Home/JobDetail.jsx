@@ -36,7 +36,7 @@ const JobDetail = () => {
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-3xl font-bold text-blue-900">{job.title}</h1>
               <img
-                src={job.avatar_url}
+                src={job.avatar_company}
                 alt="Company Logo"
                 className="w-16 h-16 rounded-full"
               />
@@ -51,9 +51,9 @@ const JobDetail = () => {
             <div className="jobDescription mt-6">
               <h2 className="text-xl font-semibold mb-4">Job Description</h2>
               <ul className="list-disc list-inside text-gray-700">
-                {job.description.split("\n").map((line, index) => (
+                {job.description ? job.description.split("\n").map((line, index) => (
                   <li key={index}>{line}</li>
-                ))}
+                )) : <li>No description available</li>}
               </ul>
             </div>
           </div>
