@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Cookies from "js-cookie";
-import Avatar from "@mui/material/Avatar";
+import { Badge } from "@mui/material";
+import NotificationDropdown from "./NotificationDropdown"; // Đảm bảo đường dẫn đúng
+import { Avatar } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import Badge from "@mui/material/Badge";
-import NotificationDropdown from "./NotificationDropdown";
 
 const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
@@ -115,6 +115,15 @@ const NavBar = () => {
                     <Link to="/advanced-profile">DevHunt Profile</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
+                    <Link to="/cv-management">CV Management</Link>
+                    <Link to="/following-job">Following Job</Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100">
+                    <Link to="/following-job">Following Job</Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100">
+                    <Link to="/application-status">My Application</Link>
+                    <Link to="/skills">Portfolio</Link>
                     <Link to="/cv-management">CV Management</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">

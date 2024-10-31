@@ -1,16 +1,58 @@
-import React, { useState } from "react";
-import NotificationSection from "./NotificationSection";
-import { mockNotifications } from "./mockNotifications";
+import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+
+const formatMessage = (message) => {
+  // Tách message tại dấu '/' và lấy phần đầu tiên
+  return message.split('/')[0];
+};
 
 const NotificationDropdown = ({ show, onMarkAsRead }) => {
   const [activeTab, setActiveTab] = useState("all");
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (show) {
+      fetchNotifications();
+    }
+  }, [show]);
+
+  const fetchNotifications = async () => {
+    setLoading(true);
+    const accessToken = Cookies.get("access_token");
+
+    try {
+      const response = await fetch("http://cnpm.duytech.site/api/job/notifications_job/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data);
+      } else {
+        setError("Failed to fetch notifications");
+      }
+    } catch (error) {
+      setError("Network error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!show) return null;
 
-  const allNotifications = [
-    ...mockNotifications.employerResponses,
-    ...mockNotifications.jobMatches,
-  ];
+  // Phân loại thông báo
+  const responseNotifications = notifications.filter(notif => 
+    notif.message.includes("chấp nhận") || notif.message.includes("từ chối")
+  );
+  
+  const matchNotifications = notifications.filter(notif => 
+    notif.message.includes("công việc mới phù hợp")
+  );
 
   return (
     <div className="absolute top-full right-0 bg-white shadow-md rounded-md py-2 w-96 z-20">
@@ -57,37 +99,57 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
       </div>
 
       <div className="max-h-96 overflow-y-auto">
-        {activeTab === "all" ? (
-          allNotifications.length > 0 ? (
-            <div>
-              <NotificationSection
-                title="Recruiter Responses"
-                notifications={mockNotifications.employerResponses}
-                onMarkAsRead={onMarkAsRead}
-              />
-              <NotificationSection
-                title="Job Matches"
-                notifications={mockNotifications.jobMatches}
-                onMarkAsRead={onMarkAsRead}
-              />
-            </div>
-          ) : (
-            <div className="px-4 py-3 text-center text-gray-500">
-              No new notifications
-            </div>
-          )
-        ) : activeTab === "responses" ? (
-          <NotificationSection
-            title="Recruiter Responses"
-            notifications={mockNotifications.employerResponses}
-            onMarkAsRead={onMarkAsRead}
-          />
+        {loading ? (
+          <div className="px-4 py-3 text-center text-gray-500">Đang tải...</div>
+        ) : error ? (
+          <div className="px-4 py-3 text-center text-red-500">{error}</div>
         ) : (
-          <NotificationSection
-            title="Job Matches"
-            notifications={mockNotifications.jobMatches}
-            onMarkAsRead={onMarkAsRead}
-          />
+          <>
+            {activeTab === "all" && (
+              <div>
+                {notifications.map((notif) => (
+                  <div key={notif.id} className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
+                    <p className="text-sm text-gray-800">{formatMessage(notif.message)}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(notif.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === "responses" && (
+              <div>
+                {responseNotifications.map((notif) => (
+                  <div key={notif.id} className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
+                    <p className="text-sm text-gray-800">{formatMessage(notif.message)}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(notif.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === "matches" && (
+              <div>
+                {matchNotifications.map((notif) => (
+                  <div key={notif.id} className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
+                    <p className="text-sm text-gray-800">{formatMessage(notif.message)}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(notif.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {notifications.length === 0 && (
+              <div className="px-4 py-3 text-center text-gray-500">
+                Không có thông báo mới
+              </div>
+            )}
+          </>
         )}
       </div>
       {/* <div className="px-4 py-2 border-t border-gray-200">
