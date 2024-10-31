@@ -12,7 +12,7 @@ const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(2); 
+  const [unreadCount, setUnreadCount] = useState(2);
 
   const accessToken = Cookies.get("access_token");
   const navigate = useNavigate();
@@ -109,10 +109,13 @@ const NavBar = () => {
               {showDropdown && (
                 <ul className="absolute top-full right-0 bg-white shadow-md rounded-md py-2 w-40 z-10">
                   <li className="px-4 py-2 hover:bg-gray-100">
-                    <Link to="/candidate">Profile</Link>
+                    <Link to="/basic-profile">Profile</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
-                    <Link to="/skills">Portfolio</Link>
+                    <Link to="/advanced-profile">DevHunt Profile</Link>
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100">
+                    <Link to="/cv-management">CV Management</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
                     <Link to="/application-status">My Application</Link>

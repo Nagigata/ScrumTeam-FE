@@ -4,8 +4,9 @@ import SignIn from "./pages/Auth/SignIn";
 import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Home/Home";
 import JobDetail from "./components/Home/JobDetail";
-import SkillManagement from "./components/Home/SkillManagement";
+import AdvancedProfile from "./components/Home/AdvancedProfile";
 import Candidate from "./pages/ProfileManage/Candidate";
+import CVManagement from "./components/Home/CVManagement";
 import ApplicationStatus from "./components/Home/ApplicationStatus";
 import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
@@ -54,7 +55,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/candidate"
+                  path="/basic-profile"
                   element={
                     userRole === "recruiter" ? (
                       <Navigate to="/" />
@@ -64,12 +65,22 @@ function App() {
                   }
                 />
                 <Route
-                  path="/skills"
+                  path="/advanced-profile"
                   element={
                     userRole === "recruiter" ? (
                       <Navigate to="/" />
                     ) : (
-                      <SkillManagement />
+                      <AdvancedProfile />
+                    )
+                  }
+                />
+                <Route
+                  path="/cv-management"
+                  element={
+                    userRole === "recruiter" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <CVManagement />
                     )
                   }
                 />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -14,19 +14,22 @@ const CVManagement = () => {
   const [status, setStatus] = useState("idle");
   const [hasCv, setHasCv] = useState(false);
   const [cvUrl, setCvUrl] = useState("");
+  const [cvFilename, setCvFilename] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
+  const getFilenameFromUrl = (url) => {
+    if (!url) return "";
+    const parts = url.split("/");
+    return parts[parts.length - 1];
+  };
 
-  const fetchUserProfile = async () => {
+  const fetchCV = useCallback(async () => {
     try {
       const accessToken = Cookies.get("access_token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/candidate/profile/`,
+        process.env.REACT_APP_API_URL + "/candidate/manage_cv/",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -38,15 +41,25 @@ const CVManagement = () => {
         const data = await response.json();
         setHasCv(!!data.cv);
         setCvUrl(data.cv || "");
+        setCvFilename(getFilenameFromUrl(data.cv));
       } else if (response.status === 401) {
         Cookies.remove("userRole");
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
+      } else if (response.status === 400) {
+        setMessage("Error fetching CV");
+        setStatus("error");
       }
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      console.error("Error fetching CV:", error);
+      setMessage("Error connecting to server");
+      setStatus("error");
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCV();
+  }, [fetchCV]);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -103,7 +116,7 @@ const CVManagement = () => {
     try {
       const accessToken = Cookies.get("access_token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/candidate/manage_cv/`,
+        process.env.REACT_APP_API_URL + "/candidate/manage_cv/",
         {
           method: "POST",
           headers: {
@@ -118,11 +131,11 @@ const CVManagement = () => {
         setStatus("success");
         setHasCv(true);
         setSelectedFile(null);
-        fetchUserProfile();
+        fetchCV();
         const fileInput = document.querySelector('input[type="file"]');
         if (fileInput) fileInput.value = "";
-      } else {
-        setMessage("Error occurred while uploading CV");
+      } else if (response.status === 400) {
+        setMessage("Error uploading CV");
         setStatus("error");
       }
     } catch (error) {
@@ -138,7 +151,7 @@ const CVManagement = () => {
     try {
       const accessToken = Cookies.get("access_token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/candidate/manage_cv/`,
+        process.env.REACT_APP_API_URL + "/candidate/manage_cv/",
         {
           method: "DELETE",
           headers: {
@@ -148,16 +161,17 @@ const CVManagement = () => {
       );
 
       if (response.ok) {
-        setMessage("CV deleted successfully");
+        const data = await response.json();
+        setMessage(data.message || "CV deleted successfully");
         setStatus("success");
         setHasCv(false);
         setCvUrl("");
-      } else {
-        setMessage(
-          response.status === 404
-            ? "No CV found to delete"
-            : "Error occurred while deleting CV"
-        );
+        setCvFilename("");
+      } else if (response.status === 404) {
+        setMessage("No CV found to delete");
+        setStatus("error");
+      } else if (response.status === 400) {
+        setMessage("Error occurred while deleting CV");
         setStatus("error");
       }
     } catch (error) {
@@ -175,7 +189,7 @@ const CVManagement = () => {
   };
 
   return (
-    <div className="w-full  my-10 bg-white rounded-lg shadow-lg border border-gray-200">
+    <div className="w-full max-w-lg mx-auto my-10 bg-white rounded-lg shadow-lg border border-gray-200">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <h2 className="text-2xl font-semibold text-gray-800">CV Management</h2>
@@ -210,7 +224,7 @@ const CVManagement = () => {
               <div className="flex items-center gap-2">
                 <DescriptionIcon className="w-5 h-5 text-blueColor" />
                 <span className="text-sm font-medium text-[#535ac8]">
-                  Current CV uploaded
+                  {cvFilename || "CV File"}
                 </span>
               </div>
               <button
@@ -258,9 +272,7 @@ const CVManagement = () => {
                   : "Drag and drop your CV here"}
               </p>
               <p className="text-xs text-gray-500">
-                Supports PDF, DOC, DOCX up to 10MB 
-                <br></br>
-                (just kidding, only 1MB lol!)
+                Supports PDF, DOC, DOCX up to 1MB
               </p>
             </div>
           </div>
