@@ -35,6 +35,30 @@ const ManageJobs = () => {
     fetchJobs();
   }, []);
 
+  const getStatusChipColor = (status) => {
+    switch (status) {
+      case "Active":
+        return "success";
+      case "Inactive":
+        return "error";
+      case "Draft":
+        return "default";
+      default:
+        return "default";
+    }
+  };
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "Active":
+        return "Active";
+      case "Inactive":
+        return "Inactive";
+      case "Draft":
+        return "Draft";
+      default:
+        return "Unknown";
+    }
+  };
   const fetchJobs = async () => {
     const apiURL = process.env.REACT_APP_API_URL + "/job/job-list-of-company/";
     const accessToken = Cookies.get("access_token");
@@ -49,7 +73,7 @@ const ManageJobs = () => {
       console.log(">>> ", res);
       if (res.ok) {
         const data = await res.json();
-
+        console.log(data)
         setJobs(data);
       } else {
         const errorData = await res.json();
@@ -92,10 +116,10 @@ const ManageJobs = () => {
           benefits: updatedJob.benefits,
           location: updatedJob.location,
           salary_range: updatedJob.salary_range,
-          status: updatedJob.status,
-          level: updatedJob.level,
+          status: updatedJob.status === "Active" ? "Active" : "Inactive",
           experience: updatedJob.experience,
           interview_process: updatedJob.interview_process,
+          expired_at: updatedJob.expired_at,
         }),
       });
 
@@ -246,6 +270,7 @@ const ManageJobs = () => {
             gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
             gap="20px"
           >
+            {console.log(jobs)}
             {jobs.map((job) => (
               <Box
                 key={job.id}
@@ -260,9 +285,9 @@ const ManageJobs = () => {
                 >
                   {job.title}
                 </Typography>
-                <Typography variant="body2" color={colors.grey[300]}>
-                  Category: {job.job_category.title}
-                </Typography>
+                {/* <Typography variant="body2" color={colors.grey[300]}>
+                  Category: {job.job_category}
+                </Typography> */}
                 <Typography variant="body2" color={colors.grey[300]}>
                   Location: {job.location}
                 </Typography>
@@ -275,9 +300,9 @@ const ManageJobs = () => {
                 <Box mt="10px">
                   <Chip label={job.level} size="small" color="default" />
                   <Chip
-                    label={job.status ? "Active" : "Inactive"}
+                    label={getStatusLabel(job.status)}
                     size="small"
-                    color={job.status ? "info" : "error"}
+                    color={getStatusChipColor(job.status)}
                     sx={{ ml: 1 }}
                   />
                 </Box>
@@ -332,7 +357,7 @@ const ManageJobs = () => {
             ))}
           </Box>
         </Box>
-
+            {console.log(selectedJob)}
         <EditJob
           open={isEditDialogOpen}
           onClose={() => {

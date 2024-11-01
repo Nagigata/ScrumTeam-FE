@@ -3,30 +3,53 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Cookies from "js-cookie";
-import { Badge } from "@mui/material";
+import { Badge, IconButton } from "@mui/material";
 import NotificationDropdown from "./NotificationDropdown"; // Đảm bảo đường dẫn đúng
 import { Avatar } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { useSocket } from "../../contextAPI/SocketProvider";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 
 const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(2);
+  const [count, setCount] = useState(0);
+  const { message } = useSocket();
 
   const accessToken = Cookies.get("access_token");
   const navigate = useNavigate();
-
-  const handleMarkAsRead = (notificationId) => {
-    setUnreadCount(Math.max(0, unreadCount - 1));
-    // Here you would typically make an API call to update the notification status
-  };
+  
+  const [listMessage, setListMessage] = useState(() => {
+    const savedMessages = Cookies.get("list_message");
+    console.log(">>> ", savedMessages);
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
 
   useEffect(() => {
     if (accessToken) {
       fetchUserProfile(accessToken);
     }
   }, [accessToken]);
+
+  useEffect(() => {
+    if (message && message !== "You are connected to Websocket") {
+      setCount((prev) => prev + 1);
+
+      setListMessage((prev) => {
+        const newList = [...prev, message];
+
+        const storedMessages = Cookies.get("list_message");
+        const parsedMessages = storedMessages ? JSON.parse(storedMessages) : [];
+
+        if (JSON.stringify(parsedMessages) !== JSON.stringify(newList)) {
+          Cookies.set("list_message", JSON.stringify(newList));
+        }
+
+        return newList;
+      });
+    }
+  }, [message]);
 
   const fetchUserProfile = async (accessToken) => {
     try {
@@ -62,6 +85,11 @@ const NavBar = () => {
     window.location.reload();
   };
 
+  const handleClick = () => {
+    setShowNotifications(!showNotifications);
+    console.log(count);
+  }
+
   return (
     <div className="navBar flex justify-between items-center p-[2rem]">
       <div className="logoDiv">
@@ -81,18 +109,24 @@ const NavBar = () => {
         {accessToken ? (
           <>
             <li className="navBarLi relative">
-              <div
-                className="cursor-pointer p-2 hover:bg-gray-100 rounded-full"
-                onClick={() => setShowNotifications(!showNotifications)}
-              >
-                <Badge badgeContent={unreadCount} color="error">
-                  <NotificationsIcon className="text-gray-600" />
-                </Badge>
-              </div>
-              <NotificationDropdown
-                show={showNotifications}
-                onMarkAsRead={handleMarkAsRead}
-              />
+            <IconButton
+              onClick={() => handleClick()}
+              size="medium"
+              className="relative"
+            >
+              {/* Notification Badge */}
+              {count > 0 && (
+                <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-cyan-500 rounded-full">
+                  <span className="text-white text-xs">
+                    {count > 99 ? "99+" : count}
+                  </span>
+                </div>
+              )}
+
+              {/* Notification Icon */}
+              <NotificationsOutlinedIcon className="relative z-0" />
+            </IconButton>
+              <NotificationDropdown show={showNotifications} />
             </li>
             <li
               className="navBarLi relative"

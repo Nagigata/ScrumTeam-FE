@@ -17,6 +17,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Recruiter/Header";
 import Cookies from "js-cookie";
 import { tokens } from "../../theme";
+import { title } from "framer-motion/client";
 
 const initialValues = {
   job_category: "",
@@ -27,10 +28,11 @@ const initialValues = {
   location: "",
   min_salary: "",
   max_salary: "",
-  status: true,
+  status: "Draft",
   level: "",
   experience: "",
   interview_process: "",
+  expired_at: "",
 };
 
 const jobSchema = yup.object().shape({
@@ -55,13 +57,21 @@ const jobSchema = yup.object().shape({
       }
     )
     .required("Required"),
-  status: yup.boolean(),
+  status: yup
+    .string()
+    .oneOf(["Active", "Inactive", "Draft"])
+    .required("Required"),
   level: yup.string().required("Required"),
   experience: yup.string().required("Required"),
   interview_process: yup.string().required("Required"),
+  expired_at: yup
+    .date()
+    .min(new Date(), "Expiration date must be in the future")
+    .required("Required"),
 });
 
 const levels = ["Entry", "Junior", "Middle", "Senior", "Lead"];
+const statusOptions = ["Active", "Inactive", "Draft"];
 
 const PostJob = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -95,11 +105,13 @@ const PostJob = () => {
     const accessToken = Cookies.get("access_token");
     const confirmValues = {
       ...values,
+      expired_at: `${values.expired_at}${":00"}`,
       salary_range: `${values.min_salary}-${values.max_salary} USD`,
     };
     delete confirmValues.min_salary;
     delete confirmValues.max_salary;
 
+    console.log(confirmValues);
     try {
       const res = await fetch(apiURL, {
         method: "POST",
@@ -115,12 +127,38 @@ const PostJob = () => {
       if (res.status === 201) {
         setStatus({ success: "Job posted successfully!" });
       } else {
-        setStatus({
-          error: data.message || "An error occurred while posting the job.",
-        });
+        // Xử lý các loại lỗi khác nhau
+        let errorMessage = "";
+
+        if (data.detail) {
+          // Lỗi authentication/authorization
+          errorMessage = `Authentication error: ${data.detail}`;
+        } else if (data.message) {
+          // Lỗi business logic từ API
+          errorMessage = data.message;
+        } else if (typeof data === "object") {
+          // Lỗi validation từ API
+          errorMessage = Object.entries(data)
+            .map(([field, errors]) => {
+              if (Array.isArray(errors)) {
+                return `${field}: ${errors.join(", ")}`;
+              }
+              return `${field}: ${errors}`;
+            })
+            .join("\n");
+        } else {
+          errorMessage = "An unknown error occurred while posting the job.";
+        }
+
+        console.error("Error details:", errorMessage);
+        setStatus({ error: errorMessage });
       }
     } catch (error) {
-      setStatus({ error: "Network error. Please check your connection." });
+      console.error("Network or parsing error:", error);
+      setStatus({
+        error:
+          "Network error or invalid response format. Please check your connection and try again.",
+      });
     }
 
     setSubmitting(false);
@@ -308,15 +346,32 @@ const PostJob = () => {
                     touched.interview_process && errors.interview_process
                   }
                 />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={values.status}
-                      onChange={handleChange}
-                      name="status"
-                    />
-                  }
-                  label="Job Status"
+                <Field
+                  as={TextField}
+                  fullWidth
+                  select
+                  variant="filled"
+                  label="Status"
+                  name="status"
+                  error={touched.status && errors.status}
+                  helperText={touched.status && errors.status}
+                >
+                  {statusOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Field>
+                <Field
+                  as={TextField}
+                  fullWidth
+                  variant="filled"
+                  type="datetime-local"
+                  label="Expiration Date"
+                  name="expired_at"
+                  InputLabelProps={{ shrink: true }}
+                  error={touched.expired_at && errors.expired_at}
+                  helperText={touched.expired_at && errors.expired_at}
                 />
               </Box>
               {status && status.error && (

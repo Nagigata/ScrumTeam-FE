@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 
 const formatMessage = (message) => {
   // Tách message tại dấu '/' và lấy phần đầu tiên
-  return message.split('/')[0];
+  return message.split("/")[0];
 };
 
 const NotificationDropdown = ({ show, onMarkAsRead }) => {
@@ -23,12 +23,15 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
     const accessToken = Cookies.get("access_token");
 
     try {
-      const response = await fetch("http://cnpm.duytech.site/api/job/notifications_job/", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        "http://cnpm.duytech.site/api/job/notifications_job/",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -46,11 +49,12 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
   if (!show) return null;
 
   // Phân loại thông báo
-  const responseNotifications = notifications.filter(notif => 
-    notif.message.includes("chấp nhận") || notif.message.includes("từ chối")
+  const responseNotifications = notifications.filter(
+    (notif) =>
+      notif.message.includes("chấp nhận") || notif.message.includes("từ chối")
   );
-  
-  const matchNotifications = notifications.filter(notif => 
+
+  const matchNotifications = notifications.filter((notif) =>
     notif.message.includes("công việc mới phù hợp")
   );
 
@@ -59,9 +63,6 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
       <div className="px-4 py-2 border-b border-gray-200">
         <div className="flex justify-between items-center">
           <h3 className="font-semibold text-gray-800">Notifications</h3>
-          <span className="text-xs text-blueColor cursor-pointer hover:underline">
-            Mark all as read
-          </span>
         </div>
       </div>
 
@@ -108,8 +109,13 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
             {activeTab === "all" && (
               <div>
                 {notifications.map((notif) => (
-                  <div key={notif.id} className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
-                    <p className="text-sm text-gray-800">{formatMessage(notif.message)}</p>
+                  <div
+                    key={notif.id}
+                    className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <p className="text-sm text-gray-800">
+                      {formatMessage(notif.message)}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
                       {new Date(notif.created_at).toLocaleString()}
                     </p>
@@ -121,8 +127,13 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
             {activeTab === "responses" && (
               <div>
                 {responseNotifications.map((notif) => (
-                  <div key={notif.id} className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
-                    <p className="text-sm text-gray-800">{formatMessage(notif.message)}</p>
+                  <div
+                    key={notif.id}
+                    className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <p className="text-sm text-gray-800">
+                      {formatMessage(notif.message)}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
                       {new Date(notif.created_at).toLocaleString()}
                     </p>
@@ -134,8 +145,13 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
             {activeTab === "matches" && (
               <div>
                 {matchNotifications.map((notif) => (
-                  <div key={notif.id} className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
-                    <p className="text-sm text-gray-800">{formatMessage(notif.message)}</p>
+                  <div
+                    key={notif.id}
+                    className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <p className="text-sm text-gray-800">
+                      {formatMessage(notif.message)}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
                       {new Date(notif.created_at).toLocaleString()}
                     </p>

@@ -1,11 +1,10 @@
-// SocketProvider.js
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import Cookies from "js-cookie";
 
 export const socketContext = createContext(); 
 
 export const useSocket = () => {
-    return useContext(socketContext) || { message: '', isConnected: false, reconnect: () => {} };
+    return useContext(socketContext);
 }
 
 export const SocketProvider = ({ children }) => {

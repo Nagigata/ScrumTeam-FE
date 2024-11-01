@@ -15,7 +15,6 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import Cookies from "js-cookie";
 import { useSocket } from "../../contextAPI/SocketProvider";
-import { useNavigate } from "react-router-dom";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -27,22 +26,29 @@ const Topbar = () => {
   const open = Boolean(anchorEl);
   const openNotifications = Boolean(notificationAnchorEl);
   const [count, setCount] = useState(0);
-  const navigate = useNavigate();
-
-  const { message } = useSocket() || {};
+  const { message } = useSocket();
   const accessToken = Cookies.get("access_token");
 
   const [listMessage, setListMessage] = useState(() => {
     const savedMessages = Cookies.get("list_message");
+    console.log(">>> ", savedMessages);
     return savedMessages ? JSON.parse(savedMessages) : [];
   });
 
   useEffect(() => {
     if (message && message !== "You are connected to Websocket") {
       setCount((prev) => prev + 1);
+
       setListMessage((prev) => {
         const newList = [...prev, message];
-        Cookies.set("list_message", JSON.stringify(newList));
+
+        const storedMessages = Cookies.get("list_message");
+        const parsedMessages = storedMessages ? JSON.parse(storedMessages) : [];
+
+        if (JSON.stringify(parsedMessages) !== JSON.stringify(newList)) {
+          Cookies.set("list_message", JSON.stringify(newList));
+        }
+
         return newList;
       });
     }
@@ -66,33 +72,26 @@ const Topbar = () => {
 
   const handleNotificationClick = (event) => {
     setNotificationAnchorEl(event.currentTarget);
-    setCount(0); 
   };
 
   const handleNotificationClose = () => {
     setNotificationAnchorEl(null);
   };
 
-  const clearNotifications = () => {
-    setListMessage([]); 
-    Cookies.remove("list_message"); 
-    setCount(0); 
-  };
-
-  const handleNotificationItemClick = (notification) => {
-    try {
-      const { jobId } = JSON.parse(notification);
-      if (jobId) {
-        navigate(`/job/${jobId}/candidates`); // Điều hướng đến trang danh sách ứng viên của job
-      }
-    } catch (e) {
-      console.error("Thông báo không có thông tin jobId hợp lệ:", e);
-    }
-    handleNotificationClose();
-  };
+  // Example notifications
+  const notifications = [
+    "Thông báo 1: Bạn có một tin nhắn mới.",
+    "Thông báo 2: Hẹn gặp bạn lúc 3 giờ chiều.",
+    "Thông báo 3: Bạn đã được mời tham gia sự kiện.",
+  ];
 
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      p={2}
+    >
       {/* LOGO */}
       <Box display="flex" alignItems="center" gap={1}>
         <img
@@ -129,7 +128,9 @@ const Topbar = () => {
             <IconButton
               onClick={handleNotificationClick}
               size="medium"
-              aria-controls={openNotifications ? "notification-menu" : undefined}
+              aria-controls={
+                openNotifications ? "notification-menu" : undefined
+              }
               aria-haspopup="true"
               aria-expanded={openNotifications ? "true" : undefined}
               className="relative"
@@ -155,16 +156,38 @@ const Topbar = () => {
               sx={{ minWidth: "300px" }}
             >
               <Box sx={{ width: 400, padding: 2 }}>
-                <Typography variant="h6" sx={{ padding: 1, fontWeight: "bold" }}>
-                  Notification
+                <Typography
+                  variant="h6"
+                  sx={{ padding: 1, fontWeight: "bold" }}
+                >
+                  Thông báo
                 </Typography>
                 <Divider />
-                
                 {listMessage.length > 0 ? (
-                  listMessage.map((notification, index) => (
+                  <>
+                    {listMessage.map((notification, index) => (
+                      <MenuItem
+                        key={index}
+                        onClick={handleNotificationClose}
+                        sx={{ padding: 2 }} //khoảng cách giữa các thông báo
+                      >
+                        <Typography
+                          sx={{
+                            whiteSpace: "normal",
+                            overflow: "visible",
+                            textOverflow: "clip",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          {notification}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                  </>
+                ) : (
+                  <>
                     <MenuItem
-                      key={index}
-                      onClick={() => handleNotificationItemClick(notification)}
+                      onClick={handleNotificationClose}
                       sx={{ padding: 2 }}
                     >
                       <Typography
@@ -175,44 +198,8 @@ const Topbar = () => {
                           fontSize: "0.9rem",
                         }}
                       >
-                        {notification}
+                        No notification
                       </Typography>
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem onClick={handleNotificationClose} sx={{ padding: 2 }}>
-                    <Typography
-                      sx={{
-                        whiteSpace: "normal",
-                        overflow: "visible",
-                        textOverflow: "clip",
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      No notification
-                    </Typography>
-                  </MenuItem>
-                )}
-
-                {listMessage.length > 0 && (
-                  <>
-                    <Divider sx={{ marginY: 1 }} />
-                    <MenuItem 
-                      onClick={clearNotifications} 
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        backgroundColor: "#f8d7da",
-                        color: "#d9534f",
-                        borderRadius: "8px",
-                        "&:hover": {
-                          backgroundColor: "#f5c6cb",
-                          color: "#c9302c",
-                        },
-                        padding: 1.5,
-                      }}
-                    >
-                      <Typography variant="body2" fontWeight="bold">Xóa tất cả thông báo</Typography>
                     </MenuItem>
                   </>
                 )}
