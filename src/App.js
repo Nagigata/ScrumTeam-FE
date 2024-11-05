@@ -13,7 +13,6 @@ import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
 import Recruiter from "./AppRecruiter";
 import Cookies from "js-cookie";
-import { SocketProvider } from "./contextAPI/SocketProvider";
 
 function App() {
   const userRole = Cookies.get("userRole");
@@ -38,24 +37,19 @@ function App() {
 
   return (
     <div className="App">
-      <SocketProvider>
       <Routes>
         <Route
           path="/*"
           element={
             <MainLayout>
               <Routes>
-                <Route path="/login" element={<SignIn />} />
-                <Route path="/register" element={<SignUp />} />
                 <Route
-                  path="/job-detail/:id"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <JobDetail />
-                    )
-                  }
+                  path="/login"
+                  element={userRole ? <Navigate to="/" /> : <SignIn />}
+                />
+                <Route
+                  path="/register"
+                  element={userRole ? <Navigate to="/" /> : <SignUp />}
                 />
                 <Route
                   path="/job/:id"
@@ -68,32 +62,12 @@ function App() {
                   }
                 />
                 <Route
-                  path="/basic-profile"
+                  path="/candidate"
                   element={
                     userRole === "recruiter" ? (
                       <Navigate to="/" />
                     ) : (
                       <Candidate />
-                    )
-                  }
-                />
-                <Route
-                  path="/advanced-profile"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <AdvancedProfile />
-                    )
-                  }
-                />
-                <Route
-                  path="/cv-management"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <CVManagement />
                     )
                   }
                 />
@@ -107,26 +81,7 @@ function App() {
                     )
                   }
                 />
-                <Route
-                  path="/cv-management"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <CVManagement />
-                    )
-                  }
-                />
-                <Route
-                  path="/following-job"
-                  element={
-                    userRole === "recruiter" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <FollowingJob />
-                    )
-                  }
-                />
+
                 <Route
                   path="/"
                   element={
@@ -148,8 +103,6 @@ function App() {
           }
         />
       </Routes>
-    </SocketProvider>
-
     </div>
   );
 }

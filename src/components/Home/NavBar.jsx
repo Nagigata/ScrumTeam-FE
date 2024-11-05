@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+=======
+import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+>>>>>>> b4f0b312d3627dce08d9e2a35e9e0438bb495158
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Cookies from "js-cookie";
@@ -7,12 +12,28 @@ import { Badge, IconButton } from "@mui/material";
 import NotificationDropdown from "./NotificationDropdown"; // Đảm bảo đường dẫn đúng
 import { Avatar } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+<<<<<<< HEAD
 import { useSocket } from "../../contextAPI/SocketProvider";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+=======
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import { useSocket } from "../../contextAPI/socketProvider";
+
+import {
+  Box,
+  IconButton,
+  useTheme,
+  Typography,
+  Menu,
+  MenuItem,
+  Divider,
+} from "@mui/material";
+>>>>>>> b4f0b312d3627dce08d9e2a35e9e0438bb495158
 
 const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+<<<<<<< HEAD
   const [showNotifications, setShowNotifications] = useState(false);
   const [count, setCount] = useState(0);
   const { message } = useSocket();
@@ -25,6 +46,41 @@ const NavBar = () => {
     console.log(">>> ", savedMessages);
     return savedMessages ? JSON.parse(savedMessages) : [];
   });
+=======
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const openNotifications = Boolean(notificationAnchorEl);
+  const [count, setCount] = useState(-2);
+  const { message } = useSocket();
+  const accessToken = Cookies.get("access_token");
+
+  const [listMessage, setListMessage] = useState(() => {
+    const savedMessages = Cookies.get('list_message');
+    console.log(">>> " , savedMessages);
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
+
+  useEffect(() => {
+    if (message && message !== 'You are connected to Websocket') {
+      setCount(prev => prev + 1);
+  
+      setListMessage(prev => {
+        const newList = [...prev, message];
+        
+        const storedMessages = Cookies.get("list_message");
+        const parsedMessages = storedMessages ? JSON.parse(storedMessages) : [];
+  
+        if (JSON.stringify(parsedMessages) !== JSON.stringify(newList)) {
+          Cookies.set("list_message", JSON.stringify(newList));
+        }
+  
+        return newList;
+      });
+    }
+  }, [message]);
+  
+>>>>>>> b4f0b312d3627dce08d9e2a35e9e0438bb495158
 
   useEffect(() => {
     if (accessToken) {
@@ -85,10 +141,20 @@ const NavBar = () => {
     window.location.reload();
   };
 
+<<<<<<< HEAD
   const handleClick = () => {
     setShowNotifications(!showNotifications);
     console.log(count);
   }
+=======
+  const handleNotificationClick = (event) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null);
+  };
+>>>>>>> b4f0b312d3627dce08d9e2a35e9e0438bb495158
 
   return (
     <div className="navBar flex justify-between items-center p-[2rem]">
@@ -106,7 +172,92 @@ const NavBar = () => {
         <li className="navBarLi">Companies</li>
         <li className="navBarLi">Contact</li>
 
+<<<<<<< HEAD
         {accessToken ? (
+=======
+        {accessToken ?
+          <>
+            {/* Biểu tượng thông báo */}
+            <IconButton
+              onClick={handleNotificationClick}
+              size="medium"
+              aria-controls={openNotifications ? "notification-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={openNotifications ? "true" : undefined}
+              className="relative"
+            >
+              {/* Notification Badge */}
+              {count > 0 && (
+                <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-cyan-500 rounded-full">
+                  <span className="text-white text-xs">
+                    {count > 99 ? '99+' : count}
+                  </span>
+                </div>
+              )}
+              
+              {/* Notification Icon */}
+              <NotificationsOutlinedIcon className="relative z-0" />
+            </IconButton>
+            
+            <Menu
+              anchorEl={notificationAnchorEl}
+              id="notification-menu"
+              open={openNotifications}
+              onClose={handleNotificationClose}
+              sx={{ minWidth: '300px' }} 
+            >
+              <Box sx={{ width: 400, padding: 2 }}>
+                <Typography variant="h6" sx={{ padding: 1, fontWeight: 'bold' }}>Thông báo</Typography>
+                <Divider />
+                {listMessage.length > 0 ?
+                  <>
+                    {listMessage.map((notification, index) => (
+                      <MenuItem 
+                        key={index} 
+                        onClick={handleNotificationClose}
+                        sx={{ padding: 2 }} //khoảng cách giữa các thông báo
+                      >
+                        <Typography 
+                          sx={{ 
+                            whiteSpace: "normal", 
+                            overflow: "visible", 
+                            textOverflow: "clip", 
+                            fontSize: '0.9rem', 
+                          }}
+                        >
+                          {notification}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                  </>
+                  :
+                  <>
+                    <MenuItem 
+                        onClick={handleNotificationClose}
+                        sx={{ padding: 2 }}
+                      >
+                        <Typography 
+                          sx={{ 
+                            whiteSpace: "normal", 
+                            overflow: "visible", 
+                            textOverflow: "clip", 
+                            fontSize: '0.9rem', 
+                          }}
+                        >
+                          No notification
+                        </Typography>
+                    </MenuItem>
+                  </>
+                }
+              </Box>
+            </Menu>
+          </>
+          :
+          <></>
+        }
+
+        {userProfile ? (
+>>>>>>> b4f0b312d3627dce08d9e2a35e9e0438bb495158
           <>
             <li className="navBarLi relative">
             <IconButton
