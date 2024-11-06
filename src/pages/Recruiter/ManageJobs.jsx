@@ -22,6 +22,7 @@ import WorkIcon from "@mui/icons-material/Work";
 import PaidIcon from "@mui/icons-material/Paid";
 import ReplayIcon from '@mui/icons-material/Replay';
 import { useNavigate } from "react-router-dom";
+import RepostJob from "../../components/Recruiter/RepostJob";
 
 const ManageJobs = () => {
   const theme = useTheme();
@@ -36,6 +37,8 @@ const ManageJobs = () => {
   const [dataDetail, setDataDetail] = useState({});
   const [approvedApplications, setApprovedApplications] = useState({});
   const [applicationStatuses, setApplicationStatuses] = useState({});
+  const [isRepostDialogOpen, setIsRepostDialogOpen] = useState(false);
+  const [selectedJobForRepost, setSelectedJobForRepost] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -160,7 +163,7 @@ const ManageJobs = () => {
   };
 
   const handleHide = async (jobId) => {
-    const apiURL = process.env.REACT_APP_API_URL + "/job/hide-recruitment/";
+    const apiURL = process.env.REACT_APP_API_URL + "/job/hide_job/";
     const accessToken = Cookies.get("access_token");
 
     try {
@@ -260,21 +263,22 @@ const ManageJobs = () => {
   };
 
   const handleRepost = (job) => {
-    console.log("Job being reposted:", job);
-    navigate("/recruiter/post-job", { 
-      state: { 
-        rejectedJob: {
-          ...job,
-          id: undefined,
-          status: undefined,
-          created_at: undefined,
-          updated_at: undefined,
-          is_expired: undefined,
-          rejection_reason: undefined,
-          approved_at: undefined
-        } 
-      } 
-    });
+    setSelectedJob(job);
+    setIsRepostDialogOpen(true);
+  };
+
+  const handleRepostSuccess = async (data) => {
+    // Chỉ ẩn job cũ khi repost thành công
+    if (selectedJob) {
+      await handleHide(selectedJob.id);
+    }
+    fetchJobs(); // Refresh danh sách
+    setIsRepostDialogOpen(false);
+  };
+
+  const handleRepostedJob = async (repostedJob) => {
+    // Add your repost API logic here
+    // Similar to handleUpdatedJob but with different endpoint
   };
 
   return (
@@ -400,6 +404,11 @@ const ManageJobs = () => {
                     <IconButton
                       onClick={() => handleRepost(job)}
                       color="primary"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'rgba(144, 202, 249, 0.08)',
+                        },
+                      }}
                     >
                       <ReplayIcon />
                     </IconButton>
@@ -527,6 +536,12 @@ const ManageJobs = () => {
           dataDetail={dataDetail}
         />
       </Box>
+      <RepostJob
+        open={isRepostDialogOpen}
+        onClose={() => setIsRepostDialogOpen(false)}
+        onSave={handleRepostSuccess}
+        job={selectedJob}
+      />
     </>
   );
 };
