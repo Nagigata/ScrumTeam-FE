@@ -17,6 +17,13 @@ import { style } from "framer-motion/client";
 import { motion } from "framer-motion";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import ApplicationFile from "../../components/Recruiter/ApplicationFile";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import WorkIcon from "@mui/icons-material/Work";
+import PaidIcon from "@mui/icons-material/Paid";
+import ReplayIcon from '@mui/icons-material/Replay';
+import { useNavigate } from "react-router-dom";
+import RepostJob from "../../components/Recruiter/RepostJob";
+
 const ManageJobs = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -30,6 +37,9 @@ const ManageJobs = () => {
   const [dataDetail, setDataDetail] = useState({});
   const [approvedApplications, setApprovedApplications] = useState({});
   const [applicationStatuses, setApplicationStatuses] = useState({});
+  const [isRepostDialogOpen, setIsRepostDialogOpen] = useState(false);
+  const [selectedJobForRepost, setSelectedJobForRepost] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchJobs();
@@ -37,28 +47,26 @@ const ManageJobs = () => {
 
   const getStatusChipColor = (status) => {
     switch (status) {
-      case "Active":
+      case "Approved":
         return "success";
-      case "Inactive":
+      case "Pending":
+        return "warning";
+      case "Rejected":
         return "error";
-      case "Draft":
-        return "default";
       default:
         return "default";
     }
   };
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case "Active":
-        return "Active";
-      case "Inactive":
-        return "Inactive";
-      case "Draft":
-        return "Draft";
-      default:
-        return "Unknown";
-    }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
+
   const fetchJobs = async () => {
     const apiURL = process.env.REACT_APP_API_URL + "/job/job-list-of-company/";
     const accessToken = Cookies.get("access_token");
@@ -88,9 +96,24 @@ const ManageJobs = () => {
   };
 
   const handleEdit = (job) => {
+    if (!job) return;
+    
     const jobForEdit = {
       ...job,
-      job_category: job.job_category.id,
+      job_type: job.job_type || "",
+      title: job.title || "",
+      description: job.description || "",
+      skill_required: job.skill_required || "",
+      benefits: job.benefits || "",
+      location: job.location || "",
+      specific_address: job.specific_address || "",
+      salary_range: job.salary_range || "",
+      level: job.level || "",
+      minimum_years_of_experience: job.minimum_years_of_experience || "",
+      role_and_responsibilities: job.role_and_responsibilities || "",
+      contract_type: job.contract_type || "",
+      interview_process: job.interview_process || "",
+      expired_at: job.expired_at ? job.expired_at.split('T')[0] : "",
     };
     setSelectedJob(jobForEdit);
     setIsEditDialogOpen(true);
@@ -140,7 +163,7 @@ const ManageJobs = () => {
   };
 
   const handleHide = async (jobId) => {
-    const apiURL = process.env.REACT_APP_API_URL + "/job/hide-recruitment/";
+    const apiURL = process.env.REACT_APP_API_URL + "/job/hide_job/";
     const accessToken = Cookies.get("access_token");
 
     try {
@@ -239,6 +262,25 @@ const ManageJobs = () => {
     }
   };
 
+  const handleRepost = (job) => {
+    setSelectedJob(job);
+    setIsRepostDialogOpen(true);
+  };
+
+  const handleRepostSuccess = async (data) => {
+    // Chỉ ẩn job cũ khi repost thành công
+    if (selectedJob) {
+      await handleHide(selectedJob.id);
+    }
+    fetchJobs(); // Refresh danh sách
+    setIsRepostDialogOpen(false);
+  };
+
+  const handleRepostedJob = async (repostedJob) => {
+    // Add your repost API logic here
+    // Similar to handleUpdatedJob but with different endpoint
+  };
+
   return (
     <>
       <Box m="20px" style={{ display: showCandidate ? "none" : "block" }}>
@@ -277,82 +319,129 @@ const ManageJobs = () => {
                 backgroundColor={colors.primary[400]}
                 borderRadius="4px"
                 p="15px"
+                sx={{
+                  opacity: job.is_expired ? 0.7 : 1,
+                }}
               >
-                <Typography
-                  variant="h5"
-                  color={colors.grey[100]}
-                  fontWeight="bold"
-                >
-                  {job.title}
-                </Typography>
-                {/* <Typography variant="body2" color={colors.grey[300]}>
-                  Category: {job.job_category}
-                </Typography> */}
-                <Typography variant="body2" color={colors.grey[300]}>
-                  Location: {job.location}
-                </Typography>
-                <Typography variant="body2" color={colors.grey[300]}>
-                  Salary Range: {job.salary_range}
-                </Typography>
-                <Typography variant="body2" color={colors.grey[300]}>
-                  Experience: {job.experience}
-                </Typography>
-                <Box mt="10px">
-                  <Chip label={job.level} size="small" color="default" />
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="h5" color={colors.grey[100]} fontWeight="bold">
+                    {job.title}
+                  </Typography>
                   <Chip
-                    label={getStatusLabel(job.status)}
+                    label={job.is_expired ? "Expired" : job.status}
                     size="small"
                     color={getStatusChipColor(job.status)}
-                    sx={{ ml: 1 }}
                   />
                 </Box>
-                <Tooltip title={job.description}>
-                  <Typography
-                    variant="body2"
-                    color={colors.grey[300]}
-                    sx={{
-                      mt: 1,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                    }}
-                  >
-                    {job.description}
-                  </Typography>
-                </Tooltip>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <motion.button
-                    className=" text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleShowList(job.id)}
-                  >
-                    <span>Show</span>
-                  </motion.button>
 
-                  <Box mt="10px" display="flex" justifyContent="">
+                <Box mt={2}>
+                  <Typography variant="body2" color={colors.grey[300]}>
+                    <LocationOnIcon sx={{ fontSize: 16, mr: 1 }} />
+                    {job.location}
+                    {job.specific_address && ` - ${job.specific_address}`}
+                  </Typography>
+
+                  <Typography variant="body2" color={colors.grey[300]} mt={1}>
+                    <WorkIcon sx={{ fontSize: 16, mr: 1 }} />
+                    Level: {job.level}
+                  </Typography>
+
+                  {job.salary_range && (
+                    <Typography variant="body2" color={colors.grey[300]} mt={1}>
+                      <PaidIcon sx={{ fontSize: 16, mr: 1 }} />
+                      Salary: {job.salary_range}
+                    </Typography>
+                  )}
+                </Box>
+
+                <Box mt={2}>
+                  <Typography variant="body2" color={colors.grey[300]}>
+                    Skill Required:
+                  </Typography>
+                  <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
+                    {job.skill_required?.split(',').map((skill, index) => (
+                      <Chip
+                        key={index}
+                        label={skill.trim()}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderColor: colors.grey[300] }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+
+                {job.benefits && (
+                  <Box mt={2}>
+                    <Typography variant="body2" color={colors.grey[300]}>
+                      Benefits:
+                    </Typography>
+                    <Typography variant="body2" color={colors.grey[300]} mt={1}>
+                      {job.benefits}
+                    </Typography>
+                  </Box>
+                )}
+
+                <Box mt={2}>
+                  <Typography variant="body2" color={colors.grey[300]}>
+                    Created at: {formatDate(job.created_at)}
+                  </Typography>
+                  <Typography variant="body2" color={colors.grey[300]}>
+                    Expired at: {formatDate(job.expired_at)}
+                  </Typography>
+                </Box>
+
+
+                {job.status === "Rejected" ? (
+                  <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+                    <Tooltip title={job.rejection_reason || "No reason provided"}>
+                      <Chip
+                        label="Rejection reason"
+                        color="error"
+                        size="small"
+                      />
+                    </Tooltip>
                     <IconButton
-                      onClick={() => handleEdit(job)}
-                      color="secondary"
+                      onClick={() => handleRepost(job)}
+                      color="primary"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'rgba(144, 202, 249, 0.08)',
+                        },
+                      }}
                     >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleHide(job.id)}
-                      color="warning"
-                    >
-                      <VisibilityOffIcon />
+                      <ReplayIcon />
                     </IconButton>
                   </Box>
-                </div>
+                ) : (
+                  <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+                    <motion.button
+                      className="text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleShowList(job.id)}
+                    >
+                      View candidates
+                    </motion.button>
+
+                    <Box display="flex" gap={1}>
+                      <IconButton
+                        onClick={() => handleEdit(job)}
+                        color="secondary"
+                        disabled={job.is_expired || job.status === "Rejected"}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleHide(job.id)}
+                        color="warning"
+                        disabled={job.is_expired}
+                      >
+                        <VisibilityOffIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                )}
               </Box>
             ))}
           </Box>
@@ -363,6 +452,7 @@ const ManageJobs = () => {
           onClose={() => {
             setIsEditDialogOpen(false);
             setSelectedJob(null);
+            fetchJobs();
           }}
           onSave={handleUpdatedJob}
           job={selectedJob}
@@ -447,6 +537,12 @@ const ManageJobs = () => {
           dataDetail={dataDetail}
         />
       </Box>
+      <RepostJob
+        open={isRepostDialogOpen}
+        onClose={() => setIsRepostDialogOpen(false)}
+        onSave={handleRepostSuccess}
+        job={selectedJob}
+      />
     </>
   );
 };

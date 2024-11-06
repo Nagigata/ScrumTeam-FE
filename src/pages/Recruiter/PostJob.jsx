@@ -82,24 +82,25 @@ const PostJob = () => {
   const [contractType, setContractType] = useState([]);
   const [isHide, setIsHide] = useState(false);
   const storedIds = Cookies.get("id_job");
+  const [selectedSkills, setSelectedSkills] = useState([]);
   const idToCheck = 0;//vài bữa ai làm edit thì nhớ sửa  
   //ở đây bằng tham số id lấy được từ edit, chức năng edit cuart hiện tại 
   //bị lỗi nên t k thử được, nói chung cứ set giá trị  của idToCheck bằng với 
   //id của  thẻ mn click vào, hàm ở dưới sẽ tự thực hiện kiểm tra và set ẩn hiện của button POST
   //---------------------ĐA TẠ---------------------
 
-  useEffect(() => {
-    // Nếu cookie không tồn tại, trả về false
-    if (!storedIds) {
-      return false; // Không có ID nào trong cookie
-    }
+  // useEffect(() => {
+  //   // Nếu cookie không tồn tại, trả về false
+  //   if (!storedIds) {
+  //     return false; // Không có ID nào trong cookie
+  //   }
   
-    // Chuyển đổi dữ liệu từ cookie thành mảng
-    const idsArray = JSON.parse(storedIds);
+  //   // Chuyển đổi dữ liệu từ cookie thành mảng
+  //   const idsArray = JSON.parse(storedIds);
   
-    // Kiểm tra xem ID có tồn tại trong mảng không
-    setIsHide(idsArray.includes(idToCheck));
-  }, [idToCheck]);
+  //   // Kiểm tra xem ID có tồn tại trong mảng không
+  //   setIsHide(idsArray.includes(idToCheck));
+  // }, [idToCheck]);
 
   useEffect(() => {
     const fetchDataLocation = async () => {
@@ -241,7 +242,7 @@ const PostJob = () => {
       job_type: values.job_type,
       title: values.title,
       description: values.description,
-      skill_required: values.skill_required,
+      skill_required: selectedSkills.join(', '),
       benefits: values.benefits,
       location: values.location,
       salary_range: values.salary_range,
@@ -270,40 +271,14 @@ const PostJob = () => {
       if (res.status === 201) {
         setStatus({ success: "Job posted successfully!" });
         setIsHide(true);
-        if (!storedIds) {
-          const idsArray = [res.data.results.id];
-          Cookies.set("id_job", JSON.stringify(idsArray), { expires: 7 });
-        } else {
-          const idsArray = JSON.parse(storedIds);
-          idsArray.push(res.data.results.id);
-          Cookies.set("id_job", JSON.stringify(idsArray), { expires: 7 });
-        }
-      } else {
-        // Xử lý các loại lỗi khác nhau
-        let errorMessage = "";
-
-        if (data.detail) {
-          // Lỗi authentication/authorization
-          errorMessage = `Authentication error: ${data.detail}`;
-        } else if (data.message) {
-          // Lỗi business logic từ API
-          errorMessage = data.message;
-        } else if (typeof data === "object") {
-          // Lỗi validation từ API
-          errorMessage = Object.entries(data)
-            .map(([field, errors]) => {
-              if (Array.isArray(errors)) {
-                return `${field}: ${errors.join(", ")}`;
-              }
-              return `${field}: ${errors}`;
-            })
-            .join("\n");
-        } else {
-          errorMessage = "An unknown error occurred while posting the job.";
-        }
-
-        console.error("Error details:", errorMessage);
-        setStatus({ error: errorMessage });
+        // if (!storedIds) {
+        //   const idsArray = [res.data.results.id];
+        //   Cookies.set("id_job", JSON.stringify(idsArray), { expires: 7 });
+        // } else {
+        //   const idsArray = JSON.parse(storedIds);
+        //   idsArray.push(res.data.results.id);
+        //   Cookies.set("id_job", JSON.stringify(idsArray), { expires: 7 });
+        // }
       }
     } catch (error) {
       console.error("Network or parsing error:", error);
@@ -323,7 +298,7 @@ const PostJob = () => {
       job_type: values.job_type,
       title: values.title,
       description: values.description,
-      skill_required: values.skill_required,
+      skill_required: selectedSkills.join(', '),
       benefits: values.benefits,
       location: values.location,
       salary_range: values.salary_range,
@@ -351,32 +326,6 @@ const PostJob = () => {
 
       if (res.status === 201) {
         setStatus({ success: "Job saved successfully!" });
-      } else {
-        // Xử lý các loại lỗi khác nhau
-        let errorMessage = "";
-
-        if (data.detail) {
-          // Lỗi authentication/authorization
-          errorMessage = `Authentication error: ${data.detail}`;
-        } else if (data.message) {
-          // Lỗi business logic từ API
-          errorMessage = data.message;
-        } else if (typeof data === "object") {
-          // Lỗi validation từ API
-          errorMessage = Object.entries(data)
-            .map(([field, errors]) => {
-              if (Array.isArray(errors)) {
-                return `${field}: ${errors.join(", ")}`;
-              }
-              return `${field}: ${errors}`;
-            })
-            .join("\n");
-        } else {
-          errorMessage = "An unknown error occurred while posting the job.";
-        }
-
-        console.error("Error details:", errorMessage);
-        setStatus({ error: errorMessage });
       }
     } catch (error) {
       console.error("Network or parsing error:", error);
@@ -387,6 +336,18 @@ const PostJob = () => {
     }
     setSubmitting(false);
   }
+
+  const handleSkillChange = (event, setFieldValue) => {
+    const skill = event.target.value;
+    if (!selectedSkills.includes(skill)) {
+      setSelectedSkills([...selectedSkills, skill]);
+      setFieldValue('skill_required', skill);
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
+    setSelectedSkills(selectedSkills.filter(skill => skill !== skillToRemove));
+  };
 
   return (
     <Box m="20px">
@@ -400,7 +361,7 @@ const PostJob = () => {
           initialValues={initialValues}
           validationSchema={jobSchema}
         >
-          {({ errors, touched, values, status, handleChange, setSubmitting, setStatus }) => (
+          {({ errors, touched, values, status, setFieldValue, setSubmitting, setStatus }) => (
             <Form>
               <Box display="flex" flexDirection="column" gap={3}>
                 <Typography variant="h5" gutterBottom fontWeight="bold">
@@ -468,6 +429,7 @@ const PostJob = () => {
                     name="skill_required"
                     error={touched.skill_required && errors.skill_required}
                     helperText={touched.skill_required && errors.skill_required}
+                    onChange={(event) => handleSkillChange(event, setFieldValue)}
                   >
                     {skill.map((_skill, index) => (
                       <MenuItem key={index} value={_skill.skill}>
@@ -475,6 +437,7 @@ const PostJob = () => {
                       </MenuItem>
                     ))}
                   </Field>
+
                   <Field
                     as={TextField}
                     fullWidth
@@ -486,6 +449,15 @@ const PostJob = () => {
                     helperText={touched.benefits && errors.benefits}
                   />
                 </Box>
+                {selectedSkills.length > 0 && (
+                  <div className="flex">
+                    {selectedSkills.map((skill, index) => (
+                      <span key={index} className="mr-2 bg-gray-200 px-2 py-1 rounded cursor-pointer" onClick={() => handleRemoveSkill(skill)}>
+                        {skill} <button className="ml-2 text-gray-500 hover:text-gray-700">x</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <Typography variant="h5" gutterBottom fontWeight="bold">
                   Job Requirements
                 </Typography>
