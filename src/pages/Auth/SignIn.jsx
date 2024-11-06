@@ -17,7 +17,7 @@ const validationSchema = Yup.object().shape({
     .min(3, "Username must be at least 3 characters")
     .required("Username is required"),
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
+    .min(6, "Password must be at least 8 characters")
     .required("Password is required"),
   userRole: Yup.string().required("Please select a role"),
 });
@@ -47,14 +47,20 @@ const SignIn = () => {
       if (res.status === 200) {
         const data = await res.json();
         console.log(data);
-        Cookies.set("userRole", values.userRole, { expires: 7 });
         Cookies.set("access_token", data.access, { expires: 7 });
         Cookies.set("refresh_token", data.refresh, { expires: 7 });
-        window.location.href = "/";
+        if (data.is_admin) {
+          window.location.href = "/admin";
+        } else {
+          Cookies.set("userRole", values.userRole, { expires: 7 });
+          window.location.href = "/";
+        }
       } else if (res.status === 400) {
         setErrorMessage(
           "Login failed. Please check your username or password."
         );
+      } else if (res.status === 423) {
+        setErrorMessage("Login failed. Your account has been blocked");
       } else {
         setErrorMessage("Server error. Please try again later.");
       }

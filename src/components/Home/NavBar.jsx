@@ -22,7 +22,7 @@ const NavBar = () => {
   
   const [listMessage, setListMessage] = useState(() => {
     const savedMessages = Cookies.get("list_message");
-    console.log(">>> ", savedMessages);
+    // console.log(">>> ", savedMessages);
     return savedMessages ? JSON.parse(savedMessages) : [];
   });
 

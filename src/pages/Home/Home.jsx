@@ -63,7 +63,7 @@ const Home = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log("API Response 1:", data); // Log dữ liệu API để kiểm tra
+        //console.log("API Response 1:", data); // Log dữ liệu API để kiểm tra
         setSearchResults(Array.isArray(data.results) ? data.results : []);
       } else {
         console.error("Failed to fetch jobs");
