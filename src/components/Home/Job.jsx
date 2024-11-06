@@ -26,9 +26,9 @@ const Job = ({ searchResults }) => {
             company,
             title,
             location,
-            description,
+            skill_required,
             level,
-            avatar_url,
+            avatar_company,
           } = job;
 
           return (
@@ -41,21 +41,25 @@ const Job = ({ searchResults }) => {
                 <h1 className="text-[16px] font-semibold text-textColor group-hover:text-white">
                   {title}
                 </h1>
-                <span className="flex items-center text-[#ccc] gap-1 text-[13px]">
+                {/* <span className="flex items-center text-[#ccc] gap-1 text-[13px]">
                   <AccessTimeOutlinedIcon />
-                  {company.founded_year}
-                </span>
+                  {company}
+                </span> */}
               </span>
               <h6 className="text-[#ccc]">{location}</h6>
 
               <p className="text-[13px] text-[#959595] pt-[20px] border-t-[2px] mt-[20px] group-hover:text-white h-[60px] overflow-hidden">
                 {/* Giới hạn mô tả */}
-                {/*  {truncateDescription(description, 100)} */}{" "}
+                {/*  {truncateDescription(description, 100)} */} {skill_required}
               </p>
               <div className="company flex items-center gap-2">
-                <img src={avatar_url} alt="Company Logo" className="w-[10%]" />
+                <img
+                  src={avatar_company}
+                  alt="Company Logo"
+                  className="w-[10%]"
+                />
                 <span className="text-[14px] py-[1rem] block group-hover:text-white">
-                  {company.name}
+                  {company}
                 </span>
               </div>
 

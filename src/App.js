@@ -4,15 +4,16 @@ import SignIn from "./pages/Auth/SignIn";
 import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Home/Home";
 import JobDetail from "./components/Home/JobDetail";
-import SkillManagement from "./components/Home/SkillManagement";
+import AdvancedProfile from "./components/Home/AdvancedProfile";
 import Candidate from "./pages/ProfileManage/Candidate";
-import ApplicationStatus from "./components/Home/ApplicationStatus";
 import CVManagement from "./components/Home/CVManagement";
+import ApplicationStatus from "./components/Home/ApplicationStatus";
 import FollowingJob from "./components/Home/FollowingJob"; // Import FollowingJob
 import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
 import Recruiter from "./AppRecruiter";
 import Cookies from "js-cookie";
+import { SocketProvider } from "./contextAPI/SocketProvider";
 
 function App() {
   const userRole = Cookies.get("userRole");
@@ -37,6 +38,7 @@ function App() {
 
   return (
     <div className="App">
+      <SocketProvider>
       <Routes>
         <Route
           path="/*"
@@ -66,7 +68,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/candidate"
+                  path="/basic-profile"
                   element={
                     userRole === "recruiter" ? (
                       <Navigate to="/" />
@@ -76,12 +78,22 @@ function App() {
                   }
                 />
                 <Route
-                  path="/skills"
+                  path="/advanced-profile"
                   element={
                     userRole === "recruiter" ? (
                       <Navigate to="/" />
                     ) : (
-                      <SkillManagement />
+                      <AdvancedProfile />
+                    )
+                  }
+                />
+                <Route
+                  path="/cv-management"
+                  element={
+                    userRole === "recruiter" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <CVManagement />
                     )
                   }
                 />
@@ -136,6 +148,8 @@ function App() {
           }
         />
       </Routes>
+    </SocketProvider>
+
     </div>
   );
 }

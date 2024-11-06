@@ -138,8 +138,7 @@ const FollowingJob = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="flex items-center">
-                  </div>
+                  <div className="flex items-center"></div>
                 </div>
               </div>
             </div>
@@ -183,4 +182,3 @@ const FollowingJob = () => {
 };
 
 export default FollowingJob;
-

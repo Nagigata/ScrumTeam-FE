@@ -8,14 +8,13 @@ import {
   TextField,
   Box,
   MenuItem,
-  FormControlLabel,
-  Switch,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
 
 const levels = ["Entry", "Junior", "Middle", "Senior", "Lead"];
+const statusOptions = ["Active", "Inactive", "Draft"];
 
 const EditJob = ({ open, onClose, onSave, job }) => {
   const theme = useTheme();
@@ -28,10 +27,11 @@ const EditJob = ({ open, onClose, onSave, job }) => {
     benefits: "",
     location: "",
     salary_range: "",
-    status: true,
+    status: "Draft", // Default to Draft
     level: "",
     experience: "",
     interview_process: "",
+    expired_at: "", // Added expired_at field
   });
 
   const [errors, setErrors] = useState({});
@@ -39,10 +39,21 @@ const EditJob = ({ open, onClose, onSave, job }) => {
 
   useEffect(() => {
     if (job) {
-      setEditedJob(job);
+      setEditedJob({
+        ...job,
+        status: job.status || "Draft", // Ensure status is one of the three options
+        expired_at:
+          job.expired_at ||
+          formatDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)), // Default to 30 days from now
+      });
     }
     fetchJobCategories();
   }, [job]);
+
+  // Helper function to format date for expired_at
+  const formatDate = (date) => {
+    return date.toISOString().split("T")[0] + "T23:59:59";
+  };
 
   const fetchJobCategories = async () => {
     const apiURL =
@@ -69,20 +80,11 @@ const EditJob = ({ open, onClose, onSave, job }) => {
     }));
   };
 
-  const handleSwitchChange = (e) => {
-    setEditedJob((prevJob) => ({
-      ...prevJob,
-      status: e.target.checked,
-    }));
-  };
-
   const validate = () => {
     const newErrors = {};
     if (!editedJob.job_category)
       newErrors.job_category = "Job category is required";
     if (!editedJob.title) newErrors.title = "Title is required";
-    if (!editedJob.description)
-      newErrors.description = "Description is required";
     if (!editedJob.skill_required)
       newErrors.skill_required = "Skills required is required";
     if (!editedJob.benefits) newErrors.benefits = "Benefits is required";
@@ -90,9 +92,9 @@ const EditJob = ({ open, onClose, onSave, job }) => {
     if (!editedJob.salary_range)
       newErrors.salary_range = "Salary range is required";
     if (!editedJob.level) newErrors.level = "Level is required";
-    if (!editedJob.experience) newErrors.experience = "Experience is required";
-    if (!editedJob.interview_process)
-      newErrors.interview_process = "Interview process is required";
+    if (!editedJob.status) newErrors.status = "Status is required";
+    if (!editedJob.expired_at)
+      newErrors.expired_at = "Expiration date is required";
 
     // Validate salary range format
     const salaryRangeRegex = /^\d+-\d+\s+USD$/;
@@ -106,6 +108,15 @@ const EditJob = ({ open, onClose, onSave, job }) => {
       if (min >= max) {
         newErrors.salary_range =
           "Maximum salary must be greater than minimum salary";
+      }
+    }
+
+    // Validate expiration date
+    if (editedJob.expired_at) {
+      const expireDate = new Date(editedJob.expired_at);
+      const now = new Date();
+      if (expireDate <= now) {
+        newErrors.expired_at = "Expiration date must be in the future";
       }
     }
 
@@ -161,6 +172,7 @@ const EditJob = ({ open, onClose, onSave, job }) => {
               </MenuItem>
             ))}
           </TextField>
+
           <TextField
             label="Title"
             name="title"
@@ -171,6 +183,7 @@ const EditJob = ({ open, onClose, onSave, job }) => {
             error={!!errors.title}
             helperText={errors.title}
           />
+          {/* 
           <TextField
             label="Description"
             name="description"
@@ -182,7 +195,8 @@ const EditJob = ({ open, onClose, onSave, job }) => {
             required
             error={!!errors.description}
             helperText={errors.description}
-          />
+          /> */}
+
           <TextField
             label="Skills Required"
             name="skill_required"
@@ -194,6 +208,7 @@ const EditJob = ({ open, onClose, onSave, job }) => {
             error={!!errors.skill_required}
             helperText={errors.skill_required}
           />
+
           <TextField
             label="Benefits"
             name="benefits"
@@ -205,6 +220,7 @@ const EditJob = ({ open, onClose, onSave, job }) => {
             error={!!errors.benefits}
             helperText={errors.benefits}
           />
+
           <TextField
             label="Location"
             name="location"
@@ -215,6 +231,7 @@ const EditJob = ({ open, onClose, onSave, job }) => {
             error={!!errors.location}
             helperText={errors.location}
           />
+
           <TextField
             label="Salary Range"
             name="salary_range"
@@ -228,6 +245,25 @@ const EditJob = ({ open, onClose, onSave, job }) => {
               "Format: min-max USD (e.g., 50000-70000 USD)"
             }
           />
+
+          <TextField
+            select
+            label="Status"
+            name="status"
+            value={editedJob.status}
+            onChange={handleChange}
+            fullWidth
+            required
+            error={!!errors.status}
+            helperText={errors.status}
+          >
+            {statusOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
+
           <TextField
             select
             label="Level"
@@ -245,7 +281,8 @@ const EditJob = ({ open, onClose, onSave, job }) => {
               </MenuItem>
             ))}
           </TextField>
-          <TextField
+
+          {/* <TextField
             label="Experience"
             name="experience"
             value={editedJob.experience}
@@ -254,8 +291,9 @@ const EditJob = ({ open, onClose, onSave, job }) => {
             required
             error={!!errors.experience}
             helperText={errors.experience}
-          />
-          <TextField
+          /> */}
+
+          {/* <TextField
             label="Interview Process"
             name="interview_process"
             value={editedJob.interview_process}
@@ -266,16 +304,23 @@ const EditJob = ({ open, onClose, onSave, job }) => {
             required
             error={!!errors.interview_process}
             helperText={errors.interview_process}
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={editedJob.status}
-                onChange={handleSwitchChange}
-                name="status"
-              />
-            }
-            label="Job Status"
+          /> */}
+
+          <TextField
+            label="Expiration Date"
+            name="expired_at"
+            type="datetime-local"
+            value={
+              editedJob.expired_at ? editedJob.expired_at.slice(0, 16) : ""
+            } // Format for datetime-local input
+            onChange={handleChange}
+            fullWidth
+            required
+            error={!!errors.expired_at}
+            helperText={errors.expired_at}
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
         </Box>
       </DialogContent>

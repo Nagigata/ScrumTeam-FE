@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Box, IconButton, Typography, Menu, MenuItem, Divider } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Typography,
+  Menu,
+  MenuItem,
+  Divider,
+} from "@mui/material";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import Cookies from "js-cookie";
 
@@ -59,23 +66,25 @@ const NotificationMenu = () => {
         id="notification-menu"
         open={openNotifications}
         onClose={handleNotificationClose}
-        sx={{ minWidth: '300px' }}
+        sx={{ minWidth: "300px" }}
       >
         <Box sx={{ width: 400, padding: 2 }}>
-          <Typography variant="h4" sx={{ padding: 1, fontWeight: 'bold' }}>Thông báo</Typography>
+          <Typography variant="h4" sx={{ padding: 1, fontWeight: "bold" }}>
+            Thông báo
+          </Typography>
           <Divider />
           {notifications.map((notification) => (
-            <MenuItem 
-              key={notification.id} 
+            <MenuItem
+              key={notification.id}
               onClick={handleNotificationClose}
               sx={{ padding: 2 }}
             >
-              <Typography 
-                sx={{ 
-                  whiteSpace: "normal", 
-                  overflow: "visible", 
-                  textOverflow: "clip", 
-                  fontSize: '0.9rem', 
+              <Typography
+                sx={{
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                  textOverflow: "clip",
+                  fontSize: "0.9rem",
                 }}
               >
                 {notification.message}

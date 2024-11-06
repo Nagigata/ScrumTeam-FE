@@ -106,7 +106,7 @@ const JobDetail = () => {
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-3xl font-bold text-blue-900">{job.title}</h1>
               <img
-                src={job.avatar_url}
+                src={job.avatar_company}
                 alt="Company Logo"
                 className="w-16 h-16 rounded-full"
               />
