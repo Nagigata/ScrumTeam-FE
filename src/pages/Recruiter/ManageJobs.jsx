@@ -452,6 +452,7 @@ const ManageJobs = () => {
           onClose={() => {
             setIsEditDialogOpen(false);
             setSelectedJob(null);
+            fetchJobs();
           }}
           onSave={handleUpdatedJob}
           job={selectedJob}

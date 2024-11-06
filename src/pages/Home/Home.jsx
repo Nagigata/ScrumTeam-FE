@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Search from "../../components/Home/Search";
 import Job from "../../components/Home/Job";
 import Value from "../../components/Home/Value";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [keyword, setKeyword] = useState("");
@@ -12,6 +13,7 @@ const Home = () => {
   const [typeValue, setTypeValue] = useState("fullTime");
   const [levelValue, setLevelValue] = useState("senior");
   const [searchResults, setSearchResults] = useState([]); // State mới để lưu trữ kết quả tìm kiếm
+  const navigate = useNavigate();
 
   const handleSearch = (keyword) => {
     setKeyword(keyword);
@@ -80,6 +82,10 @@ const Home = () => {
     fetchJobs(); // Gọi API với từ khóa rỗng
   }, []);
 
+  const handleJobClick = (jobId) => {
+    navigate(`/job/${jobId}`);
+  };
+
   return (
     <motion.div
       className="w-[85%] m-auto bg-[#e6f9f3]"
@@ -109,6 +115,7 @@ const Home = () => {
           typeValue={typeValue} // Truyền giá trị typeValue
           levelValue={levelValue} // Truyền giá trị levelValue
           searchResults={searchResults} // Truyền kết quả tìm kiếm
+          onJobClick={handleJobClick} // Truyền handler xuống Job component
         />
       </motion.div>
       <motion.div
