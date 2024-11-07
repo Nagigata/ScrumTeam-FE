@@ -59,12 +59,15 @@ const ManageJobs = () => {
   };
 
   const formatDate = (dateString) => {
+    console.log("dateString:", dateString); // Thêm log để kiểm tra
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString('vi-VN', {
+    const re = new Date(dateString).toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+    console.log("re", re);
+    return re;
   };
 
   const fetchJobs = async () => {
@@ -95,25 +98,39 @@ const ManageJobs = () => {
     }
   };
 
-  const handleEdit = (job) => {
+  const handleEdit = async (job) => {
+    const apiURL = process.env.REACT_APP_API_URL + "/job/detail-job/?job_id=" + job.id
+    const accessToken = Cookies.get("access_token");
     if (!job) return;
-    
+    let results;
+    try {
+      const response = await fetch(apiURL, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+      }});
+
+      results = await response.json();
+
+    } catch (error) {
+      
+    }
+    console.log("result", results);
     const jobForEdit = {
       ...job,
       job_type: job.job_type || "",
       title: job.title || "",
-      description: job.description || "",
-      skill_required: job.skill_required || "",
+      description: results.description || "",
+      skill_required: results.skill_required || "",
       benefits: job.benefits || "",
       location: job.location || "",
       specific_address: job.specific_address || "",
       salary_range: job.salary_range || "",
       level: job.level || "",
-      minimum_years_of_experience: job.minimum_years_of_experience || "",
-      role_and_responsibilities: job.role_and_responsibilities || "",
-      contract_type: job.contract_type || "",
-      interview_process: job.interview_process || "",
-      expired_at: job.expired_at ? job.expired_at.split('T')[0] : "",
+      minimum_years_of_experience: results.minimum_years_of_experience || "",
+      role_and_responsibilities: results.role_and_responsibilities || "",
+      contract_type: results.contract_type || "",
+      interview_process: results.interview_process || "",
+      expired_at: results.expired_at ? results.expired_at : "",
     };
     setSelectedJob(jobForEdit);
     setIsEditDialogOpen(true);
@@ -438,6 +455,7 @@ const ManageJobs = () => {
                         disabled={job.is_expired}
                       >
                         <VisibilityOffIcon />
+                        
                       </IconButton>
                     </Box>
                   </Box>
