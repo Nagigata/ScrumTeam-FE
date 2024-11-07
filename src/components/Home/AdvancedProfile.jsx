@@ -14,42 +14,91 @@ import {
   WorkspacePremium as CertificationsIcon,
 } from "@mui/icons-material";
 import Cookies from "js-cookie";
-
+ 
 const Candidate = () => {
   const [status, setStatus] = useState({ success: "", error: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
-
-  const programmingLanguages = [
-    "Java",
-    "Python",
-    "JavaScript",
-    "C++",
-    "C#",
-    "PHP",
-    "Ruby",
-    "Swift",
-    "Go",
-    "Kotlin",
-  ];
-
-  // const experienceLevels = [
-  //   "Intern",
-  //   "Fresher",
-  //   "Junior",
-  //   "Mid-level",
-  //   "Senior",
-  //   "Lead",
-  // ];
-
+  const [skillOption, setSkillOption] = useState([]);
+  const [location, setLocation] = useState([]);
+  const [experienceOption, setExperienceOption] = useState([]);
+  const [salaryOption, setSalaryOption] = useState([]);
+ 
   useEffect(() => {
     fetchUserProfile();
+    fetchSkill();
+    fetchDataLocation();
+    fetchExperienceOptions();
+    fetchSalaryOptions();
   }, []);
-
+ 
+  const fetchSkill = async () => {
+    const apiURL = process.env.REACT_APP_API_URL + "/options/get_all_skills/";
+    try {
+      const response = await fetch(apiURL, { method: "GET" });
+      if (!response.ok) {
+        throw new Error("Failed to fetch skills");
+      }
+      const data = await response.json();
+      const formattedSkills = data.map((item) => ({
+        id: item.id,
+        label: item.skill,
+      }));
+      setSkillOption(formattedSkills);
+    } catch (error) {
+      console.error("Error fetching skills:", error);
+    }
+  };  
+ 
+  const fetchDataLocation = async () => {
+    const apiURL = "https://provinces.open-api.vn/api/";
+    try {
+      const res = await fetch(apiURL, {
+        method: "GET",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch locations");
+      }
+      const data = await res.json();
+      const locationNames = data.map((province) => province.name);
+      setLocation(locationNames);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
+ 
+  const fetchExperienceOptions = async () => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_API_URL + "/options/get_all_years_of_experience/"
+      );
+      if (!response.ok) throw new Error("Failed to fetch experience options");
+     
+      const data = await response.json();
+      setExperienceOption(data.map((item) => ({ id: item.id, label: item.yoe })));
+    } catch (error) {
+      console.error("Error fetching experience options:", error);
+    }
+  };
+ 
+  const fetchSalaryOptions = async () => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_API_URL + "/options/get_all_salary_ranges"
+      );
+      if (!response.ok) throw new Error("Failed to fetch salary options");
+     
+      const data = await response.json();
+      setSalaryOption(data.map((item) => ({ id: item.id, label: item.salary_range })));
+    } catch (error) {
+      console.error("Error fetching salary options:", error);
+    }
+  };
+ 
   const fetchUserProfile = async () => {
     const accessToken = Cookies.get("access_token");
     if (!accessToken) return;
-
+ 
     try {
       const response = await fetch(
         process.env.REACT_APP_API_URL + "/candidate/advanced-profile/",
@@ -59,7 +108,7 @@ const Candidate = () => {
           },
         }
       );
-
+ 
       if (response.ok) {
         const data = await response.json();
         setUserProfile({
@@ -76,14 +125,17 @@ const Candidate = () => {
       console.error("Error fetching user profile:", error);
     }
   };
-
+ 
   const handleSubmit = async (values, { setSubmitting }) => {
     setStatus({ success: "", error: "" });
     setIsSubmitting(true);
+ 
+    console.log("Submitted Values:", values);
+   
     const apiURL =
       process.env.REACT_APP_API_URL + "/candidate/advanced-profile/";
     const accessToken = Cookies.get("access_token");
-
+ 
     try {
       const response = await fetch(apiURL, {
         method: "POST",
@@ -104,13 +156,23 @@ const Candidate = () => {
             activities: values.activities,
             certifications: values.certifications,
             additional_info: values.additional_info,
+            preferred_salary: values.preferred_salary,  
+            preferred_location: values.preferred_location,  
+            years_of_experience: values.years_of_experience,  
           },
+          preferred_salary: values.preferred_salary,  
+          preferred_location: values.preferred_location,  
+          years_of_experience: values.years_of_experience,  
         }),
       });
-
+ 
       if (response.ok) {
+        console.log("k");
         setStatus({ success: "Profile updated successfully!", error: "" });
         fetchUserProfile();
+        fetchDataLocation();
+        fetchExperienceOptions();
+        fetchSalaryOptions();
       } else if (response.status === 401) {
         setStatus({ error: "Unauthorized. Please log in again.", success: "" });
       } else {
@@ -128,15 +190,15 @@ const Candidate = () => {
         success: "",
       });
     }
-
+ 
     setIsSubmitting(false);
     setSubmitting(false);
   };
-
+ 
   if (!userProfile) {
     return <div>Loading...</div>;
   }
-
+ 
   const SkillTag = ({ skill, onRemove }) => (
     <span className="inline-flex items-center px-2 py-1 mr-2 mb-2 bg-blue-100 text-blue-800 rounded">
       {skill}
@@ -149,14 +211,14 @@ const Candidate = () => {
       </button>
     </span>
   );
-
+ 
   return (
     <div>
       <div className="max-w-xl mx-auto p-4">
         <h2 className="text-2xl font-bold text-center mb-8">
           Candidate Advanced Profile
         </h2>
-
+ 
         <Formik
           initialValues={{
             summary: userProfile.summary || "",
@@ -173,6 +235,9 @@ const Candidate = () => {
             certifications: userProfile.other_information?.certifications || "",
             additional_info:
               userProfile.other_information?.additional_info || "",
+            preferred_salary: userProfile.other_information?.preferred_salary || "",  
+            preferred_location: userProfile.other_information?.preferred_location || "",
+            years_of_experience: userProfile.other_information?.years_of_experience || "",
           }}
           onSubmit={handleSubmit}
         >
@@ -187,7 +252,7 @@ const Candidate = () => {
                 errors={errors}
                 touched={touched}
               />
-
+ 
               {/* Skills */}
               <div className="mb-6">
                 <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
@@ -216,11 +281,11 @@ const Candidate = () => {
                       <option value="">
                         Select additional programming languages
                       </option>
-                      {programmingLanguages
-                        .filter((lang) => !values.skills.includes(lang))
-                        .map((lang) => (
-                          <option key={lang} value={lang}>
-                            {lang}
+                      {skillOption
+                        .filter((skill) => !values.skills.includes(skill.label))
+                        .map((skill) => (
+                          <option key={skill.id} value={skill.label}>
+                            {skill.label}
                           </option>
                         ))}
                     </select>
@@ -245,7 +310,82 @@ const Candidate = () => {
                   </div>
                 </div>
               </div>
-
+ 
+              <div className="mb-6">
+                {/* Years of Experience */}
+                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
+                  Years of experience
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <CodeIcon className="h-5 w-5 text-[#19ADC8]" />
+                  </span>
+                  <select
+                    name="years_of_experience"
+                    onChange={(e) => setFieldValue("years_of_experience", e.target.value)}
+                    value={values.years_of_experience}
+                    className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select years of experience</option>
+                    {experienceOption.map((option) => (
+                      <option key={option.id} value={option.label}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+ 
+              <div className="mb-6">
+                {/* Preferred Salary */}
+                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
+                  Preferred salary
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <CodeIcon className="h-5 w-5 text-[#19ADC8]" />
+                  </span>
+                  <select
+                    name="preferred_salary"
+                    onChange={(e) => setFieldValue("preferred_salary", e.target.value)}
+                    value={values.preferred_salary}
+                    className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select salary</option>
+                    {salaryOption.map((option) => (
+                      <option key={option.id} value={option.label}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+ 
+              <div className="mb-6">
+                {/* Preferred Work Location */}
+                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
+                  Preferred work location
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <CodeIcon className="h-5 w-5 text-[#19ADC8]" />
+                  </span>
+                  <select
+                    name="preferred_location"
+                    onChange={(e) => setFieldValue("preferred_location", e.target.value)}
+                    value={values.preferred_location}
+                    className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select area</option>
+                    {location.map((loc) => (
+                      <option key={loc} value={loc}>
+                        {loc}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+ 
               {/* Education */}
               <InputField
                 label="Education"
@@ -256,7 +396,7 @@ const Candidate = () => {
                 errors={errors}
                 touched={touched}
               />
-
+ 
               {/* Work Experience */}
               <TextAreaField
                 label="Work Experience"
@@ -266,7 +406,7 @@ const Candidate = () => {
                 errors={errors}
                 touched={touched}
               />
-
+ 
               {/* Projects */}
               <TextAreaField
                 label="Projects"
@@ -276,13 +416,13 @@ const Candidate = () => {
                 errors={errors}
                 touched={touched}
               />
-
+ 
               {/* Other Information */}
               <div className="mb-6">
                 <h3 className="text-[#19ADC8] text-lg font-semibold mb-4">
                   Other Information
                 </h3>
-
+ 
                 {/* Languages */}
                 <InputField
                   label="Languages"
@@ -293,7 +433,7 @@ const Candidate = () => {
                   errors={errors}
                   touched={touched}
                 />
-
+ 
                 {/* Interests */}
                 <InputField
                   label="Interests"
@@ -304,7 +444,7 @@ const Candidate = () => {
                   errors={errors}
                   touched={touched}
                 />
-
+ 
                 {/* References */}
                 <InputField
                   label="References"
@@ -315,7 +455,7 @@ const Candidate = () => {
                   errors={errors}
                   touched={touched}
                 />
-
+ 
                 {/* Activities */}
                 <InputField
                   label="Activities"
@@ -326,7 +466,7 @@ const Candidate = () => {
                   errors={errors}
                   touched={touched}
                 />
-
+ 
                 {/* Certifications */}
                 <InputField
                   label="Certifications"
@@ -337,7 +477,7 @@ const Candidate = () => {
                   errors={errors}
                   touched={touched}
                 />
-
+ 
                 {/* Additional Info */}
                 <TextAreaField
                   label="Additional Information"
@@ -348,7 +488,7 @@ const Candidate = () => {
                   touched={touched}
                 />
               </div>
-
+ 
               {/* Submit Button */}
               <AuthButton
                 label="Save Information"
@@ -358,7 +498,7 @@ const Candidate = () => {
             </Form>
           )}
         </Formik>
-
+ 
         {status.success && (
           <div className="mt-4 text-center text-green-600">
             {status.success}
@@ -371,5 +511,5 @@ const Candidate = () => {
     </div>
   );
 };
-
+ 
 export default Candidate;
