@@ -67,7 +67,7 @@ const Topbar = () => {
     Cookies.remove("access_token");
     Cookies.remove("refresh_token");
     handleClose();
-    window.location.reload();
+    window.location.href = "/";
   };
 
   const handleNotificationClick = (event) => {

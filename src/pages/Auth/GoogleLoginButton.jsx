@@ -12,7 +12,7 @@ const GoogleLoginButton = ({
     onSuccess: async (response) => {
       setErrorMessage("");
       setIsLoading(true);
-
+      console.log(response.access_token);
       const apiURL = process.env.REACT_APP_API_URL + "/user/google/";
       try {
         const res = await fetch(apiURL, {
@@ -29,7 +29,7 @@ const GoogleLoginButton = ({
           Cookies.set("refresh_token", data.refresh, { expires: 7 });
           Cookies.set("is_first_login", data.is_first_login, { expires: 7 });
           localStorage.setItem("userRole", "candidate");
-          window.location.href = "/";
+          // window.location.href = "/";
         } else {
           const errorData = await res.json();
           setErrorMessage(
