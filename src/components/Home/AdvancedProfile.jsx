@@ -154,7 +154,7 @@ const Candidate = () => {
             certifications: values.certifications,
             additional_info: values.additional_info,
             preferred_salary: values.preferred_salary,
-            preferred_location: values.preferred_location,
+            preferred_work_location: values.preferred_work_location,
             years_of_experience: values.years_of_experience,
           },
           is_seeking_job: values.is_seeking_job,
@@ -217,9 +217,9 @@ const Candidate = () => {
             additional_info:
               userProfile.other_information?.additional_info || "",
             preferred_salary: userProfile.other_information?.preferred_salary || "",  
-            preferred_location: userProfile.other_information?.preferred_location || "",
+            preferred_work_location: userProfile.other_information?.preferred_work_location || "",
             years_of_experience: userProfile.other_information?.years_of_experience || "",
-            is_seeking_job: userProfile?.is_seeking_job || true,
+            is_seeking_job: userProfile?.is_seeking_job || "",
           }}
           onSubmit={handleSubmit}
         >
