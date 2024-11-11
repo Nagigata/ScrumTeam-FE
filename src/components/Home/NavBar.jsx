@@ -147,11 +147,6 @@ const NavBar = () => {
                     <Link to="/basic-profile">Profile</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">
-                    <Link to="/following-job">Following Job</Link>
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100">
-                    <Link to="/application-status">My Application</Link>
-                    <Link to="/skills">Portfolio</Link>
                     <Link to="/advanced-profile">DevHunt Profile</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-100">

@@ -129,13 +129,10 @@ const Candidate = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     setStatus({ success: "", error: "" });
     setIsSubmitting(true);
- 
-    console.log("Submitted Values:", values);
-   
-    const apiURL =
-      process.env.REACT_APP_API_URL + "/candidate/advanced-profile/";
+  
+    const apiURL = process.env.REACT_APP_API_URL + "/candidate/advanced-profile/";
     const accessToken = Cookies.get("access_token");
- 
+  
     try {
       const response = await fetch(apiURL, {
         method: "POST",
@@ -156,44 +153,28 @@ const Candidate = () => {
             activities: values.activities,
             certifications: values.certifications,
             additional_info: values.additional_info,
-            preferred_salary: values.preferred_salary,  
-            preferred_location: values.preferred_location,  
-            years_of_experience: values.years_of_experience,  
+            preferred_salary: values.preferred_salary,
+            preferred_location: values.preferred_location,
+            years_of_experience: values.years_of_experience,
           },
-          preferred_salary: values.preferred_salary,  
-          preferred_location: values.preferred_location,  
-          years_of_experience: values.years_of_experience,  
+          is_seeking_job: values.is_seeking_job,
         }),
       });
- 
+  
       if (response.ok) {
-        console.log("k");
         setStatus({ success: "Profile updated successfully!", error: "" });
         fetchUserProfile();
-        fetchDataLocation();
-        fetchExperienceOptions();
-        fetchSalaryOptions();
-      } else if (response.status === 401) {
-        setStatus({ error: "Unauthorized. Please log in again.", success: "" });
       } else {
         const errorData = await response.json();
-        setStatus({
-          error:
-            errorData.message ||
-            "An error occurred while updating the profile.",
-          success: "",
-        });
+        setStatus({ error: errorData.message || "Error updating profile.", success: "" });
       }
     } catch (error) {
-      setStatus({
-        error: "Network error. Please check your connection.",
-        success: "",
-      });
+      setStatus({ error: "Network error.", success: "" });
     }
- 
+  
     setIsSubmitting(false);
     setSubmitting(false);
-  };
+  };  
  
   if (!userProfile) {
     return <div>Loading...</div>;
@@ -238,6 +219,7 @@ const Candidate = () => {
             preferred_salary: userProfile.other_information?.preferred_salary || "",  
             preferred_location: userProfile.other_information?.preferred_location || "",
             years_of_experience: userProfile.other_information?.years_of_experience || "",
+            is_seeking_job: userProfile?.is_seeking_job || true,
           }}
           onSubmit={handleSubmit}
         >
@@ -310,6 +292,43 @@ const Candidate = () => {
                   </div>
                 </div>
               </div>
+ 
+              {/* Education */}
+              <InputField
+                label="Education"
+                name="education"
+                type="text"
+                placeholder="Your educational qualifications"
+                icon={EducationIcon}
+                errors={errors}
+                touched={touched}
+              />
+ 
+              {/* Work Experience */}
+              <TextAreaField
+                label="Work Experience"
+                name="work_experience"
+                placeholder="Your work history and roles"
+                rows={4}
+                errors={errors}
+                touched={touched}
+              />
+ 
+              {/* Projects */}
+              <TextAreaField
+                label="Projects"
+                name="projects"
+                placeholder="Implemented projects"
+                rows={4}
+                errors={errors}
+                touched={touched}
+              />
+ 
+              {/* Other Information */}
+              <div className="mb-6">
+                <h3 className="text-[#19ADC8] text-lg font-semibold mb-4">
+                  Other Information
+                </h3>
  
               <div className="mb-6">
                 {/* Years of Experience */}
@@ -385,44 +404,7 @@ const Candidate = () => {
                   </select>
                 </div>
               </div>
- 
-              {/* Education */}
-              <InputField
-                label="Education"
-                name="education"
-                type="text"
-                placeholder="Your educational qualifications"
-                icon={EducationIcon}
-                errors={errors}
-                touched={touched}
-              />
- 
-              {/* Work Experience */}
-              <TextAreaField
-                label="Work Experience"
-                name="work_experience"
-                placeholder="Your work history and roles"
-                rows={4}
-                errors={errors}
-                touched={touched}
-              />
- 
-              {/* Projects */}
-              <TextAreaField
-                label="Projects"
-                name="projects"
-                placeholder="Implemented projects"
-                rows={4}
-                errors={errors}
-                touched={touched}
-              />
- 
-              {/* Other Information */}
-              <div className="mb-6">
-                <h3 className="text-[#19ADC8] text-lg font-semibold mb-4">
-                  Other Information
-                </h3>
- 
+              
                 {/* Languages */}
                 <InputField
                   label="Languages"
@@ -487,6 +469,21 @@ const Candidate = () => {
                   errors={errors}
                   touched={touched}
                 />
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
+                  Bật tìm việc
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="is_seeking_job"
+                    checked={values.is_seeking_job}
+                    onChange={(e) => setFieldValue("is_seeking_job", e.target.checked)}
+                  />
+                  <span className="ml-2">Tôi đang tìm việc</span>
+                </div>
               </div>
  
               {/* Submit Button */}
