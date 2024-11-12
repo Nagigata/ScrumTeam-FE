@@ -197,9 +197,20 @@ const ManageJobs = () => {
   };
 
   const handleOpenShowDetail = (data) => {
+    setDataDetail({
+      candidate: {
+        id: data.candidate.id,
+        full_name: data.candidate.full_name,
+        phone_number: data.candidate.phone_number,
+        email: data.candidate.email,
+        avatar: data.candidate.avatar,
+        is_male: data.candidate.is_male,
+      },
+      cv: data.cv,
+      applied_at: data.applied_at,
+    });
     setShowDetail(true);
-    setDataDetail(data);
-  };
+  };  
 
   // -----------------
   const fetchCandidates = async (jobId) => {

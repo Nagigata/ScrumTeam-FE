@@ -219,7 +219,7 @@ const Candidate = () => {
             preferred_salary: userProfile.other_information?.preferred_salary || "",  
             preferred_work_location: userProfile.other_information?.preferred_work_location || "",
             years_of_experience: userProfile.other_information?.years_of_experience || "",
-            is_seeking_job: userProfile?.is_seeking_job || "",
+            is_seeking_job: userProfile?.is_seeking_job ?? false,
           }}
           onSubmit={handleSubmit}
         >
@@ -390,9 +390,9 @@ const Candidate = () => {
                     <CodeIcon className="h-5 w-5 text-[#19ADC8]" />
                   </span>
                   <select
-                    name="preferred_location"
-                    onChange={(e) => setFieldValue("preferred_location", e.target.value)}
-                    value={values.preferred_location}
+                    name="preferred_work_location"
+                    onChange={(e) => setFieldValue("preferred_work_location", e.target.value)}
+                    value={values.preferred_work_location}
                     className="w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select area</option>
@@ -473,7 +473,7 @@ const Candidate = () => {
 
               <div className="mb-6">
                 <label className="block text-[#19ADC8] text-sm font-semibold mb-2">
-                  Bật tìm việc
+                  Share Advance Profile
                 </label>
                 <div className="flex items-center">
                   <input
@@ -481,11 +481,12 @@ const Candidate = () => {
                     name="is_seeking_job"
                     checked={values.is_seeking_job}
                     onChange={(e) => setFieldValue("is_seeking_job", e.target.checked)}
+                    className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="ml-2">Tôi đang tìm việc</span>
+                  <span className="ml-3 text-sm">Share profile with recruiters</span>
                 </div>
               </div>
- 
+
               {/* Submit Button */}
               <AuthButton
                 label="Save Information"
