@@ -60,7 +60,7 @@ const ApplicationFile = ({ open, onClose, dataDetail }) => {
           setAdvancedProfile(data);
           setShowAdvancedProfile(true);
         } else {
-          setError("Ứng viên không bật chức năng này.");
+          setError("Candidate does not enable this feature.");
           setShowAdvancedProfile(false);
         }
       } else {
@@ -218,7 +218,7 @@ const ApplicationFile = ({ open, onClose, dataDetail }) => {
 
       {error && (
         <Dialog open={true} onClose={() => setError(null)}>
-          <DialogTitle>Thông báo</DialogTitle>
+          <DialogTitle>Notification</DialogTitle>
           <DialogContent>
             <Alert severity="warning">{error}</Alert>
           </DialogContent>
