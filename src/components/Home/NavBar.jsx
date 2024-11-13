@@ -19,7 +19,7 @@ const NavBar = () => {
 
   const accessToken = Cookies.get("access_token");
   const navigate = useNavigate();
-  
+
   const [listMessage, setListMessage] = useState(() => {
     const savedMessages = Cookies.get("list_message");
     // console.log(">>> ", savedMessages);
@@ -88,7 +88,7 @@ const NavBar = () => {
   const handleClick = () => {
     setShowNotifications(!showNotifications);
     console.log(count);
-  }
+  };
 
   return (
     <div className="navBar flex justify-between items-center p-[2rem]">
@@ -103,29 +103,31 @@ const NavBar = () => {
           <Link to="/">Home</Link>
         </li>
         <li className="navBarLi">Jobs</li>
-        <li className="navBarLi">Companies</li>
+        <li className="navBarLi">
+          <Link to="/companies">Companies</Link>
+        </li>
         <li className="navBarLi">Contact</li>
 
         {accessToken ? (
           <>
             <li className="navBarLi relative">
-            <IconButton
-              onClick={() => handleClick()}
-              size="medium"
-              className="relative"
-            >
-              {/* Notification Badge */}
-              {count > 0 && (
-                <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-cyan-500 rounded-full">
-                  <span className="text-white text-xs">
-                    {count > 99 ? "99+" : count}
-                  </span>
-                </div>
-              )}
+              <IconButton
+                onClick={() => handleClick()}
+                size="medium"
+                className="relative"
+              >
+                {/* Notification Badge */}
+                {count > 0 && (
+                  <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-cyan-500 rounded-full">
+                    <span className="text-white text-xs">
+                      {count > 99 ? "99+" : count}
+                    </span>
+                  </div>
+                )}
 
-              {/* Notification Icon */}
-              <NotificationsOutlinedIcon className="relative z-0" />
-            </IconButton>
+                {/* Notification Icon */}
+                <NotificationsOutlinedIcon className="relative z-0" />
+              </IconButton>
               <NotificationDropdown show={showNotifications} />
             </li>
             <li

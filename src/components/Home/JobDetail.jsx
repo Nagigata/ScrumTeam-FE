@@ -8,7 +8,7 @@ const JobDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const job = location.state?.job;
-  
+  console.log(job)
   // Khai báo state isFollowed
   const [isFollowed, setIsFollowed] = useState(false);
   // Khai báo state showUploadModal
