@@ -103,7 +103,11 @@ const NavBar = () => {
         <li className="navBarLi">
           <Link to="/">Home</Link>
         </li>
-        <li className="navBarLi">Jobs</li>
+        <li className="navBarLi">
+          <Link to="/jobs" className="hover:text-blueColor transition-all duration-300">
+            Jobs
+          </Link>
+        </li>
         <li className="navBarLi">Companies</li>
         <li className="navBarLi">Contact</li>
 
