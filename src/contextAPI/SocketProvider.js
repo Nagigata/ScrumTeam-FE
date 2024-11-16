@@ -9,6 +9,7 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
     const [message, setMessage] = useState('');
+    const [urL, setURL] = useState('new_application');
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
 
@@ -20,8 +21,9 @@ export const SocketProvider = ({ children }) => {
         }
 
         const ws = new WebSocket(
-            `ws://cnpm.duytech.site/ws/new_application/?token=${token}`
+            `ws://cnpm.duytech.site/ws/${urL}/?token=${token}`
         );
+        console.log("Test URL: ", ws);
 
         ws.onopen = () => {
             console.log("Connected to WebSocket");
@@ -63,7 +65,7 @@ export const SocketProvider = ({ children }) => {
                 ws.close();
             }
         };
-    }, []);
+    }, [urL]);
 
     useEffect(() => {
         const cleanup = connectWebSocket();
@@ -76,6 +78,7 @@ export const SocketProvider = ({ children }) => {
     const value = {
         message,
         isConnected,
+        setURL,
         reconnect: connectWebSocket
     };
 

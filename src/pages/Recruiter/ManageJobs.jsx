@@ -23,6 +23,7 @@ import PaidIcon from "@mui/icons-material/Paid";
 import ReplayIcon from '@mui/icons-material/Replay';
 import { useNavigate } from "react-router-dom";
 import RepostJob from "../../components/Recruiter/RepostJob";
+import ApplicationApproved from "../../components/Recruiter/ApplicationApproved";
 
 const ManageJobs = () => {
   const theme = useTheme();
@@ -33,12 +34,16 @@ const ManageJobs = () => {
   const [status, setStatus] = useState(null);
   const [showCandidate, setShowCandidate] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [candidates, setCandidates] = useState([]);
   const [dataDetail, setDataDetail] = useState({});
-  const [approvedApplications, setApprovedApplications] = useState({});
   const [applicationStatuses, setApplicationStatuses] = useState({});
   const [isRepostDialogOpen, setIsRepostDialogOpen] = useState(false);
-  const [selectedJobForRepost, setSelectedJobForRepost] = useState(null);
+  const [approveClickStates, setApproveClickStates] = useState({});
+  const [approvedApplications, setApprovedApplications] = useState({});
+  const [showInterviewButtons, setShowInterviewButtons] = useState({});
+  const [idCandidate, setIdCandidate] = useState('');
+  const [submitType, setSubmitType] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -199,6 +204,30 @@ const ManageJobs = () => {
   const handleOpenShowDetail = (data) => {
     setShowDetail(true);
     setDataDetail(data);
+    alert(">>> " + data.id);
+    const fetchData = async () => {
+      const apiURL = process.env.REACT_APP_API_URL + "/job/view_cv_in_application/?application_id=" + data.id;
+      const accessToken = Cookies.get("access_token");
+      try {
+        const response = await fetch(apiURL, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Message: ", data.message);
+        } else {
+          const errorData = await response.json();
+          console.log("Failed to hide job. Please try again.");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchData();
   };
 
   // -----------------
@@ -227,9 +256,38 @@ const ManageJobs = () => {
   // -----------------
 
   const handleApplicationStatus = async (applicationId, status) => {
-    const apiURL = "http://cnpm.duytech.site/api/job/approve_application/";
     const accessToken = Cookies.get("access_token");
 
+    const apiURL_Candidate = `${process.env.REACT_APP_API_URL}/job/get_application_infor/?application_id=${applicationId}`;
+
+    try {
+      const res = await fetch(apiURL_Candidate, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setIdCandidate(data.candidate.id);
+      } else {
+        console.log("Error");
+      }
+    } catch (error) {
+      setStatus({ error: "Network error. Please check your connection." });
+    }
+
+    if (status === "Accepted") {
+      setApproveClickStates(prev => ({
+        ...prev,
+        [applicationId]: true
+      }));
+      setShowModal(true);
+    }
+    // --------------------------------------------------------------------------------
+
+    const apiURL = "http://cnpm.duytech.site/api/job/approve_application/";
     try {
       const response = await fetch(apiURL, {
         method: "PATCH",
@@ -260,6 +318,21 @@ const ManageJobs = () => {
       console.error("Network error:", error);
       alert("Network error. Please check your connection.");
     }
+  };
+
+  const handleModalClose = (applicationId, wasSaved) => {
+    if (wasSaved) {
+      setApprovedApplications(prev => ({
+        ...prev,
+        [applicationId]: true
+      }));
+    } else {
+      setApproveClickStates(prev => ({
+        ...prev,
+        [applicationId]: false
+      }));
+    }
+    setShowModal(false);
   };
 
   const handleRepost = (job) => {
@@ -471,7 +544,9 @@ const ManageJobs = () => {
         </motion.button>
 
         {candidates.map((item) => {
-          const currentStatus = applicationStatuses[item.id] || item.status;
+        const currentStatus = applicationStatuses[item.id] || item.status;
+        const isApproved = approvedApplications[item.id];
+        const hasClickedApprove = approveClickStates[item.id];
 
           return (
             <Box
@@ -501,18 +576,34 @@ const ManageJobs = () => {
                   Detail
                 </motion.button>
               </Box>
+              {isApproved ? (
               <button
-                className={`py-3 px-6 rounded-lg ${
-                  currentStatus === "Accepted"
-                    ? "bg-gray-400"
-                    : "bg-green-600 hover:bg-green-700"
-                } text-white`}
+                className="py-3 px-6 rounded-lg bg-gray-400 text-white"
+                style={{ marginLeft: "auto" }}
+                disabled
+              >
+                Approved
+              </button>
+            ) : hasClickedApprove ? (
+              <button
+                className="py-3 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                style={{ marginLeft: "auto" }}
+                onClick={() => {
+                  setIdCandidate(item.candidate.id);
+                  setShowModal(true);
+                }}
+              >
+                Set Interview Information
+              </button>
+            ) : (
+              <button
+                className="py-3 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white"
                 style={{ marginLeft: "auto" }}
                 onClick={() => handleApplicationStatus(item.id, "Accepted")}
-                disabled={currentStatus === "Accepted"}
               >
-                {currentStatus === "Accepted" ? "Approved" : "Approve"}
+                Approve
               </button>
+            )}
               <button
                 className={`py-3 px-6 rounded-lg ${
                   currentStatus === "Rejected"
@@ -536,6 +627,12 @@ const ManageJobs = () => {
           }}
           dataDetail={dataDetail}
         />
+      <ApplicationApproved
+        open={showModal}
+        onClose={(wasSaved) => handleModalClose(idCandidate, wasSaved)}
+        idCandidate={idCandidate}
+        setSubmitType={setSubmitType}
+      />
       </Box>
       <RepostJob
         open={isRepostDialogOpen}
