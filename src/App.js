@@ -9,6 +9,8 @@ import Candidate from "./pages/ProfileManage/Candidate";
 import CVManagement from "./components/Home/CVManagement";
 import ApplicationStatus from "./components/Home/ApplicationStatus";
 import FollowingJob from "./components/Home/FollowingJob"; // Import FollowingJob
+import Companies from "./pages/Home/Companies";
+import CompanyDetail from "./components/Home/CompanyDetail";
 import NavBar from "./components/Home/NavBar";
 import Footer from "./components/Home/Footer";
 import Recruiter from "./AppRecruiter";
@@ -65,6 +67,26 @@ function App() {
                         <Navigate to="/" />
                       ) : (
                         <JobDetail />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/companies"
+                    element={
+                      userRole === "recruiter" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <Companies />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/company/:id"
+                    element={
+                      userRole === "recruiter" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <CompanyDetail />
                       )
                     }
                   />

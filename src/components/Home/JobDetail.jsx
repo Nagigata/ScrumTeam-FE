@@ -24,6 +24,9 @@ const modalOverlayStyle = {
 const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  // const job = location.state?.job;
+  // console.log(job)
+  // Khai báo state isFollowed
   const [job, setJob] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);

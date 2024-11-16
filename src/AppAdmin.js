@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import Topbar from "./pages/Recruiter/Topbar";
+import Topbar from "./pages/Admin/Topbar";
 import Sidebar from "./pages/Admin/Sidebar";
 import Dashboard from "./pages/Admin/Dashboard";
 import ManageCandidate from "./pages/Admin/ManageCandidate";
