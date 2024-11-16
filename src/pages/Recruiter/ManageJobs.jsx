@@ -576,15 +576,7 @@ const ManageJobs = () => {
                   Detail
                 </motion.button>
               </Box>
-              {isApproved ? (
-              <button
-                className="py-3 px-6 rounded-lg bg-gray-400 text-white"
-                style={{ marginLeft: "auto" }}
-                disabled
-              >
-                Approved
-              </button>
-            ) : hasClickedApprove ? (
+              {hasClickedApprove ? (
               <button
                 className="py-3 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white"
                 style={{ marginLeft: "auto" }}
@@ -597,11 +589,16 @@ const ManageJobs = () => {
               </button>
             ) : (
               <button
-                className="py-3 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                className={`py-3 px-6 rounded-lg ${
+                  currentStatus === "Accepted"
+                    ? "bg-gray-400"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white`}
                 style={{ marginLeft: "auto" }}
                 onClick={() => handleApplicationStatus(item.id, "Accepted")}
+                disabled={currentStatus === "Accepted"}
               >
-                Approve
+                {currentStatus === "Accepted" ? "Approved" : "Approve"}
               </button>
             )}
               <button
