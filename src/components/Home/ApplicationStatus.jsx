@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { useSocket } from "../../contextAPI/SocketProvider";
 import {
   CalendarToday as CalendarIcon,
   Person as PersonIcon,
@@ -10,18 +11,54 @@ import {
   Work as WorkIcon,
 } from "@mui/icons-material";
 
+import ApartmentIcon from '@mui/icons-material/Apartment';
+
 const ApplicationStatus = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { message, setURL } = useSocket();
   const [status, setStatus] = useState({ error: null });
   const [currentPage, setCurrentPage] = useState(1);
+  const [applicationStatus, setApplicationStatus] = useState({});
   const itemsPerPage = 3;
 
   useEffect(() => {
     fetchApplications();
   }, []);
 
+  useEffect(() => {
+    setURL('application_seen');
+  }, []);
+
+  useEffect(() => {
+    const currentMess = message.split('/')[0];
+    const currentID = message.match(/application_id=(\d+)/)?.[1];
+
+    // Cập nhật trạng thái trong bộ nhớ
+    setApplicationStatus(prevStatus => ({
+      ...prevStatus,
+      [currentID]: currentMess === 'Recruiter has seen your application.'
+    }));
+
+    // Cập nhật trạng thái trong cookie
+    const existingStatus = Cookies.get("status_application");
+    let statusArray = existingStatus ? JSON.parse(existingStatus) : [];
+
+    if (!statusArray.some(item => item.id === currentID)) {
+      statusArray.push({ id: currentID, mess: currentMess });
+      Cookies.set("status_application", JSON.stringify(statusArray), {
+        expires: 7,
+        path: "/"
+      });
+    }
+
+    console.log("Check", existingStatus);
+  }, [message]);
+
+  const listStatus = Cookies.get("status_application");
+
   const fetchApplications = async () => {
+
     const apiURL =
       process.env.REACT_APP_API_URL + "/job/get_list_application_candidate/";
     const accessToken = Cookies.get("access_token");
@@ -157,6 +194,13 @@ const ApplicationStatus = () => {
                     <ScheduleIcon className="text-blueColor mr-2" />
                     <span className="text-gray-700">
                       Urgent: {app.is_urgent ? "Yes" : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center md:justify-self-center" style={{transform: 'translateX(-115px)'}}>
+                    <ApartmentIcon className="text-blueColor mr-2" />
+                    <span className="text-gray-700">
+                      Status: {applicationStatus[app.id] ? "Đã xem" : (listStatus && JSON.parse(listStatus).some(item => item.id === app.id.toString()) ? "Đã xem" : "Chưa xem")}
                     </span>
                   </div>
 

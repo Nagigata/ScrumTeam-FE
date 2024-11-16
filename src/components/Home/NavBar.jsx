@@ -10,12 +10,12 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useSocket } from "../../contextAPI/SocketProvider";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 
-const NavBar = () => {
+const NavBar = () => { 
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [count, setCount] = useState(0);
-  const { message } = useSocket();
+  const { message, setURL } = useSocket();
 
   const accessToken = Cookies.get("access_token");
   const navigate = useNavigate();
@@ -25,6 +25,36 @@ const NavBar = () => {
     // console.log(">>> ", savedMessages);
     return savedMessages ? JSON.parse(savedMessages) : [];
   });
+
+  useEffect(() => {
+    setURL('application_seen');
+  }, []);
+
+  useEffect(() => {
+    const currentMess = message.split('/')[0];
+    const currentID = message.match(/application_id=(\d+)/)?.[1];
+    
+    // setNewMess(currentMess);
+    // setNewID(currentID);
+
+    const existingStatus = Cookies.get("status_application");
+    let statusArray = existingStatus ? JSON.parse(existingStatus) : [];
+
+    if (!statusArray.some(item => item.id === currentID)) {
+      statusArray.push({ id: currentID, mess: currentMess });
+      Cookies.set("status_application", JSON.stringify(statusArray), {
+        expires: 7,
+        path: "/"
+      });
+    }
+
+    // setApplicationStatus(prevStatus => ({
+    //   ...prevStatus,
+    //   [currentID]: currentMess === 'Recruiter has seen your application.'
+    // }));
+
+    console.log("Check", existingStatus);
+  }, [message]);
 
   useEffect(() => {
     if (accessToken) {

@@ -26,8 +26,12 @@ const Topbar = () => {
   const open = Boolean(anchorEl);
   const openNotifications = Boolean(notificationAnchorEl);
   const [count, setCount] = useState(0);
-  const { message } = useSocket();
+  const { message, setURL } = useSocket();
   const accessToken = Cookies.get("access_token");
+
+  useEffect(() => {
+    setURL('new_application')
+  }, []);
 
   const [listMessage, setListMessage] = useState(() => {
     const savedMessages = Cookies.get("list_message");
@@ -35,16 +39,22 @@ const Topbar = () => {
     return savedMessages ? JSON.parse(savedMessages) : [];
   });
 
+  // useEffect(() => {
+  //   if (!isConnected) {
+  //     connectWebSocket('new_application');
+  //   }
+  // }, [isConnected, connectWebSocket]);
+
   useEffect(() => {
     if (message && message !== "You are connected to Websocket") {
       setCount((prev) => prev + 1);
 
       setListMessage((prev) => {
-        const newList = [...prev, message];
+        const newList = [...prev, message.split('/')[0]];
+        // const newList = [...prev, message.split('/')[1]]
 
         const storedMessages = Cookies.get("list_message");
         const parsedMessages = storedMessages ? JSON.parse(storedMessages) : [];
-
         if (JSON.stringify(parsedMessages) !== JSON.stringify(newList)) {
           Cookies.set("list_message", JSON.stringify(newList));
         }
@@ -180,6 +190,9 @@ const Topbar = () => {
                           }}
                         >
                           {notification}
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(notification.created_at).toLocaleString()}
+                          </p>
                         </Typography>
                       </MenuItem>
                     ))}
