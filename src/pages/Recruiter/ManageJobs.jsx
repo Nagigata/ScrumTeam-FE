@@ -44,6 +44,7 @@ const ManageJobs = () => {
   const [showInterviewButtons, setShowInterviewButtons] = useState({});
   const [idCandidate, setIdCandidate] = useState('');
   const [submitType, setSubmitType] = useState(false);
+  const [jobID, setJobID] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -199,6 +200,7 @@ const ManageJobs = () => {
   const handleShowList = (id) => {
     setShowCandidate(!showCandidate);
     fetchCandidates(id);
+    setJobID(id);
   };
 
   const handleOpenShowDetail = (data) => {
@@ -629,6 +631,7 @@ const ManageJobs = () => {
         onClose={(wasSaved) => handleModalClose(idCandidate, wasSaved)}
         idCandidate={idCandidate}
         setSubmitType={setSubmitType}
+        jobID={jobID}
       />
       </Box>
       <RepostJob
