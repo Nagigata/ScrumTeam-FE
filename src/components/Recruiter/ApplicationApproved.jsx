@@ -86,7 +86,7 @@ const ApplicationApproved = ({ open, onClose, idCandidate, onInterviewScheduled,
       time_interview: values.time_interview,
       address: values.address,
       note: values.note,
-      duration: 60,
+      duration: 120,
     };
 
     console.log("Formatted values:", formattedValues);
