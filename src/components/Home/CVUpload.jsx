@@ -223,20 +223,6 @@ const CVUploadForm = ({ onClose, jobId }) => {
               )}
             </div>
 
-            <div className="mb-6">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="is_urgent"
-                  onChange={(e) => setFieldValue("is_urgent", e.target.checked)}
-                  className="form-checkbox h-4 w-4 text-[#19ADC8]"
-                />
-                <span className="text-gray-700">
-                  Mark as urgent application
-                </span>
-              </label>
-            </div>
-
             {status.error && (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
                 {status.error}

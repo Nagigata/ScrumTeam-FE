@@ -133,7 +133,7 @@ const FollowingJob = () => {
                       <h2 className="text-2xl font-semibold text-gray-900">
                         {job.job_title}
                       </h2>
-                      <p className="text-gray-600">Job ID: {job.job_id}</p>
+                      <p className="text-gray-600">Company: {job.company}</p>
                     </div>
                   </div>
                 </div>

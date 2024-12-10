@@ -216,7 +216,7 @@ const ManageJobs = () => {
     });
     setShowDetail(true);
     setDataDetail(data);
-    alert(">>> " + data.id);
+    // alert(">>> " + data.id);
     const fetchData = async () => {
       const apiURL =
         process.env.REACT_APP_API_URL +

@@ -193,13 +193,13 @@ const SidebarComponent = () => {
             )}
 
             <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-              <Item
+              {/* <Item
                 title="Dashboard"
                 to="/recruiter"
                 icon={<DashboardOutlinedIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              /> */}
               {renderSectionTitle("Job Management")}
               <Item
                 title="Post Job"
