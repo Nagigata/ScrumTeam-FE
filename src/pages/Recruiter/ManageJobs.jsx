@@ -20,7 +20,7 @@ import ApplicationFile from "../../components/Recruiter/ApplicationFile";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import WorkIcon from "@mui/icons-material/Work";
 import PaidIcon from "@mui/icons-material/Paid";
-import ReplayIcon from '@mui/icons-material/Replay';
+import ReplayIcon from "@mui/icons-material/Replay";
 import { useNavigate } from "react-router-dom";
 import RepostJob from "../../components/Recruiter/RepostJob";
 import ApplicationApproved from "../../components/Recruiter/ApplicationApproved";
@@ -42,7 +42,7 @@ const ManageJobs = () => {
   const [approveClickStates, setApproveClickStates] = useState({});
   const [approvedApplications, setApprovedApplications] = useState({});
   const [showInterviewButtons, setShowInterviewButtons] = useState({});
-  const [idCandidate, setIdCandidate] = useState('');
+  const [idCandidate, setIdCandidate] = useState("");
   const [submitType, setSubmitType] = useState(false);
   const navigate = useNavigate();
 
@@ -65,10 +65,10 @@ const ManageJobs = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -86,7 +86,7 @@ const ManageJobs = () => {
       console.log(">>> ", res);
       if (res.ok) {
         const data = await res.json();
-        console.log(data)
+        console.log(data);
         setJobs(data);
       } else {
         const errorData = await res.json();
@@ -102,7 +102,7 @@ const ManageJobs = () => {
 
   const handleEdit = (job) => {
     if (!job) return;
-    
+
     const jobForEdit = {
       ...job,
       job_type: job.job_type || "",
@@ -118,7 +118,7 @@ const ManageJobs = () => {
       role_and_responsibilities: job.role_and_responsibilities || "",
       contract_type: job.contract_type || "",
       interview_process: job.interview_process || "",
-      expired_at: job.expired_at ? job.expired_at.split('T')[0] : "",
+      expired_at: job.expired_at ? job.expired_at.split("T")[0] : "",
     };
     setSelectedJob(jobForEdit);
     setIsEditDialogOpen(true);
@@ -218,7 +218,10 @@ const ManageJobs = () => {
     setDataDetail(data);
     alert(">>> " + data.id);
     const fetchData = async () => {
-      const apiURL = process.env.REACT_APP_API_URL + "/job/view_cv_in_application/?application_id=" + data.id;
+      const apiURL =
+        process.env.REACT_APP_API_URL +
+        "/job/view_cv_in_application/?application_id=" +
+        data.id;
       const accessToken = Cookies.get("access_token");
       try {
         const response = await fetch(apiURL, {
@@ -227,7 +230,7 @@ const ManageJobs = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-  
+
         if (response.ok) {
           const data = await response.json();
           console.log("Message: ", data.message);
@@ -238,7 +241,7 @@ const ManageJobs = () => {
       } catch (error) {
         console.log(error);
       }
-    }
+    };
     fetchData();
   };
 
@@ -291,9 +294,9 @@ const ManageJobs = () => {
     }
 
     if (status === "Accepted") {
-      setApproveClickStates(prev => ({
+      setApproveClickStates((prev) => ({
         ...prev,
-        [applicationId]: true
+        [applicationId]: true,
       }));
       setShowModal(true);
     }
@@ -334,14 +337,14 @@ const ManageJobs = () => {
 
   const handleModalClose = (applicationId, wasSaved) => {
     if (wasSaved) {
-      setApprovedApplications(prev => ({
+      setApprovedApplications((prev) => ({
         ...prev,
-        [applicationId]: true
+        [applicationId]: true,
       }));
     } else {
-      setApproveClickStates(prev => ({
+      setApproveClickStates((prev) => ({
         ...prev,
-        [applicationId]: false
+        [applicationId]: false,
       }));
     }
     setShowModal(false);
@@ -408,8 +411,16 @@ const ManageJobs = () => {
                   opacity: job.is_expired ? 0.7 : 1,
                 }}
               >
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="h5" color={colors.grey[100]} fontWeight="bold">
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="h5"
+                    color={colors.grey[100]}
+                    fontWeight="bold"
+                  >
                     {job.title}
                   </Typography>
                   <Chip
@@ -444,7 +455,7 @@ const ManageJobs = () => {
                     Skill Required:
                   </Typography>
                   <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
-                    {job.skill_required?.split(',').map((skill, index) => (
+                    {job.skill_required?.split(",").map((skill, index) => (
                       <Chip
                         key={index}
                         label={skill.trim()}
@@ -476,10 +487,16 @@ const ManageJobs = () => {
                   </Typography>
                 </Box>
 
-
                 {job.status === "Rejected" ? (
-                  <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
-                    <Tooltip title={job.rejection_reason || "No reason provided"}>
+                  <Box
+                    mt={2}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Tooltip
+                      title={job.rejection_reason || "No reason provided"}
+                    >
                       <Chip
                         label="Rejection reason"
                         color="error"
@@ -490,8 +507,8 @@ const ManageJobs = () => {
                       onClick={() => handleRepost(job)}
                       color="primary"
                       sx={{
-                        '&:hover': {
-                          backgroundColor: 'rgba(144, 202, 249, 0.08)',
+                        "&:hover": {
+                          backgroundColor: "rgba(144, 202, 249, 0.08)",
                         },
                       }}
                     >
@@ -499,7 +516,12 @@ const ManageJobs = () => {
                     </IconButton>
                   </Box>
                 ) : (
-                  <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    mt={2}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <motion.button
                       className="text-blueColor hover:text-[#535ac8] font-semibold transition duration-200"
                       whileHover={{ scale: 1.05 }}
@@ -531,7 +553,7 @@ const ManageJobs = () => {
             ))}
           </Box>
         </Box>
-            {console.log(selectedJob)}
+        {console.log(selectedJob)}
         <EditJob
           open={isEditDialogOpen}
           onClose={() => {
@@ -556,9 +578,9 @@ const ManageJobs = () => {
         </motion.button>
 
         {candidates.map((item) => {
-        const currentStatus = applicationStatuses[item.id] || item.status;
-        const isApproved = approvedApplications[item.id];
-        const hasClickedApprove = approveClickStates[item.id];
+          const currentStatus = applicationStatuses[item.id] || item.status;
+          const isApproved = approvedApplications[item.id];
+          const hasClickedApprove = approveClickStates[item.id];
 
           return (
             <Box
@@ -588,47 +610,55 @@ const ManageJobs = () => {
                   Detail
                 </motion.button>
               </Box>
-              {hasClickedApprove ? (
-              <button
-                className="py-3 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white"
-                style={{ marginLeft: "auto" }}
-                onClick={() => {
-                  setIdCandidate(item.candidate.id);
-                  setShowModal(true);
-                }}
-              >
-                Set Interview Information
-              </button>
-            ) : (
+
+              {/* Approve Button */}
+              {currentStatus === "Pending" ? (
+                hasClickedApprove ? (
+                  <button
+                    className="py-3 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                    style={{ marginLeft: "auto" }}
+                    onClick={() => {
+                      setIdCandidate(item.candidate.id);
+                      setShowModal(true);
+                    }}
+                  >
+                    Set Interview Information
+                  </button>
+                ) : (
+                  <button
+                    className="py-3 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                    style={{ marginLeft: "auto" }}
+                    onClick={() => handleApplicationStatus(item.id, "Accepted")}
+                  >
+                    Approve
+                  </button>
+                )
+              ) : (
+                <button
+                  className="py-3 px-6 rounded-lg bg-gray-400 text-white cursor-not-allowed"
+                  style={{ marginLeft: "auto" }}
+                  disabled
+                >
+                  {currentStatus === "Accepted" ? "Approved" : "Approve"}
+                </button>
+              )}
+
+              {/* Reject Button */}
               <button
                 className={`py-3 px-6 rounded-lg ${
-                  currentStatus === "Accepted"
-                    ? "bg-gray-400"
-                    : "bg-green-600 hover:bg-green-700"
-                } text-white`}
-                style={{ marginLeft: "auto" }}
-                onClick={() => handleApplicationStatus(item.id, "Accepted")}
-                disabled={currentStatus === "Accepted"}
-              >
-                {currentStatus === "Accepted" ? "Approved" : "Approve"}
-              </button>
-            )}
-              <button
-                className={`py-3 px-6 rounded-lg ${
-                  currentStatus === "Rejected"
-                    ? "bg-gray-400"
-                    : "bg-red-600 hover:bg-red-700"
+                  currentStatus === "Pending"
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-gray-400 cursor-not-allowed"
                 } text-white`}
                 style={{ marginLeft: "50px" }}
                 onClick={() => handleApplicationStatus(item.id, "Rejected")}
-                disabled={currentStatus === "Rejected"}
+                disabled={currentStatus !== "Pending"}
               >
                 {currentStatus === "Rejected" ? "Rejected" : "Reject"}
               </button>
             </Box>
           );
         })}
-
         <ApplicationFile
           open={showDetail}
           onClose={() => {
@@ -636,12 +666,12 @@ const ManageJobs = () => {
           }}
           dataDetail={dataDetail}
         />
-      <ApplicationApproved
-        open={showModal}
-        onClose={(wasSaved) => handleModalClose(idCandidate, wasSaved)}
-        idCandidate={idCandidate}
-        setSubmitType={setSubmitType}
-      />
+        <ApplicationApproved
+          open={showModal}
+          onClose={(wasSaved) => handleModalClose(idCandidate, wasSaved)}
+          idCandidate={idCandidate}
+          setSubmitType={setSubmitType}
+        />
       </Box>
       <RepostJob
         open={isRepostDialogOpen}

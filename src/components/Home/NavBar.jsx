@@ -137,7 +137,7 @@ const NavBar = () => {
         <li className="navBarLi">
           <Link to="/companies">Companies</Link>
         </li>
-        <li className="navBarLi">Contact</li>
+      
 
         {accessToken ? (
           <>

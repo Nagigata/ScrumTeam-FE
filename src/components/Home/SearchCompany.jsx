@@ -4,15 +4,15 @@ import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 
 const SearchCompany = ({ onSearch }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [location, setLocation] = useState("All"); // Changed default to "All"
+  const [location, setLocation] = useState("All"); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch({ keyword: searchKeyword, location });
+    alert(`Searching for: ${searchKeyword} in ${location}`);
   };
 
   const locationOptions = [
-    "All", // Added "All" option
+    "All", 
     "Hanoi",
     "Ho Chi Minh City",
     "Da Nang",
@@ -23,7 +23,6 @@ const SearchCompany = ({ onSearch }) => {
   const handleClearSearch = () => {
     setSearchKeyword("");
     setLocation("All");
-    onSearch({ keyword: "", location: "All" });
   };
 
   return (

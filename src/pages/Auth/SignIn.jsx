@@ -4,9 +4,9 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import AuthSection from "../../components/Auth/AuthSection";
 import InputField from "../../components/Auth/InputField";
+import PasswordInputField from "../../components/Auth/PasswordInputField";
 import AuthButton from "../../components/Auth/AuthButton";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import GoogleLoginButton from "./GoogleLoginButton";
@@ -109,12 +109,9 @@ const SignIn = () => {
                       errors={errors}
                       touched={touched}
                     />
-                    <InputField
-                      label="Password"
+                    <PasswordInputField
                       name="password"
-                      type="password"
                       placeholder="Enter your password"
-                      icon={LockOutlinedIcon}
                       errors={errors}
                       touched={touched}
                     />

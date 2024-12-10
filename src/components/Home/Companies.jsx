@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -17,7 +17,7 @@ const CompanyList = () => {
   });
   const navigate = useNavigate();
 
-  const ITEMS_PER_PAGE = 5; 
+  const ITEMS_PER_PAGE = 5;
 
   useEffect(() => {
     const apiURL = process.env.REACT_APP_API_URL;
@@ -88,32 +88,32 @@ const CompanyList = () => {
               return (
                 <div
                   key={id}
-                  className="group group/item singleCompany w-[270px] p-[20px] bg-white rounded-[10px] hover:bg-blueColor shadow-lg shadow-greyIsh-400/700 hover:shadow-lg cursor-pointer transition-all duration-300"
+                  className="group group/item singleCompany w-[320px] h-[320px] p-[20px] bg-white rounded-[10px] hover:bg-blueColor shadow-lg shadow-greyIsh-400/700 hover:shadow-lg cursor-pointer transition-all duration-300 flex flex-col"
                   onClick={() => handleCompanyClick(company)}
                 >
-                  <span className="flex justify-between items-center gap-4">
-                    <h1 className="text-[16px] font-semibold text-textColor group-hover:text-white">
-                      {name}
-                    </h1>
-                  </span>
-
-                  <div className="company flex items-center gap-2 my-[1rem]">
+                  <div className="flex items-center gap-4 mb-4">
                     <img
                       src={avatar || "/assets/default-company.png"}
                       alt="Company Logo"
-                      className="w-[40px] h-[40px] object-cover rounded-full"
+                      className="w-16 h-16 object-cover rounded-full border-2 border-gray-100"
                       onError={(e) => {
                         e.target.src = "/assets/default-company.png";
                       }}
                     />
+                    <h1 className="text-lg font-semibold text-textColor group-hover:text-white line-clamp-2">
+                      {name}
+                    </h1>
                   </div>
 
-                  <p className="text-[13px] text-[#959595] pt-[20px] border-t-[2px] mt-[20px] group-hover:text-white h-[60px] overflow-hidden">
+                  <p
+                    className="text-[13px] text-[#959595] pt-[20px] border-t-[2px] mt-[20px]
+                   group-hover:text-white line-clamp-4"
+                  >
                     {description || "No description available"}
                   </p>
 
                   <button
-                    className="border-[2px] rounded-[10px] block p-[10px] w-full text-[14px] font-semibold text-textColor hover:bg-white group-hover/item:text-textColor group-hover:text-textColor mt-[1rem]"
+                    className="border-[2px] rounded-[10px] block p-[10px] w-full text-[14px] font-semibold text-textColor hover:bg-white group-hover/item:text-textColor group-hover:text-textColor mt-auto"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCompanyClick(company);

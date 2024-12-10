@@ -11,7 +11,7 @@ import {
   Work as WorkIcon,
 } from "@mui/icons-material";
 
-import ApartmentIcon from '@mui/icons-material/Apartment';
+import ApartmentIcon from "@mui/icons-material/Apartment";
 
 const ApplicationStatus = () => {
   const [applications, setApplications] = useState([]);
@@ -27,28 +27,28 @@ const ApplicationStatus = () => {
   }, []);
 
   useEffect(() => {
-    setURL('application_seen');
+    setURL("application_seen");
   }, []);
 
   useEffect(() => {
-    const currentMess = message.split('/')[0];
+    const currentMess = message.split("/")[0];
     const currentID = message.match(/application_id=(\d+)/)?.[1];
 
     // Cập nhật trạng thái trong bộ nhớ
-    setApplicationStatus(prevStatus => ({
+    setApplicationStatus((prevStatus) => ({
       ...prevStatus,
-      [currentID]: currentMess === 'Recruiter has seen your application.'
+      [currentID]: currentMess === "Recruiter has seen your application.",
     }));
 
     // Cập nhật trạng thái trong cookie
     const existingStatus = Cookies.get("status_application");
     let statusArray = existingStatus ? JSON.parse(existingStatus) : [];
 
-    if (!statusArray.some(item => item.id === currentID)) {
+    if (!statusArray.some((item) => item.id === currentID)) {
       statusArray.push({ id: currentID, mess: currentMess });
       Cookies.set("status_application", JSON.stringify(statusArray), {
         expires: 7,
-        path: "/"
+        path: "/",
       });
     }
 
@@ -58,7 +58,6 @@ const ApplicationStatus = () => {
   const listStatus = Cookies.get("status_application");
 
   const fetchApplications = async () => {
-
     const apiURL =
       process.env.REACT_APP_API_URL + "/job/get_list_application_candidate/";
     const accessToken = Cookies.get("access_token");
@@ -191,16 +190,17 @@ const ApplicationStatus = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <ScheduleIcon className="text-blueColor mr-2" />
-                    <span className="text-gray-700">
-                      Urgent: {app.is_urgent ? "Yes" : "No"}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center md:justify-self-center" style={{transform: 'translateX(-115px)'}}>
                     <ApartmentIcon className="text-blueColor mr-2" />
                     <span className="text-gray-700">
-                      Status: {applicationStatus[app.id] ? "Đã xem" : (listStatus && JSON.parse(listStatus).some(item => item.id === app.id.toString()) ? "Đã xem" : "Chưa xem")}
+                      Status:{" "}
+                      {applicationStatus[app.id]
+                        ? "Viewed"
+                        : listStatus &&
+                          JSON.parse(listStatus).some(
+                            (item) => item.id === app.id.toString()
+                          )
+                        ? "Viewed"
+                        : "Not Viewed"}
                     </span>
                   </div>
 
