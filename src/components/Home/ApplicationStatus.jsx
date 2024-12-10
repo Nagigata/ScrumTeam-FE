@@ -34,7 +34,6 @@ const ApplicationStatus = () => {
     const currentMess = message.split("/")[0];
     const currentID = message.match(/application_id=(\d+)/)?.[1];
 
-    // Cập nhật trạng thái trong bộ nhớ
     setApplicationStatus((prevStatus) => ({
       ...prevStatus,
       [currentID]: currentMess === "Recruiter has seen your application.",
@@ -214,6 +213,16 @@ const ApplicationStatus = () => {
                       >
                         View CV
                       </a>
+                    </div>
+                  )}
+
+                  {app.status === "Accepted" && (
+                    <div className="col-span-full bg-green-100 p-4 rounded-md flex items-center">
+                      <ScheduleIcon className="text-green-600 mr-2" />
+                      <span className="text-green-700">
+                        Congratulations! Please check your email for the
+                        interview schedule details.
+                      </span>
                     </div>
                   )}
                 </div>
