@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Cookies from "js-cookie";
@@ -10,12 +10,18 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useSocket } from "../../contextAPI/SocketProvider";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 
-const NavBar = () => { 
+const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [count, setCount] = useState(0);
   const { message, setURL } = useSocket();
+
+  const location = useLocation();
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
 
   const accessToken = Cookies.get("access_token");
   const navigate = useNavigate();
@@ -27,24 +33,24 @@ const NavBar = () => {
   });
 
   useEffect(() => {
-    setURL('application_seen');
+    setURL("application_seen");
   }, []);
 
   useEffect(() => {
-    const currentMess = message.split('/')[0];
+    const currentMess = message.split("/")[0];
     const currentID = message.match(/application_id=(\d+)/)?.[1];
-    
+
     // setNewMess(currentMess);
     // setNewID(currentID);
 
     const existingStatus = Cookies.get("status_application");
     let statusArray = existingStatus ? JSON.parse(existingStatus) : [];
 
-    if (!statusArray.some(item => item.id === currentID)) {
+    if (!statusArray.some((item) => item.id === currentID)) {
       statusArray.push({ id: currentID, mess: currentMess });
       Cookies.set("status_application", JSON.stringify(statusArray), {
         expires: 7,
-        path: "/"
+        path: "/",
       });
     }
 
@@ -126,18 +132,18 @@ const NavBar = () => {
         <h1 className="logo text-[25px] text-blueColor">
           <strong>Dev</strong>Hunt
         </h1>
-      </div> 
-      
+      </div>
 
       <div className="menu flex gap-8 items-center">
-        <li className="navBarLi">
+        <li className={`navBarLi ${isActive("/") ? "active" : ""}`}>
           <Link to="/">Home</Link>
         </li>
-        <li className="navBarLi">Jobs</li>
-        <li className="navBarLi">
+        <li className={`navBarLi ${isActive("/jobs") ? "active" : ""}`}>
+          <Link to="/jobs">Jobs</Link>
+        </li>
+        <li className={`navBarLi ${isActive("/companies") ? "active" : ""}`}>
           <Link to="/companies">Companies</Link>
         </li>
-      
 
         {accessToken ? (
           <>
@@ -202,16 +208,16 @@ const NavBar = () => {
           </>
         ) : (
           <>
-            <li className="navBarLi">
+            <li className={`navBarLi ${isActive("/login") ? "active" : ""}`}>
               <Link to="/login">Login</Link>
             </li>
-            <li className="navBarLi">
+            <li className={`navBarLi ${isActive("/register") ? "active" : ""}`}>
               <Link to="/register">Register</Link>
             </li>
           </>
         )}
-        </div>
       </div>
+    </div>
   );
 };
 

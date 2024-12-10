@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import Search from "../../components/Home/Search";
 import Value from "../../components/Home/Value";
 import { useNavigate } from "react-router-dom";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import WorkIcon from '@mui/icons-material/Work';
-import PaidIcon from '@mui/icons-material/Paid';
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import WorkIcon from "@mui/icons-material/Work";
+import PaidIcon from "@mui/icons-material/Paid";
 
 const Home = () => {
   const [keyword, setKeyword] = useState("");
@@ -22,7 +22,7 @@ const Home = () => {
   const [filterOptions, setFilterOptions] = useState({
     locations: [],
     salaryRanges: [],
-    skills: []
+    skills: [],
   });
 
   const handleSearch = (keyword) => {
@@ -77,7 +77,7 @@ const Home = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        //console.log("API Response 1:", data); // Log dữ liệu API để kiểm tra
+        // console.log("API Response 1:", data); // Log dữ liệu API để kiểm tra
         setSearchResults(Array.isArray(data.results) ? data.results : []);
       } else {
         console.error("Failed to fetch jobs");
@@ -92,7 +92,9 @@ const Home = () => {
   // Thêm function để fetch top jobs
   const fetchTopJobs = async () => {
     try {
-      const response = await fetch('http://cnpm.duytech.site/api/job/top_outstanding_jobs/');
+      const response = await fetch(
+        "http://cnpm.duytech.site/api/job/top_outstanding_jobs/"
+      );
       if (response.ok) {
         const data = await response.json();
         setTopJobs(Array.isArray(data) ? data : []);
@@ -109,7 +111,9 @@ const Home = () => {
   // Thêm function để fetch top new jobs
   const fetchTopNewJobs = async () => {
     try {
-      const response = await fetch('http://cnpm.duytech.site/api/job/top_new_jobs/');
+      const response = await fetch(
+        "http://cnpm.duytech.site/api/job/top_new_jobs/"
+      );
       if (response.ok) {
         const data = await response.json();
         setTopNewJobs(Array.isArray(data) ? data : []);
@@ -126,7 +130,9 @@ const Home = () => {
   // Thêm function để fetch top companies
   const fetchTopCompanies = async () => {
     try {
-      const response = await fetch('http://cnpm.duytech.site/api/company/top_outstanding_companies/');
+      const response = await fetch(
+        "http://cnpm.duytech.site/api/company/top_outstanding_companies/"
+      );
       if (response.ok) {
         const data = await response.json();
         setTopCompanies(Array.isArray(data) ? data : []);
@@ -156,17 +162,17 @@ const Home = () => {
     try {
       // Chỉ cần fetch salary ranges và skills vì chúng ta không dùng locations nữa
       const [salaryRes, skillsRes] = await Promise.all([
-        fetch('http://cnpm.duytech.site/api/options/get_all_salary_ranges/'),
-        fetch('http://cnpm.duytech.site/api/options/get_all_skills/')
+        fetch("http://cnpm.duytech.site/api/options/get_all_salary_ranges/"),
+        fetch("http://cnpm.duytech.site/api/options/get_all_skills/"),
       ]);
 
       if (!salaryRes.ok || !skillsRes.ok) {
-        throw new Error('Failed to fetch filter options');
+        throw new Error("Failed to fetch filter options");
       }
 
       const [salaryRanges, skills] = await Promise.all([
         salaryRes.json(),
-        skillsRes.json()
+        skillsRes.json(),
       ]);
 
       console.log("Fetched skills:", skills); // Debug log
@@ -174,7 +180,7 @@ const Home = () => {
       setFilterOptions({
         salaryRanges,
         skills, // API trả về array of objects với {id, skill}
-        locations: [] // Giữ lại để tránh lỗi undefined
+        locations: [], // Giữ lại để tránh lỗi undefined
       });
     } catch (error) {
       console.error("Error fetching filter options:", error);
@@ -205,7 +211,7 @@ const Home = () => {
         selectedFilters={{
           location: locationKeyword,
           salary: sortValue,
-          skill: typeValue
+          skill: typeValue,
         }}
         showFilters={false}
       />
@@ -333,7 +339,10 @@ const JobCard = ({ job, onJobClick }) => {
       </div>
 
       {/* Apply Button */}
-      <button className="border-[2px] rounded-[10px] block p-[10px] w-full text-[14px] font-semibold text-textColor hover:bg-white group-hover/item:text-textColor group-hover:text-white mt-4">
+      <button
+        className="border-[2px] rounded-[10px] block p-[10px] w-full text-[14px] font-semibold
+       text-textColor hover:bg-white group-hover/item:text-textColor mt-4"
+      >
         Apply Now
       </button>
 
@@ -349,48 +358,49 @@ const JobCard = ({ job, onJobClick }) => {
 
 // Tạo component CompanyCard
 const CompanyCard = ({ company }) => {
+  const navigate = useNavigate();
+
+  const handleCompanyClick = (company) => {
+    navigate(`/company/${company.id}`);
+  };
+
   return (
-    <div className="group w-[300px] h-[320px] p-[20px] bg-white rounded-[10px] hover:bg-blueColor shadow-lg shadow-greyIsh-400/700 hover:shadow-lg transition-all duration-300 flex flex-col">
-      {/* Company Logo */}
-      <div className="flex justify-center mb-4">
-        {company.avatar ? (
-          <img
-            src={company.avatar}
-            alt={`${company.name} Logo`}
-            className="w-[100px] h-[100px] rounded-full object-cover border-4 border-[#e6f9f3] group-hover:border-white"
-          />
-        ) : (
-          <div className="w-[100px] h-[100px] bg-gray-200 rounded-full flex items-center justify-center">
-            <span className="text-4xl font-bold text-gray-400">
-              {company.name.charAt(0).toUpperCase()}
-            </span>
-          </div>
-        )}
+    <div
+      key={company.id}
+      className="group group/item singleCompany w-[320px] h-[320px] p-[20px] bg-white rounded-[10px] hover:bg-blueColor shadow-lg shadow-greyIsh-400/700 hover:shadow-lg cursor-pointer transition-all duration-300 flex flex-col"
+      onClick={() => handleCompanyClick(company)}
+    >
+      <div className="flex items-center gap-4 mb-4">
+        <img
+          src={company.avatar || "/assets/default-company.png"}
+          alt="Company Logo"
+          className="w-16 h-16 object-cover rounded-full border-2 border-gray-100"
+          onError={(e) => {
+            e.target.src = "/assets/default-company.png";
+          }}
+        />
+        <h1 className="text-lg font-semibold text-textColor group-hover:text-white line-clamp-2">
+          {company.name}
+        </h1>
       </div>
 
-      {/* Company Info Container */}
-      <div className="flex flex-col flex-1">
-        {/* Company Name */}
-        <div className="text-center mb-2">
-          <h3 className="text-[18px] font-bold text-textColor group-hover:text-white truncate px-2">
-            {company.name}
-          </h3>
-        </div>
+      <p
+        className="text-[13px] text-[#959595] pt-[20px] border-t-[2px] mt-[20px]
+         group-hover:text-white line-clamp-4"
+      >
+        {company.description || "No description available"}
+      </p>
 
-        {/* Company Description - với chiều cao cố định và xử lý overflow */}
-        <div className="text-center mb-4 flex-1 overflow-hidden max-h-[100px]">
-          <p className="text-[14px] text-[#959595] group-hover:text-white line-clamp-4 px-2">
-            {company.description || "No description available"}
-          </p>
-        </div>
-
-        {/* View Profile Button - Fixed at bottom */}
-        <div className="mt-auto">
-          <button className="w-full py-2 px-4 rounded-lg border-2 border-[#959595] text-[#959595] group-hover:border-white group-hover:text-white transition-all duration-300 text-[14px] font-semibold hover:bg-white hover:text-blueColor">
-            View Profile
-          </button>
-        </div>
-      </div>
+      <button
+        className="border-[2px] rounded-[10px] block p-[10px] w-full text-[14px] font-semibold
+         text-textColor hover:bg-white group-hover/item:text-textColor group-hover:text-textColor mt-auto"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCompanyClick(company);
+        }}
+      >
+        View Company
+      </button>
     </div>
   );
 };

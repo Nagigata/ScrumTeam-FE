@@ -35,7 +35,7 @@ const SearchCompany = ({ onSearch }) => {
           <input
             type="text"
             className="w-full py-3 px-2 focus:outline-none text-gray-600 placeholder-gray-400"
-            placeholder="Enter Company Keyword"
+            placeholder="Enter Company Name..."
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
