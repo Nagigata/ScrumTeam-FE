@@ -114,7 +114,6 @@ const ApplicationStatus = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = applications.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(applications.length / itemsPerPage);
 
   const handleNextPage = () => {
@@ -161,7 +160,7 @@ const ApplicationStatus = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl font-semibold text-gray-900">
-                        Application #{app.id}
+                        Application
                       </h2>
                       <p className="text-gray-600">{app.candidate.full_name}</p>
                     </div>

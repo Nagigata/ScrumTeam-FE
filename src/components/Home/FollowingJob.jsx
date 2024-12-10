@@ -52,7 +52,6 @@ const FollowingJob = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = followedJobs.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(followedJobs.length / itemsPerPage);
 
   const handleNextPage = () => {
@@ -133,7 +132,7 @@ const FollowingJob = () => {
                       <h2 className="text-2xl font-semibold text-gray-900">
                         {job.job_title}
                       </h2>
-                      <p className="text-gray-600">Job ID: {job.job_id}</p>
+                      <p className="text-gray-600">Job Company: {job.company}</p>
                     </div>
                   </div>
                 </div>

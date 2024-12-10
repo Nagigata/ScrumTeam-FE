@@ -98,19 +98,19 @@ const CompanyDetail = () => {
 
   return (
     <div className="p-10 bg-gray-100 min-h-screen">
+      {/* Back Button */}
+      <div className="pb-5">
+        <button
+          onClick={handleGoBack}
+          className="flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
+        >
+          <ChevronLeftIcon className="w-5 h-5 mr-2" />
+          Back
+        </button>
+      </div>
       <div className="grid grid-cols-3 gap-6">
         {/* Left Column - Company Info & Jobs */}
         <div className="col-span-2">
-          {/* Back Button */}
-          <div className="pb-5">
-            <button
-              onClick={handleGoBack}
-              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
-            >
-              <ChevronLeftIcon className="w-5 h-5 mr-2" />
-              Back
-            </button>
-          </div>
           <div className="bg-white rounded-lg shadow-lg mb-6">
             {/* Company Header */}
             <div className="p-6">
