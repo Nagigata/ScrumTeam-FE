@@ -12,6 +12,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Radio,
+  RadioGroup,
+  FormLabel,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
@@ -20,6 +26,7 @@ import Header from "./Header";
 import Cookies from "js-cookie";
 import { tokens } from "../../theme";
 import EditIcon from "@mui/icons-material/Edit";
+import { CheckBox } from "@mui/icons-material";
 
 const jobSchema = yup.object().shape({
   date_interview: yup
@@ -51,7 +58,7 @@ const jobSchema = yup.object().shape({
   note: yup.string().required("Required"),
 });
 
-const ApplicationApproved = ({ open, onClose, idCandidate, onInterviewScheduled  }) => {
+const ApplicationApproved = ({ open, onClose, idCandidate, onInterviewScheduled, jobID  }) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -73,10 +80,13 @@ const ApplicationApproved = ({ open, onClose, idCandidate, onInterviewScheduled 
 
     const formattedValues = {
       candidate_id: idCandidate,
+      job_id: jobID,
+      interview_type: values.interview_type,
       date_interview: formatDate(values.date_interview),
       time_interview: values.time_interview,
       address: values.address,
       note: values.note,
+      duration: 120,
     };
 
     console.log("Formatted values:", formattedValues);
@@ -144,6 +154,7 @@ const ApplicationApproved = ({ open, onClose, idCandidate, onInterviewScheduled 
             time_interview: "",
             address: "",
             note: "",
+            interview_type: ''
           }}
           validationSchema={jobSchema}
         >
@@ -210,6 +221,32 @@ const ApplicationApproved = ({ open, onClose, idCandidate, onInterviewScheduled 
                   helperText={touched.address && errors.address}
                   sx={{ bgcolor: colors.primary[400] }}
                 />
+
+                <FormControl
+                  component="fieldset"
+                  error={touched.interview_type && Boolean(errors.interview_type)}
+                >
+                  <FormLabel component="legend">Interview Type</FormLabel>
+                  <RadioGroup
+                    name="interview_type"
+                    value={values.interview_type}
+                    onChange={handleChange}
+                  >
+                    <FormControlLabel
+                      value="Online"
+                      control={<Radio />}
+                      label="Online"
+                    />
+                    <FormControlLabel
+                      value="Offline"
+                      control={<Radio />}
+                      label="Offline"
+                    />
+                  </RadioGroup>
+                  {touched.interview_type && errors.interview_type && (
+                    <FormHelperText>{errors.interview_type}</FormHelperText>
+                  )}
+                </FormControl>
 
                 {/* Note */}
                 <Field

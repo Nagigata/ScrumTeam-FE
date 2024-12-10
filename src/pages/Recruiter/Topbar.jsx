@@ -83,7 +83,7 @@ const Topbar = () => {
     // Reset số lượng thông báo chưa đọc khi mở menu
     setCount(0);
     // Xóa hết thông báo trong cookies
-    // Cookies.remove("list_message");
+    Cookies.remove("list_message");
 
   };
 

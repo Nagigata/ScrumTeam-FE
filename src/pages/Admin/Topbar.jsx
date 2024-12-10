@@ -26,33 +26,40 @@ const Topbar = () => {
   const open = Boolean(anchorEl);
   const openNotifications = Boolean(notificationAnchorEl);
   const [count, setCount] = useState(0);
-  const { message } = useSocket();
+  const { message, setURL } = useSocket();
   const accessToken = Cookies.get("access_token");
+
+  useEffect(() => {
+    setURL('new_application')
+  }, []);
 
   const [listMessage, setListMessage] = useState(() => {
     const savedMessages = Cookies.get("list_message");
     console.log(">>> ", savedMessages);
-    return savedMessages ? JSON.parse(savedMessages) : [];
+    return savedMessages ? JSON.parse(savedMessages).reverse() : [];  // Đảo ngược thông báo khi lấy từ cookies
   });
 
   useEffect(() => {
     if (message && message !== "You are connected to Websocket") {
       setCount((prev) => prev + 1);
-
+  
       setListMessage((prev) => {
-        const newList = [...prev, message];
-
+        // Thêm thông báo mới vào đầu mảng
+        const newList = [message, ...prev];
+  
+        // Lưu danh sách thông báo vào cookies
         const storedMessages = Cookies.get("list_message");
         const parsedMessages = storedMessages ? JSON.parse(storedMessages) : [];
-
         if (JSON.stringify(parsedMessages) !== JSON.stringify(newList)) {
-          Cookies.set("list_message", JSON.stringify(newList));
+          Cookies.set("list_message", JSON.stringify(newList));  // Lưu lại thông báo mới nhất
         }
-
+  
         return newList;
       });
+      console.log("CHECK: ", message);
     }
-  }, [message]);
+  }, [message]);  
+  
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -67,23 +74,22 @@ const Topbar = () => {
     Cookies.remove("access_token");
     Cookies.remove("refresh_token");
     handleClose();
-    window.location.href = "/";
+    window.location.reload();
   };
 
   const handleNotificationClick = (event) => {
     setNotificationAnchorEl(event.currentTarget);
+
+    // Reset số lượng thông báo chưa đọc khi mở menu
+    setCount(0);
+    // Xóa hết thông báo trong cookies
+    Cookies.remove("list_message");
+
   };
 
   const handleNotificationClose = () => {
     setNotificationAnchorEl(null);
   };
-
-  // Example notifications
-  const notifications = [
-    "Thông báo 1: Bạn có một tin nhắn mới.",
-    "Thông báo 2: Hẹn gặp bạn lúc 3 giờ chiều.",
-    "Thông báo 3: Bạn đã được mời tham gia sự kiện.",
-  ];
 
   return (
     <Box
@@ -160,16 +166,27 @@ const Topbar = () => {
                   variant="h6"
                   sx={{ padding: 1, fontWeight: "bold" }}
                 >
-                  Thông báo
+                  Notification
                 </Typography>
                 <Divider />
                 {listMessage.length > 0 ? (
                   <>
-                    {listMessage.map((notification, index) => (
+                  {listMessage.map((notification, index) => {
+                    // Tách chuỗi thời gian từ notification
+                    const rawTime = notification.substring(notification.lastIndexOf("/time:") + 6); // Bỏ "/time:" ra
+                    // Tách ngày giờ từ rawTime
+                    const [date, time] = rawTime.split(" "); // Phân tách "2024-12-10" và "18:17:51"
+                    const [year, month, day] = date.split("-"); // Tách "2024", "12", "10"
+                    const [hour, minute] = time.split(":"); // Tách "18", "17"
+
+                    // Định dạng thời gian theo 12/10/2024 18:17
+                    const formattedTime = `${month}/${day}/${year} ${hour}:${minute}`;
+
+                    return (
                       <MenuItem
                         key={index}
                         onClick={handleNotificationClose}
-                        sx={{ padding: 2 }} //khoảng cách giữa các thông báo
+                        sx={{ padding: 2 }} // Khoảng cách giữa các thông báo
                       >
                         <Typography
                           sx={{
@@ -179,10 +196,14 @@ const Topbar = () => {
                             fontSize: "0.9rem",
                           }}
                         >
-                          {notification}
+                          {notification.split("/")[0]}
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formattedTime}
+                          </p>
                         </Typography>
                       </MenuItem>
-                    ))}
+                    );
+                  })}
                   </>
                 ) : (
                   <>
