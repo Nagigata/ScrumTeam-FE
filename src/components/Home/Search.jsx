@@ -4,7 +4,7 @@ import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
-import provinces from '../../provinces.json';
+import provinces from "../../provinces.json";
 
 const Search = ({
   onSearch,
@@ -30,15 +30,11 @@ const Search = ({
 
   const searchTypeOptions = [
     { value: "jobs", label: "Search Jobs" },
-    { value: "companies", label: "Search Companies" }
+    { value: "companies", label: "Search Companies" },
   ];
 
   // Định nghĩa locations cố định
-  const predefinedLocations = [
-    { id: "", name: "All Location" },
-    ...provinces
-  ];
-  
+  const predefinedLocations = [{ id: "", name: "All Location" }, ...provinces];
 
   // Fetch salary ranges when component mounts
   useEffect(() => {
@@ -61,11 +57,12 @@ const Search = ({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (isHomePage) {
-      navigate("/jobs", {
+      const targetPath = searchType === "jobs" ? "/jobs" : "/companies";
+      navigate(targetPath, {
         state: {
           searchKeyword,
           searchType,
@@ -97,7 +94,11 @@ const Search = ({
             <input
               type="text"
               className="w-full py-3 px-2 focus:outline-none text-gray-600 placeholder-gray-400"
-              placeholder={searchType === "jobs" ? "Search Jobs Here..." : "Enter Company Name..."}
+              placeholder={
+                searchType === "jobs"
+                  ? "Search Jobs Here..."
+                  : "Enter Company Name..."
+              }
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
             />
@@ -115,7 +116,10 @@ const Search = ({
                 <select
                   className="w-full h-full px-4 focus:outline-none text-gray-600 bg-transparent cursor-pointer"
                   value={searchType}
-                  onChange={(e) => setSearchType(e.target.value)}
+                  onChange={(e) => {
+                    setSearchType(e.target.value);
+                   
+                  }}
                 >
                   {searchTypeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -134,7 +138,7 @@ const Search = ({
             </>
           )}
 
-         {showFilters && (
+          {showFilters && (
             <button
               type="submit"
               className="px-8 bg-blueColor text-white font-medium rounded-r-[8px] hover:bg-[#535ac8] transition-colors shadow-lg shadow-greyIsh-700"
@@ -193,7 +197,10 @@ const Search = ({
             >
               <option value="">All Skills</option>
               {filterOptions.skills?.map((skillItem) => (
-                <option key={skillItem.id} value={skillItem.skill.toLowerCase()}>
+                <option
+                  key={skillItem.id}
+                  value={skillItem.skill.toLowerCase()}
+                >
                   {skillItem.skill}
                 </option>
               ))}

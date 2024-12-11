@@ -4,15 +4,30 @@ import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 
 const SearchCompany = ({ onSearch }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [location, setLocation] = useState("All"); 
+  const [location, setLocation] = useState("All");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Searching for: ${searchKeyword} in ${location}`);
+
+    const apiURL = process.env.REACT_APP_API_URL;
+    try {
+      const response = await fetch(
+        `${apiURL}/company/list_company/?name=${searchKeyword}&page=1`
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to search for the company");
+      }
+
+      const data = await response.json();
+      onSearch(data);
+    } catch (error) {
+      console.error("Error while searching:", error);
+    }
   };
 
   const locationOptions = [
-    "All", 
+    "All",
     "Hanoi",
     "Ho Chi Minh City",
     "Da Nang",
@@ -23,6 +38,7 @@ const SearchCompany = ({ onSearch }) => {
   const handleClearSearch = () => {
     setSearchKeyword("");
     setLocation("All");
+    onSearch(null);
   };
 
   return (
@@ -47,7 +63,7 @@ const SearchCompany = ({ onSearch }) => {
           )}
         </div>
 
-        <div className="w-48 border-y border-gray-300 bg-white shadow-lg shadow-greyIsh-700">
+        {/* <div className="w-48 border-y border-gray-300 bg-white shadow-lg shadow-greyIsh-700">
           <select
             className="w-full h-full px-4 focus:outline-none text-gray-600 bg-transparent cursor-pointer"
             value={location}
@@ -59,7 +75,7 @@ const SearchCompany = ({ onSearch }) => {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         <button
           type="submit"
