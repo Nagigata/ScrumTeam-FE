@@ -6,19 +6,20 @@ import Cookies from "js-cookie";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import WorkIcon from "@mui/icons-material/Work";
 import PaidIcon from "@mui/icons-material/Paid";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 // Thêm styles cho modal overlay
 const modalOverlayStyle = {
-  position: 'fixed',
+  position: "fixed",
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  zIndex: 1000
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
 };
 
 const JobDetail = () => {
@@ -33,16 +34,18 @@ const JobDetail = () => {
   const [isFollowed, setIsFollowed] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
 
   const fetchJobDetail = async () => {
     try {
+      console.log(id);
       setIsLoading(true);
       const response = await fetch(
         `http://cnpm.duytech.site/api/job/detail-job/?job_id=${id}`
       );
-      
+
       if (!response.ok) {
-        throw new Error('Failed to fetch job details');
+        throw new Error("Failed to fetch job details");
       }
 
       const data = await response.json();
@@ -66,6 +69,7 @@ const JobDetail = () => {
     if (job) {
       checkFollowStatus();
       checkAppliedStatus();
+      checkExpiration();
     }
   }, [job]);
 
@@ -103,7 +107,9 @@ const JobDetail = () => {
       if (response.ok) {
         const data = await response.json();
         // Kiểm tra xem job hiện tại có trong danh sách followed jobs không
-        const isJobFollowed = data.some(followedJob => followedJob.job_id === job.id);
+        const isJobFollowed = data.some(
+          (followedJob) => followedJob.job_id === job.id
+        );
         setIsFollowed(isJobFollowed);
         console.log("Follow status:", isJobFollowed);
       } else {
@@ -184,7 +190,7 @@ const JobDetail = () => {
     await Promise.all([
       fetchJobDetail(),
       checkAppliedStatus(),
-      checkFollowStatus()
+      checkFollowStatus(),
     ]);
   };
 
@@ -194,14 +200,24 @@ const JobDetail = () => {
     await refreshJobData(); // Refresh toàn bộ dữ liệu
   };
 
+  const checkExpiration = () => {
+    if (job) {
+      const expirationDate = new Date(job.expired_at);
+      const currentDate = new Date();
+      setIsExpired(currentDate > expirationDate);
+    }
+  };
+
   return (
     <>
       <div className="jobDetailContainer p-10 bg-gray-100">
         <button
           onClick={() => navigate(-1)}
-          className="mb-4 text-blue-500 hover:underline"
+          className="flex items-center pb-5 text-blue-600 hover:text-blue-800 
+          transition-colors duration-200"
         >
-          Quay lại
+          <ChevronLeftIcon className="w-5 h-5 mr-2" />
+          Back
         </button>
 
         <div className="grid grid-cols-3 gap-6">
@@ -211,7 +227,9 @@ const JobDetail = () => {
               {/* Job Header */}
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-blue-900">{job.title}</h1>
+                  <h1 className="text-3xl font-bold text-blue-900">
+                    {job.title}
+                  </h1>
                   <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">
                     {job.job_type}
                   </span>
@@ -230,12 +248,16 @@ const JobDetail = () => {
               {/* Job Description */}
               <div className="mt-6">
                 <h2 className="text-xl font-semibold mb-4">Job Description</h2>
-                <p className="text-gray-700 whitespace-pre-line">{job.description}</p>
+                <p className="text-gray-700 whitespace-pre-line">
+                  {job.description}
+                </p>
               </div>
 
               {/* Role & Responsibilities */}
               <div className="mt-6">
-                <h2 className="text-xl font-semibold mb-4">Role & Responsibilities</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Role & Responsibilities
+                </h2>
                 <p className="text-gray-700 whitespace-pre-line">
                   {job.role_and_responsibilities}
                 </p>
@@ -243,10 +265,10 @@ const JobDetail = () => {
 
               {/* Interview Process */}
               <div className="mt-6">
-                <h2 className="text-xl font-semibold mb-4">Interview Process</h2>
-                <p className="text-gray-700">
-                  {job.interview_process}
-                </p>
+                <h2 className="text-xl font-semibold mb-4">
+                  Interview Process
+                </h2>
+                <p className="text-gray-700">{job.interview_process}</p>
               </div>
             </div>
           </div>
@@ -295,7 +317,7 @@ const JobDetail = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
               <h3 className="text-lg font-semibold mb-4">Required Skills</h3>
               <div className="flex flex-wrap gap-2">
-                {job.skill_required.split(',').map((skill, index) => (
+                {job.skill_required.split(",").map((skill, index) => (
                   <span
                     key={index}
                     className="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg"
@@ -310,21 +332,37 @@ const JobDetail = () => {
             <div className="mt-6 flex items-center gap-4">
               <button
                 onClick={handleOpenUploadModal}
-                disabled={isApplied}
+                disabled={
+                  isApplied || isExpired || !Cookies.get("access_token")
+                }
                 className={`flex-1 py-3 px-6 rounded-lg transition-colors ${
-                  isApplied 
-                    ? "bg-gray-400 cursor-not-allowed" 
+                  isApplied
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : isExpired
+                    ? "bg-red-400 cursor-not-allowed"
+                    : !Cookies.get("access_token")
+                    ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
                 } text-white`}
               >
-                {isApplied ? "Applied" : "Apply Now"}
+                {isApplied
+                  ? "Applied"
+                  : isExpired
+                  ? "Expired"
+                  : !Cookies.get("access_token")
+                  ? "Login required"
+                  : "Apply Now"}
               </button>
               <button
                 onClick={handleFollowToggle}
                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <img
-                  src={isFollowed ? "/assets/follow_on.png" : "/assets/follow_off.png"}
+                  src={
+                    isFollowed
+                      ? "/assets/follow_on.png"
+                      : "/assets/follow_off.png"
+                  }
                   alt="Follow Icon"
                   className="w-6 h-6"
                 />
@@ -333,18 +371,19 @@ const JobDetail = () => {
 
             {/* Expiration Date */}
             <div className="mt-4 text-center text-gray-500 text-sm">
-              Application deadline: {new Date(job.expired_at).toLocaleDateString()}
+              Application deadline:{" "}
+              {new Date(job.expired_at).toLocaleDateString()}
             </div>
           </div>
         </div>
       </div>
 
       {/* CV Upload Modal - Move outside main container */}
-      {showUploadModal && !isApplied && (
+      {showUploadModal && !isApplied && !isExpired && (
         <div style={modalOverlayStyle}>
           <div className="bg-white rounded-lg shadow-xl p-6 w-[500px] relative">
-            <CVUploadForm 
-              onClose={handleCloseUploadModal} 
+            <CVUploadForm
+              onClose={handleCloseUploadModal}
               jobId={job.id}
               onSuccess={handleApplySuccess}
             />

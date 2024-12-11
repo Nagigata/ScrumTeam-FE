@@ -82,7 +82,7 @@ const Footer = () => {
           </span>
           <div>
             <small className="text-[14px] text-white">
-              devhunt2k3@gmail.com
+              devhunt@gmail.com
             </small>
             <div className="icons flex gap-5 py-[2rem]">
               <FacebookOutlinedIcon

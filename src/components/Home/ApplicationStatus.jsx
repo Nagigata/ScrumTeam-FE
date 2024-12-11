@@ -34,7 +34,6 @@ const ApplicationStatus = () => {
     const currentMess = message.split("/")[0];
     const currentID = message.match(/application_id=(\d+)/)?.[1];
 
-    // Cập nhật trạng thái trong bộ nhớ
     setApplicationStatus((prevStatus) => ({
       ...prevStatus,
       [currentID]: currentMess === "Recruiter has seen your application.",
@@ -114,7 +113,6 @@ const ApplicationStatus = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = applications.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(applications.length / itemsPerPage);
 
   const handleNextPage = () => {
@@ -161,7 +159,7 @@ const ApplicationStatus = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl font-semibold text-gray-900">
-                        Application #{app.id}
+                        Application
                       </h2>
                       <p className="text-gray-600">{app.candidate.full_name}</p>
                     </div>
@@ -215,6 +213,16 @@ const ApplicationStatus = () => {
                       >
                         View CV
                       </a>
+                    </div>
+                  )}
+
+                  {app.status === "Accepted" && (
+                    <div className="col-span-full bg-green-100 p-4 rounded-md flex items-center">
+                      <ScheduleIcon className="text-green-600 mr-2" />
+                      <span className="text-green-700">
+                        Congratulations! Please check your email for the
+                        interview schedule details.
+                      </span>
                     </div>
                   )}
                 </div>

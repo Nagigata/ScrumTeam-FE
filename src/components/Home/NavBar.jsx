@@ -1,59 +1,49 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import Cookies from "js-cookie";
-import { Badge, IconButton } from "@mui/material";
-import NotificationDropdown from "./NotificationDropdown"; // Đảm bảo đường dẫn đúng
-import { Avatar } from "@mui/material";
+import { Badge, IconButton, Avatar } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useSocket } from "../../contextAPI/SocketProvider";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import NotificationDropdown from "./NotificationDropdown"; // Đảm bảo đường dẫn đúng
 
-const NavBar = () => { 
+const NavBar = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [count, setCount] = useState(0);
   const { message, setURL } = useSocket();
-
-  const accessToken = Cookies.get("access_token");
+  const location = useLocation();
   const navigate = useNavigate();
+  const accessToken = Cookies.get("access_token");
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
 
   const [listMessage, setListMessage] = useState(() => {
     const savedMessages = Cookies.get("list_message");
-    // console.log(">>> ", savedMessages);
     return savedMessages ? JSON.parse(savedMessages) : [];
   });
 
   useEffect(() => {
-    setURL('application_seen');
+    setURL("application_seen");
   }, []);
 
   useEffect(() => {
-    const currentMess = message.split('/')[0];
+    const currentMess = message.split("/")[0];
     const currentID = message.match(/application_id=(\d+)/)?.[1];
-    
-    // setNewMess(currentMess);
-    // setNewID(currentID);
-
     const existingStatus = Cookies.get("status_application");
     let statusArray = existingStatus ? JSON.parse(existingStatus) : [];
 
-    if (!statusArray.some(item => item.id === currentID)) {
+    if (!statusArray.some((item) => item.id === currentID)) {
       statusArray.push({ id: currentID, mess: currentMess });
       Cookies.set("status_application", JSON.stringify(statusArray), {
         expires: 7,
-        path: "/"
+        path: "/",
       });
     }
-
-    // setApplicationStatus(prevStatus => ({
-    //   ...prevStatus,
-    //   [currentID]: currentMess === 'Recruiter has seen your application.'
-    // }));
-
-    console.log("Check", existingStatus);
   }, [message]);
 
   useEffect(() => {
@@ -68,12 +58,14 @@ const NavBar = () => {
 
       setListMessage((prev) => {
         const newList = [...prev, message];
-
         const storedMessages = Cookies.get("list_message");
         const parsedMessages = storedMessages ? JSON.parse(storedMessages) : [];
 
         if (JSON.stringify(parsedMessages) !== JSON.stringify(newList)) {
-          Cookies.set("list_message", JSON.stringify(newList));
+          Cookies.set("list_message", JSON.stringify(newList), {
+            expires: 7,
+            path: "/",
+          });
         }
 
         return newList;
@@ -116,8 +108,12 @@ const NavBar = () => {
   };
 
   const handleClick = () => {
+    // Đặt lại số lượng thông báo khi nhấn vào icon
+    setCount(0);
+
+    // Toggle hiển thị dropdown thông báo
     setShowNotifications(!showNotifications);
-    console.log(count);
+    console.log(count); // In ra để kiểm tra số thông báo sau khi reset
   };
 
   return (
@@ -126,24 +122,24 @@ const NavBar = () => {
         <h1 className="logo text-[25px] text-blueColor">
           <strong>Dev</strong>Hunt
         </h1>
-      </div> 
-      
+      </div>
 
       <div className="menu flex gap-8 items-center">
-        <li className="navBarLi">
+        <li className={`navBarLi ${isActive("/") ? "active" : ""}`}>
           <Link to="/">Home</Link>
         </li>
-        <li className="navBarLi">Jobs</li>
-        <li className="navBarLi">
+        <li className={`navBarLi ${isActive("/jobs") ? "active" : ""}`}>
+          <Link to="/jobs">Jobs</Link>
+        </li>
+        <li className={`navBarLi ${isActive("/companies") ? "active" : ""}`}>
           <Link to="/companies">Companies</Link>
         </li>
-      
 
         {accessToken ? (
           <>
             <li className="navBarLi relative">
               <IconButton
-                onClick={() => handleClick()}
+                onClick={handleClick}
                 size="medium"
                 className="relative"
               >
@@ -202,16 +198,16 @@ const NavBar = () => {
           </>
         ) : (
           <>
-            <li className="navBarLi">
+            <li className={`navBarLi ${isActive("/login") ? "active" : ""}`}>
               <Link to="/login">Login</Link>
             </li>
-            <li className="navBarLi">
+            <li className={`navBarLi ${isActive("/register") ? "active" : ""}`}>
               <Link to="/register">Register</Link>
             </li>
           </>
         )}
-        </div>
       </div>
+    </div>
   );
 };
 

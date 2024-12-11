@@ -72,3 +72,11 @@ body,
 .navBarLi:hover::before {
   transform: scaleX(1);
 }
+
+.navBarLi.active {
+  color: #535ac8;
+}
+
+.navBarLi.active::before {
+  transform: scaleX(1);
+}

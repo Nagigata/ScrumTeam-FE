@@ -83,7 +83,10 @@ const Job = ({ searchResults, onJobClick }) => {
             </div>
 
             {/* Apply Button */}
-            <button className="border-[2px] rounded-[10px] block p-[10px] w-full text-[14px] font-semibold text-textColor hover:bg-white group-hover/item:text-textColor group-hover:text-white mt-4">
+            <button
+              className="border-[2px] rounded-[10px] block p-[10px] w-full text-[14px] font-semibold text-textColor 
+            hover:bg-white group-hover/item:text-textColor  mt-4"
+            >
               Apply Now
             </button>
 

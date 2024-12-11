@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import SearchCompany from "../../components/Home/SearchCompany";
 import Companies from "../../components/Home/Companies";
 import Value from "../../components/Home/Value";
 
@@ -12,7 +11,6 @@ const Home = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <SearchCompany />
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}

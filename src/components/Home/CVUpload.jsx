@@ -20,7 +20,7 @@ const validationSchema = Yup.object({
       ];
       return supportedFormats.includes(value.type);
     })
-    .test("fileSize", "File size must be less than 5MB", (value) => {
+    .test("fileSize", "File size must be less than 1MB", (value) => {
       if (!value) return false;
       return value.size <= 5 * 1024 * 1024;
     }),
@@ -103,7 +103,7 @@ const CVUploadForm = ({ onClose, jobId }) => {
           body: formData,
         }
       );
-
+      console.log(response.status);
       if (response.status === 201) {
         setStatus({ loading: false, error: null, success: true });
         setTimeout(() => {
@@ -122,7 +122,7 @@ const CVUploadForm = ({ onClose, jobId }) => {
     } catch (error) {
       setStatus({
         loading: false,
-        error: "Network error. Please check your connection.",
+        error: "File is too large. Maximum file size is 1MB.",
         success: false,
       });
     }
@@ -165,7 +165,7 @@ const CVUploadForm = ({ onClose, jobId }) => {
                     Upload CV from your computer, select or drag and drop
                   </p>
                   <p className="text-xs text-gray-500">
-                    Supports .doc, .docx, pdf files under 5MB
+                    Supports .doc, .docx, pdf files under 1MB
                   </p>
                   <input
                     type="file"

@@ -91,7 +91,7 @@ const ApplicationApproved = ({ open, onClose, idCandidate, onInterviewScheduled,
 
     console.log("Formatted values:", formattedValues);
 
-    const apiURL = "http://cnpm.duytech.site/api/job/add-interview-information/";
+    const apiURL = "http://cnpm.duytech.site/api/job/add_interview_information/";
     const accessToken = Cookies.get("access_token");
 
     try {

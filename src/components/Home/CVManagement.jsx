@@ -139,7 +139,7 @@ const CVManagement = () => {
         setStatus("error");
       }
     } catch (error) {
-      setMessage("Error connecting to server");
+      setMessage("File is too large. Maximum file size is 1MB.");
       setStatus("error");
     } finally {
       setIsUploading(false);
