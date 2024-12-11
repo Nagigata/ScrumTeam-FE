@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 const formatMessage = (message) => {
@@ -7,6 +8,7 @@ const formatMessage = (message) => {
 };
 
 const NotificationDropdown = ({ show, onMarkAsRead }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("all");
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -56,7 +58,11 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
 
   const matchNotifications = notifications.filter((notif) =>
     notif.message.includes("công việc mới phù hợp")
-  );
+  ); 
+
+  const handleClickShowDetail = (id) => {
+    navigate(`/job/${id}`);
+  }
 
   return (
     <div className="absolute top-full right-0 bg-white shadow-md rounded-md py-2 w-96 z-20">
@@ -112,6 +118,7 @@ const NotificationDropdown = ({ show, onMarkAsRead }) => {
                   <div
                     key={notif.id}
                     className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50"
+                    onClick={() => handleClickShowDetail(notif.message.split('/job_id=')[1].split('/')[0])}
                   >
                     <p className="text-sm text-gray-800">
                       {formatMessage(notif.message)}

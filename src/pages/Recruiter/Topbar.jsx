@@ -8,6 +8,7 @@ import {
   MenuItem,
   Divider,
 } from "@mui/material";
+import { useLostTeach } from '../../contextAPI/LostTeach';
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -20,6 +21,7 @@ const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+  const { setIdJob, setCheckClick } = useLostTeach();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
@@ -50,7 +52,7 @@ const Topbar = () => {
       setCount((prev) => prev + 1);
 
       setListMessage((prev) => {
-        const newList = [...prev, message.split('/')[0]];
+        const newList = [...prev, message];
         // const newList = [...prev, message.split('/')[1]]
 
         const storedMessages = Cookies.get("list_message");
@@ -61,6 +63,7 @@ const Topbar = () => {
 
         return newList;
       });
+      console.log("CHECK: ", message);
     }
   }, [message]);
 
@@ -94,6 +97,11 @@ const Topbar = () => {
     "Thông báo 2: Hẹn gặp bạn lúc 3 giờ chiều.",
     "Thông báo 3: Bạn đã được mời tham gia sự kiện.",
   ];
+
+  const handleClickShowDetail = (id) => {
+    setCheckClick(true);
+    setIdJob(id);
+  }
 
   return (
     <Box
@@ -175,27 +183,44 @@ const Topbar = () => {
                 <Divider />
                 {listMessage.length > 0 ? (
                   <>
-                    {listMessage.map((notification, index) => (
-                      <MenuItem
-                        key={index}
-                        onClick={handleNotificationClose}
-                        sx={{ padding: 2 }} //khoảng cách giữa các thông báo
-                      >
-                        <Typography
-                          sx={{
-                            whiteSpace: "normal",
-                            overflow: "visible",
-                            textOverflow: "clip",
-                            fontSize: "0.9rem",
-                          }}
+                    {listMessage.map((notification, index) => {
+                      // Tách chuỗi thời gian từ notification
+                      const rawTime = notification.substring(notification.lastIndexOf("/time:") + 6); // Bỏ "/time:" ra
+                      // Tách ngày giờ từ rawTime
+                      const [date, time] = rawTime.split(" "); // Phân tách "2024-12-10" và "18:17:51"
+                      const [year, month, day] = date.split("-"); // Tách "2024", "12", "10"
+                      const [hour, minute] = time.split(":"); // Tách "18", "17"
+
+                      // Chuyển đổi giờ sang định dạng 12 giờ
+                      const hour12 = (parseInt(hour) % 12) || 12; // Chuyển 0 thành 12
+                      const period = parseInt(hour) >= 12 ? "PM" : "AM"; // Xác định AM hoặc PM
+
+                      // Định dạng thời gian theo 12/10/2024 6:17 PM
+                      const formattedTime = `${month}/${day}/${year} ${hour12}:${minute} ${period}`;
+
+                      return (
+                        <MenuItem
+                          key={index}
+                          onClick={handleNotificationClose}
+                          sx={{ padding: 2 }} // Khoảng cách giữa các thông báo
                         >
-                          {notification}
-                          <p className="text-xs text-gray-500 mt-1">
-                            {new Date(notification.created_at).toLocaleString()}
-                          </p>
-                        </Typography>
-                      </MenuItem>
-                    ))}
+                          <Typography
+                            sx={{
+                              whiteSpace: "normal",
+                              overflow: "visible",
+                              textOverflow: "clip",
+                              fontSize: "0.9rem",
+                            }}
+                            onClick={() => handleClickShowDetail(notification.split('/job_id=')[1].split('/')[0])}
+                          >
+                            {notification.split("/")[0]}
+                            <p className="text-xs text-gray-500 mt-1">
+                              {formattedTime}
+                            </p>
+                          </Typography>
+                        </MenuItem>
+                      );
+                    })}
                   </>
                 ) : (
                   <>

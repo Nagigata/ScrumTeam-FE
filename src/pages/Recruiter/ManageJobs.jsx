@@ -23,10 +23,12 @@ import PaidIcon from "@mui/icons-material/Paid";
 import ReplayIcon from '@mui/icons-material/Replay';
 import { useNavigate } from "react-router-dom";
 import RepostJob from "../../components/Recruiter/RepostJob";
+import { useLostTeach } from "../../contextAPI/LostTeach";
 import ApplicationApproved from "../../components/Recruiter/ApplicationApproved";
 
 const ManageJobs = () => {
   const theme = useTheme();
+  const { checkClick, setCheckClick, idJob, setIdJob } = useLostTeach();
   const colors = tokens(theme.palette.mode);
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -203,6 +205,15 @@ const ManageJobs = () => {
     setJobID(id);
   };
 
+  useEffect(() => {
+    if(checkClick) {
+      setShowCandidate(true);
+      fetchCandidates(idJob);
+      setCheckClick(false);
+      setIdJob('');
+    }
+  }, [idJob, checkClick]);
+
   const handleOpenShowDetail = (data) => {
     setShowDetail(true);
     setDataDetail(data);
@@ -351,11 +362,29 @@ const ManageJobs = () => {
     setIsRepostDialogOpen(false);
   };
 
-  const handleRepostedJob = async (repostedJob) => {
-    // Add your repost API logic here
-    // Similar to handleUpdatedJob but with different endpoint
-  };
+  const fecthDataInterView = async () => {
+    const accessToken = Cookies.get("access_token");
 
+    const apiURL_interview = `${process.env.REACT_APP_API_URL}/job/get_list_interview_information/?job_id=${jobID}`;
+
+    try {
+      const res = await fetch(apiURL_interview, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+      } else {
+        console.log("Error");
+      }
+    } catch (error) {
+      setStatus({ error: "Network error. Please check your connection." });
+    }
+  }
+ 
   return (
     <>
       <Box m="20px" style={{ display: showCandidate ? "none" : "block" }}>

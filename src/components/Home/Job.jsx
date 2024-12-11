@@ -7,7 +7,7 @@ import PaidIcon from "@mui/icons-material/Paid";
 const Job = ({ searchResults, onJobClick }) => {
   return (
     <div className="jobContainer flex gap-10 justify-center flex-wrap items-center py-10">
-      {Array.isArray(searchResults) &&
+      {Array.isArray(searchResults) && 
         searchResults.map((job) => (
           <div
             key={job.id}
