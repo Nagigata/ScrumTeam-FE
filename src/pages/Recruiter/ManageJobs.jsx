@@ -24,6 +24,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import { useNavigate } from "react-router-dom";
 import RepostJob from "../../components/Recruiter/RepostJob";
 import ApplicationApproved from "../../components/Recruiter/ApplicationApproved";
+import { useLostTeach } from '../../contextAPI/LostTeach';
 
 const ManageJobs = () => {
   const theme = useTheme();
@@ -46,6 +47,16 @@ const ManageJobs = () => {
   const [submitType, setSubmitType] = useState(false);
   const [jobID, setJobID] = useState('');
   const navigate = useNavigate();
+  const { checkClick, setCheckClick, idJob, setIdJob } = useLostTeach();
+
+  useEffect(() => {
+    if(checkClick) {
+      setShowCandidate(true);
+      fetchCandidates(idJob);
+      setCheckClick(false);
+      setIdJob('');
+    }
+  }, [idJob, checkClick]);
 
   useEffect(() => {
     fetchJobs();

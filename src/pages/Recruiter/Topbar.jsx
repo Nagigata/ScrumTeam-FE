@@ -15,6 +15,7 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import Cookies from "js-cookie";
 import { useSocket } from "../../contextAPI/SocketProvider";
+import { useLostTeach } from '../../contextAPI/LostTeach';
 
 const Topbar = () => {
   const theme = useTheme();
@@ -28,6 +29,8 @@ const Topbar = () => {
   const [count, setCount] = useState(0);
   const { message, setURL } = useSocket();
   const accessToken = Cookies.get("access_token");
+
+  const { setIdJob, setCheckClick } = useLostTeach();
 
   useEffect(() => {
     setURL('new_application')
@@ -83,13 +86,18 @@ const Topbar = () => {
     // Reset số lượng thông báo chưa đọc khi mở menu
     setCount(0);
     // Xóa hết thông báo trong cookies
-    Cookies.remove("list_message");
+    // Cookies.remove("list_message");
 
   };
 
   const handleNotificationClose = () => {
     setNotificationAnchorEl(null);
   };
+
+  const handleClickShowDetail = (id) => {
+    setCheckClick(true);
+    setIdJob(id);
+  }
 
   return (
     <Box
@@ -195,6 +203,8 @@ const Topbar = () => {
                             textOverflow: "clip",
                             fontSize: "0.9rem",
                           }}
+
+                          onClick={() => handleClickShowDetail(notification.split('/job_id=')[1].split('/')[0])}
                         >
                           {notification.split("/")[0]}
                           <p className="text-xs text-gray-500 mt-1">

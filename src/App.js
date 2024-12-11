@@ -18,6 +18,7 @@ import Recruiter from "./AppRecruiter";
 import Admin from "./AppAdmin";
 import Cookies from "js-cookie";
 import { SocketProvider } from "./contextAPI/SocketProvider";
+import { LostTeachProvider } from "./contextAPI/LostTeach";
 
 function App() {
   const userRole = Cookies.get("userRole");
@@ -43,141 +44,143 @@ function App() {
   return (
     <div className="App">
       <SocketProvider>
-        <Routes>
-          <Route
-            path="/*"
-            element={
-              <MainLayout>
-                <Routes>
-                  <Route path="/login" element={<SignIn />} />
-                  <Route path="/register" element={<SignUp />} />
-                  <Route path="/jobs" element={<Jobs />} />
-                  <Route
-                    path="/job-detail/:id"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <JobDetail />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/job/:id"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <JobDetail />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/companies"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <Companies />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/company/:id"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <CompanyDetail />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/basic-profile"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <Candidate />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/advanced-profile"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <AdvancedProfile />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/cv-management"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <CVManagement />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/application-status"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <ApplicationStatus />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/cv-management"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <CVManagement />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/following-job"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/" />
-                      ) : (
-                        <FollowingJob />
-                      )
-                    }
-                  />
-                  <Route
-                    path="/"
-                    element={
-                      userRole === "recruiter" ? (
-                        <Navigate to="/recruiter" />
-                      ) : (
-                        <Home />
-                      )
-                    }
-                  />
-                </Routes>
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/recruiter/*"
-            element={
-              userRole === "recruiter" ? <Recruiter /> : <Navigate to="/" />
-            }
-          />
-          <Route
-            path="/admin/*"
-            // element={userRole === "admin" ? <Admin /> : <Navigate to="/" />}
-            element={<Admin />}
-          />
-        </Routes>
+        <LostTeachProvider>
+          <Routes>
+            <Route
+              path="/*"
+              element={
+                <MainLayout>
+                  <Routes>
+                    <Route path="/login" element={<SignIn />} />
+                    <Route path="/register" element={<SignUp />} />
+                    <Route path="/jobs" element={<Jobs />} />
+                    <Route
+                      path="/job-detail/:id"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <JobDetail />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/job/:id"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <JobDetail />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/companies"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <Companies />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/company/:id"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <CompanyDetail />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/basic-profile"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <Candidate />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/advanced-profile"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <AdvancedProfile />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/cv-management"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <CVManagement />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/application-status"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <ApplicationStatus />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/cv-management"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <CVManagement />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/following-job"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/" />
+                        ) : (
+                          <FollowingJob />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/"
+                      element={
+                        userRole === "recruiter" ? (
+                          <Navigate to="/recruiter" />
+                        ) : (
+                          <Home />
+                        )
+                      }
+                    />
+                  </Routes>
+                </MainLayout>
+              }
+            />
+            <Route
+              path="/recruiter/*"
+              element={
+                userRole === "recruiter" ? <Recruiter /> : <Navigate to="/" />
+              }
+            />
+            <Route
+              path="/admin/*"
+              // element={userRole === "admin" ? <Admin /> : <Navigate to="/" />}
+              element={<Admin />}
+            />
+          </Routes>
+        </LostTeachProvider>
       </SocketProvider>
     </div>
   );
